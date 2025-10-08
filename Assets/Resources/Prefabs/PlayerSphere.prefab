@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 5870355034393544537}
   - component: {fileID: 2842938716497040965}
   - component: {fileID: 6890620937536659426}
-  - component: {fileID: 1966317082821989556}
   m_Layer: 0
   m_Name: PlayerSphere
   m_TagString: Untagged
@@ -210,15 +209,3 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 0
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
---- !u!114 &1966317082821989556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5131049519844384821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f2ab2f8c5df906458c1b07015380da9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

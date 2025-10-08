@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 6096b0f0e8323a74dac90d503a0e1110
   - enabled: 1
-    path: Assets/Scenes/MapSelection.unity
+    path: Assets/Scenes/MapSelectionScene.unity
     guid: 2b9a1ff4638a3de46b135003980ac777
   - enabled: 1
     path: Assets/Scenes/Stage_Practice.unity

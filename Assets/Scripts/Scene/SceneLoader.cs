@@ -13,4 +13,14 @@ public class SceneLoader : MonoBehaviour
     {
         SceneManager.LoadScene("InviteMemberScene");
     }
+
+    public void LoadMapSelectionScene()
+    {
+        SceneManager.LoadScene("MapSelectionScene");
+    }
+
+    public void OnBackButtonPressed()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }
