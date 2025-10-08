@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\starg\\Desktop\\Carider\\project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\starg\\Desktop\\Carider\\project\\Assets\\Editor\\Layer\\backend\\Asset.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Editor\\Layer\\backend\\Asset.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\starg\\Desktop\\Carider\\project\\Assets\\Scripts\\BGMManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\BGMManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,14 +23,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Asset.cs",
-              "DocumentMoniker": "C:\\Users\\starg\\Desktop\\Carider\\project\\Assets\\Editor\\Layer\\backend\\Asset.cs",
-              "RelativeDocumentMoniker": "Assets\\Editor\\Layer\\backend\\Asset.cs",
-              "ToolTip": "C:\\Users\\starg\\Desktop\\Carider\\project\\Assets\\Editor\\Layer\\backend\\Asset.cs",
-              "RelativeToolTip": "Assets\\Editor\\Layer\\backend\\Asset.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Title": "BGMManager.cs",
+              "DocumentMoniker": "C:\\Users\\starg\\Desktop\\Carider\\project\\Assets\\Scripts\\BGMManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\BGMManager.cs",
+              "ToolTip": "C:\\Users\\starg\\Desktop\\Carider\\project\\Assets\\Scripts\\BGMManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\BGMManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T18:42:15.245Z",
+              "WhenOpened": "2025-10-07T20:10:05.222Z",
               "EditorCaption": ""
             }
           ]
