@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Stage_2.unity
     guid: 27c452a3c8a24504e94d624f0ddf8419
+  - enabled: 1
+    path: Assets/Scenes/InviteMemberScene.unity
+    guid: 04da13589658024428aa2c00ecc71b35
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

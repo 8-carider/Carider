@@ -9,17 +9,8 @@ public class SceneLoader : MonoBehaviour
             SceneManager.LoadScene(sceneName);
     }
 
-    public void LoadMapSelection()
+    public void LoadInviteMemberScene()
     {
-        LoadScene("MapSelection");
-    }
-
-    public void QuitGame()
-    {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
+        SceneManager.LoadScene("InviteMemberScene");
     }
 }

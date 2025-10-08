@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class BGMManager : MonoBehaviour
 {
@@ -9,11 +9,11 @@ public class BGMManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // ¾ÀÀÌ ¹Ù²î¾îµµ À¯Áö
+            DontDestroyOnLoad(gameObject); // ì”¬ì´ ë°”ë€Œì–´ë„ ìœ ì§€
         }
         else
         {
-            Destroy(gameObject); // Áßº¹ »ı¼º ¹æÁö
+            Destroy(gameObject); // ì¤‘ë³µ ìƒì„± ë°©ì§€
         }
     }
 }
