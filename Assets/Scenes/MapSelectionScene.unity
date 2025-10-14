@@ -990,13 +990,13 @@ MonoBehaviour:
   mapNameText: {fileID: 177880716}
   maps:
   - mapName: Practice
-    previewImage: {fileID: 21300000, guid: 15228fef2319cbc4b974884d31eb6583, type: 3}
+    previewImage: {fileID: 0}
     sceneName: Stage_Practice
   - mapName: Stage1
-    previewImage: {fileID: 21300000, guid: 1fc652e3005a4b441a6cee875b45dc62, type: 3}
+    previewImage: {fileID: 0}
     sceneName: Stage_1
   - mapName: Stage2
-    previewImage: {fileID: 21300000, guid: a261e56e703a0bb43a519f0b04e4371b, type: 3}
+    previewImage: {fileID: 0}
     sceneName: Stage_2
 --- !u!4 &1201296822
 Transform:
