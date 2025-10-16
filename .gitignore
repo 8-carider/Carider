@@ -1,3 +1,4 @@
+# Unity project folders
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -5,6 +6,11 @@
 [Bb]uilds/
 UserSettings/
 Logs/
+MemoryCaptures/
+CrashReports/
+
+# IDE and build system folders
+.vs/
 *.csproj
 *.unityproj
 *.sln
@@ -17,5 +23,27 @@ Logs/
 *.mdb
 *.opendb
 *.VC.db
+*.sln.ide
+*.g.cs
+*.Generated.cs
+*.cache
+
+# Unity packages and definitions
+*.unitypackage
+*.asmdef
+*.asmref
+
+# Misc
+*.db
+*.bak
+*.tmp
+*.log
+*.psess
+*.vsp
+*.tlog
+*.idb
+*.ipch
 .DS_Store
 Thumbs.db
+
+# DO NOT IGNORE .meta files in team projects
