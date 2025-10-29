@@ -50,5 +50,6 @@ public class VehiclePhysic : MonoBehaviour
 
         transform.position = _startPosition;
         transform.rotation = _startRotation;
+        FindObjectOfType<HUDManager>().IncrementRespawn();
     }
 }
