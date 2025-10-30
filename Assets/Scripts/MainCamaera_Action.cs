@@ -18,6 +18,17 @@ public class DrivingCamera : MonoBehaviour
 
     void LateUpdate()
     {
+        // 차량 위치에서 카메라 위치는 X,Z 좌표만 같고 Y는 고정 높이 유지
+        Vector3 desiredPosition = new Vector3(target.position.x, target.position.y + offset.y, target.position.z);
+
+        // 위치 부드럽게 변환
+        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
+
+        // 카메라 회전 - 완전 탑뷰 (피치 90도, 요 0, 롤 0)
+        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+    }
+    /*  void LateUpdate()
+    {
         // 차량 위치와 회전 반영한 목표 위치
         Vector3 desiredPosition = target.position + target.rotation * offset;
 
@@ -30,5 +41,5 @@ public class DrivingCamera : MonoBehaviour
 
         // 카메라 회전 설정 (x: 피치 고정, y: 보간된 차량 회전, z: 0으로 롤 제거)
         transform.rotation = Quaternion.Euler(fixedPitchAngle, smoothAngle, 0);
-    }
+    }*/
 }

@@ -406,10 +406,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 846098373}
-  offset: {x: 3, y: 5, z: -12}
+  offset: {x: 6, y: 26, z: -5}
   positionSmoothTime: 0.3
   rotationSmoothTime: 0.1
-  fixedPitchAngle: 10
+  fixedPitchAngle: 65
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
