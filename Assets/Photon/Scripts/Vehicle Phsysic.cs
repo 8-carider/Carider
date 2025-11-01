@@ -9,27 +9,12 @@ public class VehiclePhysic : MonoBehaviour
     [SerializeField] Wheel[] _motorWheel;
     [SerializeField] Wheel[] _steerWheel;
 
-    private Vector3 _startPosition;
-    private Quaternion _startRotation;
-
-    void Start()
+    private void Update()
     {
-        _startPosition = transform.position;
-        _startRotation = transform.rotation;
-    }
-
-    void Update()
-    {
-        float gas = Input.GetAxisRaw("Vertical");
+        float gas = Input.GetAxis("Vertical");
         float steer = Input.GetAxis("Horizontal");
         MoveCar(gas, steer);
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ResetCar();
-        }
     }
-
     void MoveCar(float gas, float steer)
     {
         foreach (Wheel item in _motorWheel)
@@ -40,16 +25,6 @@ public class VehiclePhysic : MonoBehaviour
         {
             item.AddSteerAngle(steer * _maxSteerAngle);
         }
-    }
 
-    void ResetCar()
-    {
-        Rigidbody rb = GetComponent<Rigidbody>();
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        transform.position = _startPosition;
-        transform.rotation = _startRotation;
-        FindObjectOfType<HUDManager>().IncrementRespawn();
     }
 }

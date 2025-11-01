@@ -2,44 +2,95 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DrivingCamera : MonoBehaviour
+//public class DrivingCamera : MonoBehaviour
+//{
+//    public Transform target;             // 따라갈 차량
+//    public float height = 10f;           // 카메라 높이 (Y축)
+//    public float positionSmoothTime = 0.3f;   // 위치 보간 속도
+//    private Vector3 positionVelocity = Vector3.zero;
+
+//    //void LateUpdate()
+//    //{
+//    //    // 차량의 X,Z 위치는 따라가고, Y는 고정
+//    //    Vector3 desiredPosition = new Vector3(target.position.x, height, target.position.z);
+
+//    //    // 부드럽게 위치 이동
+//    //    transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
+
+//    //    // 카메라 회전은 완전 탑뷰 (위에서 아래로 90도 회전)
+//    //    transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+//    //}
+//    void LateUpdate()
+//    {
+//        Vector3 desiredPosition = new Vector3(target.position.x, height, target.position.z);
+//        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
+//        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+//    }
+
+//}
+
+//public class TopDownCamera : MonoBehaviour
+//{
+//    public Transform target;  // 따라갈 대상
+
+//    [SerializeField]
+//    private Vector3 offset = new Vector3(0, 30, 0);  // 카메라 위치 오프셋 (인스펙터에 노출됨)
+
+//    public float positionSmoothTime = 0.3f;  // 위치 보간 시간
+//    private Vector3 positionVelocity = Vector3.zero;
+
+//    void LateUpdate()
+//    {
+//        if (target == null) return;
+
+//        Vector3 desiredPosition = target.position + offset;
+//        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
+
+//        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+//    }
+//}
+
+
+public class AdjustableAngleCamera : MonoBehaviour
 {
-    public Transform target;             // 따라갈 차량
-    public Vector3 offset = new Vector3(3, 5, -12);   // 차량 뒤에서 카메라 위치 오프셋
+    public Transform target;  // 따라갈 대상
 
-    public float positionSmoothTime = 0.3f;   // 위치 보간 속도
+    [SerializeField]
+    private float distance = 10f;  // 차량 뒤로 얼마나 떨어질지 거리
+
+    [SerializeField]
+    private float height = 5f;     // 카메라 높이
+
+    [SerializeField, Range(0f, 90f)]
+    private float angle = 45f;     // 카메라 내려다보는 각도 (0 = 수평, 90 = 완전 위)
+
+    public float positionSmoothTime = 0.3f;  // 위치 보간 시간
     private Vector3 positionVelocity = Vector3.zero;
-
-    public float rotationSmoothTime = 0.1f;   // 회전 보간 속도
-    private float rotationVelocity;
-
-    // 고정된 피치 각도(카메라가 위에서 바라보도록)
-    public float fixedPitchAngle = 10f;
 
     void LateUpdate()
     {
-        // 차량 위치에서 카메라 위치는 X,Z 좌표만 같고 Y는 고정 높이 유지
-        Vector3 desiredPosition = new Vector3(target.position.x, target.position.y + offset.y, target.position.z);
+        if (target == null) return;
 
-        // 위치 부드럽게 변환
+        // 카메라 위치 계산: 타겟 위치에서 뒤쪽으로 distance 만큼 뒤로 가고 위로 height만큼 올라감
+        // angle에 따라 y축 상승과 뒤쪽 거리 조절 (피타고라스)
+        float radAngle = Mathf.Deg2Rad * angle;
+
+        // 카메라가 뒤로 이동할 거리의 수평 거리 (cos), 높이 (sin)
+        float horizontalDistance = distance * Mathf.Cos(radAngle);
+        float verticalHeight = distance * Mathf.Sin(radAngle);
+
+        // 타겟 뒤 방향: 타겟의 앞 방향 반대방향
+        Vector3 behindDirection = -target.forward;
+
+        // 원하는 위치 = 타겟 위치 + 뒤 방향 * horizontal 거리 + height 보정 + 수직 높이
+        Vector3 desiredPosition = target.position + behindDirection * horizontalDistance + Vector3.up * (verticalHeight + height);
+
+        // 부드럽게 이동
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
 
-        // 카메라 회전 - 완전 탑뷰 (피치 90도, 요 0, 롤 0)
-        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        // 회전은 타겟을 바라보도록
+        // LookAt 함수는 카메라가 타겟을 바라보게 함
+        transform.LookAt(target.position + Vector3.up * height);
     }
-    /*  void LateUpdate()
-    {
-        // 차량 위치와 회전 반영한 목표 위치
-        Vector3 desiredPosition = target.position + target.rotation * offset;
-
-        // 위치 부드럽게 변환(SmoothDamp)
-        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
-
-        // 차량의 y축 회전을 기준으로 회전 보간(SmoothDampAngle)
-        float targetAngle = target.eulerAngles.y;
-        float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationVelocity, rotationSmoothTime);
-
-        // 카메라 회전 설정 (x: 피치 고정, y: 보간된 차량 회전, z: 0으로 롤 제거)
-        transform.rotation = Quaternion.Euler(fixedPitchAngle, smoothAngle, 0);
-    }*/
 }
+
