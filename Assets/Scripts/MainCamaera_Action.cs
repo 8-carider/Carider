@@ -4,20 +4,20 @@ using UnityEngine;
 
 //public class DrivingCamera : MonoBehaviour
 //{
-//    public Transform target;             // µû¶ó°¥ Â÷·®
-//    public float height = 10f;           // Ä«¸Ş¶ó ³ôÀÌ (YÃà)
-//    public float positionSmoothTime = 0.3f;   // À§Ä¡ º¸°£ ¼Óµµ
+//    public Transform target;             // ë”°ë¼ê°ˆ ì°¨ëŸ‰
+//    public float height = 10f;           // ì¹´ë©”ë¼ ë†’ì´ (Yì¶•)
+//    public float positionSmoothTime = 0.3f;   // ìœ„ì¹˜ ë³´ê°„ ì†ë„
 //    private Vector3 positionVelocity = Vector3.zero;
 
 //    //void LateUpdate()
 //    //{
-//    //    // Â÷·®ÀÇ X,Z À§Ä¡´Â µû¶ó°¡°í, Y´Â °íÁ¤
+//    //    // ì°¨ëŸ‰ì˜ X,Z ìœ„ì¹˜ëŠ” ë”°ë¼ê°€ê³ , YëŠ” ê³ ì •
 //    //    Vector3 desiredPosition = new Vector3(target.position.x, height, target.position.z);
 
-//    //    // ºÎµå·´°Ô À§Ä¡ ÀÌµ¿
+//    //    // ë¶€ë“œëŸ½ê²Œ ìœ„ì¹˜ ì´ë™
 //    //    transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
 
-//    //    // Ä«¸Ş¶ó È¸ÀüÀº ¿ÏÀü Å¾ºä (À§¿¡¼­ ¾Æ·¡·Î 90µµ È¸Àü)
+//    //    // ì¹´ë©”ë¼ íšŒì „ì€ ì™„ì „ íƒ‘ë·° (ìœ„ì—ì„œ ì•„ë˜ë¡œ 90ë„ íšŒì „)
 //    //    transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 //    //}
 //    void LateUpdate()
@@ -31,12 +31,12 @@ using UnityEngine;
 
 //public class TopDownCamera : MonoBehaviour
 //{
-//    public Transform target;  // µû¶ó°¥ ´ë»ó
+//    public Transform target;  // ë”°ë¼ê°ˆ ëŒ€ìƒ
 
 //    [SerializeField]
-//    private Vector3 offset = new Vector3(0, 30, 0);  // Ä«¸Ş¶ó À§Ä¡ ¿ÀÇÁ¼Â (ÀÎ½ºÆåÅÍ¿¡ ³ëÃâµÊ)
+//    private Vector3 offset = new Vector3(0, 30, 0);  // ì¹´ë©”ë¼ ìœ„ì¹˜ ì˜¤í”„ì…‹ (ì¸ìŠ¤í™í„°ì— ë…¸ì¶œë¨)
 
-//    public float positionSmoothTime = 0.3f;  // À§Ä¡ º¸°£ ½Ã°£
+//    public float positionSmoothTime = 0.3f;  // ìœ„ì¹˜ ë³´ê°„ ì‹œê°„
 //    private Vector3 positionVelocity = Vector3.zero;
 
 //    void LateUpdate()
@@ -53,43 +53,43 @@ using UnityEngine;
 
 public class AdjustableAngleCamera : MonoBehaviour
 {
-    public Transform target;  // µû¶ó°¥ ´ë»ó
+    public Transform target;  // ë”°ë¼ê°ˆ ëŒ€ìƒ
 
     [SerializeField]
-    private float distance = 10f;  // Â÷·® µÚ·Î ¾ó¸¶³ª ¶³¾îÁúÁö °Å¸®
+    private float distance = 10f;  // ì°¨ëŸ‰ ë’¤ë¡œ ì–¼ë§ˆë‚˜ ë–¨ì–´ì§ˆì§€ ê±°ë¦¬
 
     [SerializeField]
-    private float height = 5f;     // Ä«¸Ş¶ó ³ôÀÌ
+    private float height = 5f;     // ì¹´ë©”ë¼ ë†’ì´
 
     [SerializeField, Range(0f, 90f)]
-    private float angle = 45f;     // Ä«¸Ş¶ó ³»·Á´Ùº¸´Â °¢µµ (0 = ¼öÆò, 90 = ¿ÏÀü À§)
+    private float angle = 45f;     // ì¹´ë©”ë¼ ë‚´ë ¤ë‹¤ë³´ëŠ” ê°ë„ (0 = ìˆ˜í‰, 90 = ì™„ì „ ìœ„)
 
-    public float positionSmoothTime = 0.3f;  // À§Ä¡ º¸°£ ½Ã°£
+    public float positionSmoothTime = 0.3f;  // ìœ„ì¹˜ ë³´ê°„ ì‹œê°„
     private Vector3 positionVelocity = Vector3.zero;
 
     void LateUpdate()
     {
         if (target == null) return;
 
-        // Ä«¸Ş¶ó À§Ä¡ °è»ê: Å¸°Ù À§Ä¡¿¡¼­ µÚÂÊÀ¸·Î distance ¸¸Å­ µÚ·Î °¡°í À§·Î height¸¸Å­ ¿Ã¶ó°¨
-        // angle¿¡ µû¶ó yÃà »ó½Â°ú µÚÂÊ °Å¸® Á¶Àı (ÇÇÅ¸°í¶ó½º)
+        // ì¹´ë©”ë¼ ìœ„ì¹˜ ê³„ì‚°: íƒ€ê²Ÿ ìœ„ì¹˜ì—ì„œ ë’¤ìª½ìœ¼ë¡œ distance ë§Œí¼ ë’¤ë¡œ ê°€ê³  ìœ„ë¡œ heightë§Œí¼ ì˜¬ë¼ê°
+        // angleì— ë”°ë¼ yì¶• ìƒìŠ¹ê³¼ ë’¤ìª½ ê±°ë¦¬ ì¡°ì ˆ (í”¼íƒ€ê³ ë¼ìŠ¤)
         float radAngle = Mathf.Deg2Rad * angle;
 
-        // Ä«¸Ş¶ó°¡ µÚ·Î ÀÌµ¿ÇÒ °Å¸®ÀÇ ¼öÆò °Å¸® (cos), ³ôÀÌ (sin)
+        // ì¹´ë©”ë¼ê°€ ë’¤ë¡œ ì´ë™í•  ê±°ë¦¬ì˜ ìˆ˜í‰ ê±°ë¦¬ (cos), ë†’ì´ (sin)
         float horizontalDistance = distance * Mathf.Cos(radAngle);
         float verticalHeight = distance * Mathf.Sin(radAngle);
 
-        // Å¸°Ù µÚ ¹æÇâ: Å¸°ÙÀÇ ¾Õ ¹æÇâ ¹İ´ë¹æÇâ
+        // íƒ€ê²Ÿ ë’¤ ë°©í–¥: íƒ€ê²Ÿì˜ ì• ë°©í–¥ ë°˜ëŒ€ë°©í–¥
         Vector3 behindDirection = -target.forward;
 
-        // ¿øÇÏ´Â À§Ä¡ = Å¸°Ù À§Ä¡ + µÚ ¹æÇâ * horizontal °Å¸® + height º¸Á¤ + ¼öÁ÷ ³ôÀÌ
+        // ì›í•˜ëŠ” ìœ„ì¹˜ = íƒ€ê²Ÿ ìœ„ì¹˜ + ë’¤ ë°©í–¥ * horizontal ê±°ë¦¬ + height ë³´ì • + ìˆ˜ì§ ë†’ì´
         Vector3 desiredPosition = target.position + behindDirection * horizontalDistance + Vector3.up * (verticalHeight + height);
 
-        // ºÎµå·´°Ô ÀÌµ¿
+        // ë¶€ë“œëŸ½ê²Œ ì´ë™
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref positionVelocity, positionSmoothTime);
 
-        // È¸ÀüÀº Å¸°ÙÀ» ¹Ù¶óº¸µµ·Ï
-        // LookAt ÇÔ¼ö´Â Ä«¸Ş¶ó°¡ Å¸°ÙÀ» ¹Ù¶óº¸°Ô ÇÔ
+        // íšŒì „ì€ íƒ€ê²Ÿì„ ë°”ë¼ë³´ë„ë¡
+        // LookAt í•¨ìˆ˜ëŠ” ì¹´ë©”ë¼ê°€ íƒ€ê²Ÿì„ ë°”ë¼ë³´ê²Œ í•¨
         transform.LookAt(target.position + Vector3.up * height);
     }
 }
