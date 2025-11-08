@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 7b69b8f3c26e6894b8bfe386290182a8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Scripts/Editor/DialogueEditor.cs
+  uploadId: 681977

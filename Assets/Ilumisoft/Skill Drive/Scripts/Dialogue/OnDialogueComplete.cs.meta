@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8996884b0d635814ab8066e3d318c93d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Scripts/Dialogue/OnDialogueComplete.cs
+  uploadId: 681977

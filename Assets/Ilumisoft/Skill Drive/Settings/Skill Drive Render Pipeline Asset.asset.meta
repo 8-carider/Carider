@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 05c5582d3ac81c04f81c054fc9c0ca28
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Settings/Skill Drive Render Pipeline Asset.asset
+  uploadId: 681977

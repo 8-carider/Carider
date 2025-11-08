@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 035c41988194d6247ba42a30c22f3e8e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Scripts/Vehicle/Input/VehicleInputSource.cs
+  uploadId: 681977

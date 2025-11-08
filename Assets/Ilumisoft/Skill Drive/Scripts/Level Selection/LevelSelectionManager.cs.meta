@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a11e282acf2f7f14b9f18e9b304979ca
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Scripts/Level Selection/LevelSelectionManager.cs
+  uploadId: 681977

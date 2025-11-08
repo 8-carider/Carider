@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 66d6b75218218f24fa05ee1a10bf64b2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Scripts/Game/InputActionEvent.cs
+  uploadId: 681977

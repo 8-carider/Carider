@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b67d6b59cf127764b9d813ded1687ac2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Physic Materials/Wheels.physicMaterial
+  uploadId: 681977

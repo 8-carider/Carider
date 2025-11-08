@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 38849894b8a33194cb0ab8dbcd2a595d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 229855
+  packageName: Skill Drive - Game Template
+  packageVersion: 1.2
+  assetPath: Assets/Ilumisoft/Skill Drive/Settings/DefaultVolumeProfile.asset
+  uploadId: 681977
