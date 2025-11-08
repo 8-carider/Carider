@@ -1728,6 +1728,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 480802755}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!320 &1334378409 stripped
+PlayableDirector:
+  m_CorrespondingSourceObject: {fileID: 1763770592, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+  m_PrefabInstance: {fileID: 1532081504}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1532081504
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1736,6 +1741,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3477196594550433438, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+      propertyPath: playableDirector
+      value: 
+      objectReference: {fileID: 1334378409}
+    - target: {fileID: 3477196594550433438, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+      propertyPath: loadedPlayableDirector
+      value: 
+      objectReference: {fileID: 1334378409}
     - target: {fileID: 4357519437633950667, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
