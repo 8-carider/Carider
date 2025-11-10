@@ -6,6 +6,11 @@ namespace Ilumisoft.SkillDrive.Game
     public class CollectableManager : MonoBehaviour
     {
         public UnityAction OnAllCollected;
+        public UnityAction OnCollectableCollected;
+        public UnityAction OnCollectableSpawned;
+
+        public int CollectedCount => collected;
+        public int TotalCount => amount;
 
         [SerializeField]
         private GameObject collectablePrefab; // 수집품 프리팹 참조
@@ -62,6 +67,9 @@ namespace Ilumisoft.SkillDrive.Game
         {
             collected++;
 
+            // 수집 이벤트 발생
+            OnCollectableCollected?.Invoke();
+
             // 새로운 수집품 생성
             SpawnNewCollectable();
 
@@ -114,6 +122,7 @@ namespace Ilumisoft.SkillDrive.Game
                     {
                         collectableComponent.OnCollect += OnCollect;
                         amount++; // 전체 수집품 개수 증가
+                        OnCollectableSpawned?.Invoke(); // 생성 이벤트 발생
                     }
 
                     return;
