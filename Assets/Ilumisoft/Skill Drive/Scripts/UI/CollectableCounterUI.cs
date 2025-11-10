@@ -7,53 +7,50 @@ namespace Ilumisoft.SkillDrive
     public class CollectableCounterUI : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI counterText;
-        private CollectableManager collectableManager;
+        [SerializeField] private VehicleCollectables vehicleCollectables;
 
         private void Awake()
         {
-            if (collectableManager == null)
+            // counterText가 연결되지 않았다면 자동으로 찾기
+            if (counterText == null)
             {
-                collectableManager = FindAnyObjectByType<CollectableManager>();
+                counterText = GetComponent<TextMeshProUGUI>();
             }
-
+            
+            // vehicleCollectables가 연결되지 않았다면 자동으로 찾기
+            if (vehicleCollectables == null)
+            {
+                var playerVehicle = GameObject.FindGameObjectWithTag("Player");
+                if (playerVehicle != null)
+                {
+                    vehicleCollectables = playerVehicle.GetComponent<VehicleCollectables>();
+                }
+            }
+            
             UpdateCounterText();
         }
 
         private void OnEnable()
         {
-            // 이벤트 구독
-            if (collectableManager != null)
+            if (vehicleCollectables != null)
             {
-                collectableManager.OnCollectableCollected += OnCollectableCollected;
-                collectableManager.OnCollectableSpawned += OnCollectableSpawned;
+                vehicleCollectables.OnCollectableCollected += UpdateCounterText;
             }
         }
 
         private void OnDisable()
         {
-            // 이벤트 구독 해제
-            if (collectableManager != null)
+            if (vehicleCollectables != null)
             {
-                collectableManager.OnCollectableCollected -= OnCollectableCollected;
-                collectableManager.OnCollectableSpawned -= OnCollectableSpawned;
+                vehicleCollectables.OnCollectableCollected -= UpdateCounterText;
             }
-        }
-
-        private void OnCollectableCollected()
-        {
-            UpdateCounterText();
-        }
-
-        private void OnCollectableSpawned()
-        {
-            UpdateCounterText();
         }
 
         private void UpdateCounterText()
         {
-            if (counterText != null && collectableManager != null)
+            if (counterText != null && vehicleCollectables != null)
             {
-                counterText.text = $"{collectableManager.CollectedCount}";
+                counterText.text = $"{vehicleCollectables.CollectedCount}";
             }
         }
     }

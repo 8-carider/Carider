@@ -19,6 +19,13 @@ namespace Ilumisoft.SkillDrive.Game
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
                 }
 
+                // 차량의 VehicleCollectables 컴포넌트 업데이트
+                var vehicleCollectables = other.GetComponent<VehicleCollectables>();
+                if (vehicleCollectables != null)
+                {
+                    vehicleCollectables.AddCollectable();
+                }
+
                 OnCollect?.Invoke();
 
                 gameObject.SetActive(false);
