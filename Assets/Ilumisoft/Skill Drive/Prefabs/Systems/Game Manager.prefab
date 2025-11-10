@@ -102,6 +102,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collectablePrefab: {fileID: 5489907549188334767, guid: 78b8313037794e243b8365b81a5c643a, type: 3}
   spawnAreaSize: {x: 10, y: 10}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  maxSpawnAttempts: 10
+  spawnCheckRadius: 0.6
 --- !u!82 &373460459887380687
 AudioSource:
   m_ObjectHideFlags: 0
