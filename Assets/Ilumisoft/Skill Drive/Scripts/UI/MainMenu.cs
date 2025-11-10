@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Ilumisoft.SkillDrive; // MenuController 사용
 
 namespace Ilumisoft.SkillDrive.UI
 {
@@ -15,6 +16,7 @@ namespace Ilumisoft.SkillDrive.UI
         Selectable selectable = null;
 
         SceneLoader sceneLoader;
+    MenuController menuController;
 
         [SerializeField]
         Button playButton;
@@ -35,6 +37,7 @@ namespace Ilumisoft.SkillDrive.UI
             playButton.onClick.AddListener(OnPlayButtonClick);
 
             sceneLoader = FindAnyObjectByType<SceneLoader>();
+            menuController = FindAnyObjectByType<MenuController>();
 
             yield return null;
 
@@ -43,6 +46,14 @@ namespace Ilumisoft.SkillDrive.UI
 
         private void OnPlayButtonClick()
         {
+            // 멀티플레이 전용: 로비가 있으면 로비 표시로 대체
+            if (menuController != null)
+            {
+                menuController.ShowLobby();
+                return;
+            }
+
+            // 기본 단일 플레이 흐름(로비가 없을 때만)
             StopAllCoroutines();
             StartCoroutine(LoadCoroutine());
         }

@@ -1,0 +1,79 @@
+using Photon.Pun;
+using Photon.Realtime;
+using UnityEngine;
+
+namespace Ilumisoft.SkillDrive.Network
+{
+    public class NetworkManager : MonoBehaviourPunCallbacks
+    {
+        [SerializeField] private string gameVersion = "1.0";
+        [SerializeField] private byte maxPlayersPerRoom = 4;
+
+        private void Start()
+        {
+            // Photon 서버에 연결
+            PhotonNetwork.GameVersion = gameVersion;
+            PhotonNetwork.ConnectUsingSettings();
+            
+            Debug.Log("Photon 서버에 연결 중...");
+        }
+
+        public override void OnConnectedToMaster()
+        {
+            Debug.Log("Photon 서버에 연결됨!");
+            // 로비에 참가
+            PhotonNetwork.JoinLobby();
+        }
+
+        public override void OnJoinedLobby()
+        {
+            Debug.Log("로비에 참가함!");
+        }
+
+        public override void OnDisconnected(DisconnectCause cause)
+        {
+            Debug.LogWarning($"Photon 서버 연결 끊김: {cause}");
+        }
+
+        // 랜덤 룸에 참가 (없으면 생성)
+        public void JoinOrCreateRoom()
+        {
+            if (!PhotonNetwork.IsConnected)
+            {
+                Debug.LogError("Photon에 연결되지 않았습니다!");
+                return;
+            }
+
+            PhotonNetwork.JoinRandomRoom();
+        }
+
+        public override void OnJoinRandomFailed(short returnCode, string message)
+        {
+            Debug.Log("랜덤 룸 참가 실패, 새 룸 생성 중...");
+            
+            RoomOptions roomOptions = new RoomOptions
+            {
+                MaxPlayers = maxPlayersPerRoom,
+                IsVisible = true,
+                IsOpen = true
+            };
+
+            PhotonNetwork.CreateRoom(null, roomOptions);
+        }
+
+        public override void OnJoinedRoom()
+        {
+            Debug.Log($"룸에 참가함! 플레이어 수: {PhotonNetwork.CurrentRoom.PlayerCount}");
+        }
+
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            Debug.Log($"새 플레이어 참가: {newPlayer.NickName}");
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            Debug.Log($"플레이어 퇴장: {otherPlayer.NickName}");
+        }
+    }
+}
