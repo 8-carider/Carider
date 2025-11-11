@@ -195,6 +195,28 @@ namespace Ilumisoft.SkillDrive.Network
                             Debug.Log($"[MapVehicleSpawner] Vehicle {i} custom gravity adjusted: ground=0, fall=15");
                         }
                     }
+
+                    // 지면 감지 레이캐스트 거리 조정 (차량 피벗이 높아서 기본값으로는 땅 감지 못함)
+                    var groundDetectionField = typeof(Ilumisoft.SkillDrive.Vehicle).GetField("groundDetection",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (groundDetectionField != null)
+                    {
+                        var groundDetection = groundDetectionField.GetValue(vehicleComp) as Ilumisoft.SkillDrive.VehicleGroundDetection;
+                        if (groundDetection != null)
+                        {
+                            groundDetection.RaycastDist = 5.0f; // 충분한 레이 거리로 강제 설정
+                            // 기본층(Default)과 'Ground' 레이어 자동 포함
+                            int groundLayerIndex = LayerMask.NameToLayer("Ground");
+                            LayerMask mask = Physics.DefaultRaycastLayers;
+                            if (groundLayerIndex != -1)
+                            {
+                                mask |= (1 << groundLayerIndex);
+                            }
+                            groundDetection.GroundLayers = mask;
+                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} ground raycast distance set to {groundDetection.RaycastDist}");
+                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} ground layer mask set to {groundDetection.GroundLayers.value}");
+                        }
+                    }
                 }
 
                 // 비마스터에서 차량이 '멈춘 것처럼' 보이는 문제 해결을 위해 PhotonRigidbodyView 추가 (변위/속도 동기화)

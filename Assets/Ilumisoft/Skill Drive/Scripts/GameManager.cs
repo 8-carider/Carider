@@ -63,7 +63,22 @@ namespace Ilumisoft.SkillDrive.Game
 
             yield return new WaitForSeconds(startDelay);
 
-            countdown.StartCountdown();
+            // 멀티플레이(Photon 룸)에서는 카운트다운 비활성화 (무제한 시간)
+            bool inMultiplayer = false;
+#if PHOTON_UNITY_NETWORKING
+            inMultiplayer = Photon.Pun.PhotonNetwork.IsConnected && Photon.Pun.PhotonNetwork.InRoom;
+#endif
+
+            if (!inMultiplayer)
+            {
+                countdown.StartCountdown();
+                Debug.Log("[GameManager] Countdown started (single player mode)");
+            }
+            else
+            {
+                countdown.StopTimer();
+                Debug.Log("[GameManager] Countdown disabled (multiplayer mode)");
+            }
 
             isGameOver = false;
         }

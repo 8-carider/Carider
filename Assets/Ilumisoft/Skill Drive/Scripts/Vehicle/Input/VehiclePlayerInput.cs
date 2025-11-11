@@ -12,6 +12,7 @@ namespace Ilumisoft.SkillDrive.Input
     public class VehiclePlayerInput : VehicleInputSource
     {
         Vector2 movementInput = Vector2.zero;
+        private bool useNetworkInput = false; // 네트워크 입력 모드 플래그
 
         /// <summary>
         /// Returns the input this input source has collected from the PlayerInput component. This method is mainly used by the vehicle, when it collects the input from the input sources.
@@ -28,12 +29,16 @@ namespace Ilumisoft.SkillDrive.Input
         /// <param name="movementValue"></param>
         public void OnMove(InputValue movementValue)
         {
+            // 네트워크 입력 모드에서는 PlayerInput 콜백 무시
+            if (useNetworkInput) return;
+            
             movementInput = movementValue.Get<Vector2>();
         }
 
         // Allow external systems (e.g., networking seat manager) to set input directly
         public void SetMovementInput(Vector2 value)
         {
+            useNetworkInput = true; // 네트워크 입력 모드 활성화
             movementInput = value;
         }
 

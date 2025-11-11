@@ -81,6 +81,14 @@ namespace Ilumisoft.SkillDrive
             ApplySteering();
 
             ApplyAcceleration();
+
+            // Runtime diagnostics (once every ~0.5s)
+            _diagTimer += Time.fixedDeltaTime;
+            if (_diagTimer >= 0.5f)
+            {
+                _diagTimer = 0f;
+                Debug.Log($"[VehicleDiag] CanMove={CanMove} IsGrounded={IsGrounded} Input={Input} ForwardSpeed={ForwardSpeed:F2} Pos={transform.position}");
+            }
         }
 
         /// <summary>
@@ -104,7 +112,20 @@ namespace Ilumisoft.SkillDrive
         /// </summary>
         protected virtual void ApplyGravity()
         {
-            float factor = groundDetection.IsGrounded ? physics.Gravity : physics.FallGravity;
+            // 언덕/경사 위에서 근접 상태도 약하게 접지로 취급해 낙하를 완화
+            float factor;
+            if (groundDetection.IsGrounded)
+            {
+                factor = physics.Gravity;
+            }
+            else if (groundDetection.IsNearGround)
+            {
+                factor = Mathf.Lerp(physics.FallGravity, physics.Gravity, 0.7f); // 부드럽게 떨어지지 않도록 완화
+            }
+            else
+            {
+                factor = physics.FallGravity;
+            }
 
             Rigidbody.AddForce(-factor * Vector3.up, ForceMode.Acceleration);
         }
@@ -161,20 +182,6 @@ namespace Ilumisoft.SkillDrive
                     Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
                 }
             }
-            else
-            {
-                // 진단용 로그: 왜 움직이지 않는지 한 번만 출력 (스팸 방지)
-                if (!_reportedNoMove && IsGrounded && !CanMove)
-                {
-                    Debug.Log("[Vehicle] Acceleration skipped: CanMove == false (authoritative remote or misconfiguration)." );
-                    _reportedNoMove = true;
-                }
-                else if (!_reportedNoMove && !IsGrounded)
-                {
-                    Debug.Log("[Vehicle] Acceleration skipped: not grounded (raycast miss). Consider increasing RaycastDist or checking pivot height." );
-                    _reportedNoMove = true;
-                }
-            }
         }
 
         /// <summary>
@@ -210,7 +217,6 @@ namespace Ilumisoft.SkillDrive
             groundDetection.OnDrawGizmosSelected(this);
         }
 
-        // 진단 플래그 (로그 1회 출력용)
-        private bool _reportedNoMove = false;
+        private float _diagTimer = 0f;
     }
 }

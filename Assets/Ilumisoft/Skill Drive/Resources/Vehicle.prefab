@@ -395,7 +395,10 @@ MonoBehaviour:
     GroundLayers:
       serializedVersion: 2
       m_Bits: 256
-    RaycastDist: 0.25
+    RaycastDist: 5
+    NearGroundExtraDistance: 0.75
+    GroundProbeRadius: 0.6
+    MaxSlopeAngle: 55
 --- !u!114 &5258304601143362749
 MonoBehaviour:
   m_ObjectHideFlags: 0
