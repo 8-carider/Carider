@@ -41,6 +41,41 @@ namespace Ilumisoft.SkillDrive.Network
             throttleSeatActorNumber = throttleActor;
             steeringSeatActorNumber = steeringActor;
             Debug.Log($"[VehicleSeatManager] Seats assigned on {gameObject.name} -> Throttle:{throttleActor} Steering:{steeringActor}");
+
+            // 로컬 카메라 활성/비활성은 좌석 배정 정보만으로 결정 (RPC 인자 불일치 문제 방지)
+            var cam = GetComponent<VehicleCameraManager>();
+            if (cam != null && PhotonNetwork.IsConnected && PhotonNetwork.LocalPlayer != null)
+            {
+                int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
+                bool active = IsPlayerAssigned(localActor);
+                
+                // 로컬 플레이어의 배정 정보 로그 출력
+                if (active)
+                {
+                    string vehicleName = gameObject.name;
+                    string seatRole = "";
+                    if (throttleSeatActorNumber == localActor && steeringSeatActorNumber == localActor)
+                    {
+                        seatRole = "조향+가속";
+                    }
+                    else if (throttleSeatActorNumber == localActor)
+                    {
+                        seatRole = "가속";
+                    }
+                    else if (steeringSeatActorNumber == localActor)
+                    {
+                        seatRole = "조향";
+                    }
+                    Debug.Log($"[플레이어 배정] {vehicleName} ({seatRole})");
+                }
+                
+                // Enable or disable the virtual camera component explicitly
+                cam.SetCameraActive(active, localActor);
+                if (cam.transform.TryGetComponent<Unity.Cinemachine.CinemachineCamera>(out var vcam))
+                {
+                    vcam.enabled = active; // prevent inactive seat cameras from grabbing priority
+                }
+            }
         }
 
         [PunRPC]

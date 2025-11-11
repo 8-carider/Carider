@@ -16,6 +16,11 @@ namespace Ilumisoft.SkillDrive.Network
         private float cacheRefreshTime = 1f;
         private float lastCacheTime = 0f;
 
+        // Camera enforcement: ensure local client only follows assigned vehicle
+        private VehicleSeatManager _myAssignedManager = null;
+        private float cameraCheckInterval = 0.5f;
+        private float lastCameraCheckTime = 0f;
+
         private void Update()
         {
             // Only read local input
@@ -83,6 +88,41 @@ namespace Ilumisoft.SkillDrive.Network
 
                 lastInput = currentInput;
                 lastSendTime = Time.time;
+            }
+
+            // Periodically enforce local camera to follow only the assigned vehicle
+            if (PhotonNetwork.IsConnected && PhotonNetwork.LocalPlayer != null && cachedManagers != null)
+            {
+                if (Time.time - lastCameraCheckTime > cameraCheckInterval)
+                {
+                    int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
+                    VehicleSeatManager newlyAssigned = null;
+                    foreach (var m in cachedManagers)
+                    {
+                        if (m != null && m.IsPlayerAssigned(myActor))
+                        {
+                            newlyAssigned = m;
+                            break;
+                        }
+                    }
+
+                    if (newlyAssigned != _myAssignedManager)
+                    {
+                        // Toggle cameras so only my assigned vehicle is active
+                        foreach (var m in cachedManagers)
+                        {
+                            if (m == null) continue;
+                            var cam = m.GetComponent<VehicleCameraManager>();
+                            if (cam != null)
+                            {
+                                bool active = (m == newlyAssigned);
+                                cam.SetCameraActive(active, myActor);
+                            }
+                        }
+                        _myAssignedManager = newlyAssigned;
+                    }
+                    lastCameraCheckTime = Time.time;
+                }
             }
         }
     }

@@ -96,14 +96,6 @@ namespace Ilumisoft.SkillDrive
             ApplySteering();
 
             ApplyAcceleration();
-
-            // Runtime diagnostics (once every ~0.5s)
-            _diagTimer += Time.fixedDeltaTime;
-            if (_diagTimer >= 0.5f)
-            {
-                _diagTimer = 0f;
-                Debug.Log($"[VehicleDiag] CanMove={CanMove} IsGrounded={IsGrounded} Input={Input} ForwardSpeed={ForwardSpeed:F2} Pos={transform.position}");
-            }
         }
 
         /// <summary>
@@ -231,7 +223,5 @@ namespace Ilumisoft.SkillDrive
         {
             groundDetection.OnDrawGizmosSelected(this);
         }
-
-        private float _diagTimer = 0f;
     }
 }

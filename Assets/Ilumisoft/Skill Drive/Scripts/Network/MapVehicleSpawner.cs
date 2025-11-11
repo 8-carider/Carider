@@ -1,12 +1,14 @@
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
+using System.Linq;
 
 namespace Ilumisoft.SkillDrive.Network
 {
     // Put this in each GAME LEVEL scene (not in Level Selection).
     // Provide two spawn points for two shared vehicles.
     // Master client spawns both vehicles; all players receive them via Photon.
-    public class MapVehicleSpawner : MonoBehaviourPun
+    public class MapVehicleSpawner : MonoBehaviourPunCallbacks
     {
         [SerializeField] private string vehiclePrefabName = "Vehicle";
         [SerializeField] private Transform[] vehicleSpawnPoints; // Expect length >= 2
@@ -14,6 +16,10 @@ namespace Ilumisoft.SkillDrive.Network
 
         private GameObject[] spawnedVehicles;
         private bool hasSpawned = false; // 중복 스폰 완전 방지
+
+    // 좌석 상태 캐시 (마스터만 결정, RPC로 반영)
+    private struct SeatAssignment { public int throttle; public int steering; }
+    private SeatAssignment[] seatAssignments = new SeatAssignment[2]; // 2대 차량
 
         private void Awake()
         {
@@ -34,6 +40,22 @@ namespace Ilumisoft.SkillDrive.Network
         {
             if (!autoSpawnOnStart) return;
             TrySpawnVehicles();
+        }
+
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            if (PhotonNetwork.IsMasterClient && hasSpawned)
+            {
+                RecalculateAndBroadcastSeats();
+            }
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+            if (PhotonNetwork.IsMasterClient && hasSpawned)
+            {
+                RecalculateAndBroadcastSeats();
+            }
         }
 
         public void TrySpawnVehicles()
@@ -73,7 +95,7 @@ namespace Ilumisoft.SkillDrive.Network
                     Debug.LogError($"[MapVehicleSpawner] Spawn point {i} is null.");
                     continue;
                 }
-                
+
                 var vehicle = PhotonNetwork.Instantiate(vehiclePrefabName, sp.position, sp.rotation);
                 spawnedVehicles[i] = vehicle;
 
@@ -117,71 +139,11 @@ namespace Ilumisoft.SkillDrive.Network
                 }
                 respawnHandler.SetSpawnPoint(sp);
                 Debug.Log($"[MapVehicleSpawner] Vehicle {i} respawn handler configured with spawn point: {sp.name}");
-                
-                // 마스터 클라이언트만 좌석 배정
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    // 4명 플레이어를 2대 차량에 분산 배정
-                    // Vehicle 0: Player 1 (throttle), Player 2 (steering)
-                    // Vehicle 1: Player 3 (throttle), Player 4 (steering)
-                    
-                    int throttleActor = -1;
-                    int steeringActor = -1;
-                    
-                    if (i == 0) // 첫 번째 차량
-                    {
-                        // Player 1 (index 0) -> throttle
-                        throttleActor = PhotonNetwork.PlayerList.Length >= 1 
-                            ? PhotonNetwork.PlayerList[0].ActorNumber 
-                            : -1;
-                        
-                        // Player 2 (index 1) -> steering
-                        steeringActor = PhotonNetwork.PlayerList.Length >= 2 
-                            ? PhotonNetwork.PlayerList[1].ActorNumber 
-                            : throttleActor; // 혼자면 둘 다 담당
-                    }
-                    else if (i == 1) // 두 번째 차량
-                    {
-                        // Player 3 (index 2) -> throttle
-                        throttleActor = PhotonNetwork.PlayerList.Length >= 3 
-                            ? PhotonNetwork.PlayerList[2].ActorNumber 
-                            : -1;
-                        
-                        // Player 4 (index 3) -> steering
-                        steeringActor = PhotonNetwork.PlayerList.Length >= 4 
-                            ? PhotonNetwork.PlayerList[3].ActorNumber 
-                            : throttleActor; // 3명이면 Player 3이 둘 다 담당
-                    }
-
-                    // 좌석 배정 (버퍼링되어 나중에 합류한 플레이어도 동일 상태 유지)
-                    if (throttleActor != -1)
-                    {
-                        // 루트 PhotonView로 RPC 호출 (VehicleSeatManager가 같은 GO에 존재)
-                        var vpvAssign = vehicle.GetComponent<PhotonView>();
-                        if (vpvAssign != null)
-                        {
-                            vpvAssign.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttleActor, steeringActor);
-                            photonView.RPC("RPC_AssignCamera", RpcTarget.AllBuffered, vpvAssign.ViewID, throttleActor, steeringActor);
-                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} (ViewID {vpvAssign.ViewID}) assigned -> throttle:{throttleActor}, steering:{steeringActor}");
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"[MapVehicleSpawner] PhotonView missing on spawned vehicle index {i}");
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log($"[MapVehicleSpawner] Vehicle {i} has no players assigned (not enough players in room)");
-                    }
-                }
 
                 // 이동 권한: 마스터가 물리 시뮬레이션을 하고 나머지는 동기화만 받도록 설정
-                // (비권한 클라이언트에서도 입력은 RPC로 전달됨)
                 var vehicleComp = vehicle.GetComponent<Ilumisoft.SkillDrive.Vehicle>();
                 if (vehicleComp != null)
                 {
-                    // 오프라인(Photon 미연결) 또는 싱글 테스트 시에는 항상 이동 허용
-                    // 온라인 룸에서는 마스터만 권한 시뮬레이션 (간단한 authoritative 모델)
                     bool allowMove = !PhotonNetwork.IsConnected || PhotonNetwork.IsMasterClient;
                     vehicleComp.CanMove = allowMove;
                     if (!allowMove)
@@ -189,7 +151,7 @@ namespace Ilumisoft.SkillDrive.Network
                         Debug.Log($"[MapVehicleSpawner] Vehicle {i} movement disabled locally (non-authoritative client). Waiting for network sync.");
                     }
 
-                    // 커스텀 중력 값 조정 (너무 강한 중력이 차량을 땅에 눌러서 끌림 현상 발생)
+                    // 커스텀 중력 값 조정
                     var physicsField = typeof(Ilumisoft.SkillDrive.Vehicle).GetField("physics",
                         System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                     if (physicsField != null)
@@ -197,13 +159,13 @@ namespace Ilumisoft.SkillDrive.Network
                         var physics = physicsField.GetValue(vehicleComp) as Ilumisoft.SkillDrive.VehiclePhysics;
                         if (physics != null)
                         {
-                            physics.Gravity = 0f; // Unity의 기본 중력 사용 (Rigidbody.useGravity = true)
-                            physics.FallGravity = 15f; // 공중에서만 추가 중력
+                            physics.Gravity = 0f;
+                            physics.FallGravity = 15f;
                             Debug.Log($"[MapVehicleSpawner] Vehicle {i} custom gravity adjusted: ground=0, fall=15");
                         }
                     }
 
-                    // 지면 감지 레이캐스트 거리 조정 (차량 피벗이 높아서 기본값으로는 땅 감지 못함)
+                    // 지면 감지 레이캐스트 거리 조정
                     var groundDetectionField = typeof(Ilumisoft.SkillDrive.Vehicle).GetField("groundDetection",
                         System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                     if (groundDetectionField != null)
@@ -211,8 +173,7 @@ namespace Ilumisoft.SkillDrive.Network
                         var groundDetection = groundDetectionField.GetValue(vehicleComp) as Ilumisoft.SkillDrive.VehicleGroundDetection;
                         if (groundDetection != null)
                         {
-                            groundDetection.RaycastDist = 5.0f; // 충분한 레이 거리로 강제 설정
-                            // 기본층(Default)과 'Ground' 레이어 자동 포함
+                            groundDetection.RaycastDist = 5.0f;
                             int groundLayerIndex = LayerMask.NameToLayer("Ground");
                             LayerMask mask = Physics.DefaultRaycastLayers;
                             if (groundLayerIndex != -1)
@@ -226,36 +187,33 @@ namespace Ilumisoft.SkillDrive.Network
                     }
                 }
 
-                // 비마스터에서 차량이 '멈춘 것처럼' 보이는 문제 해결을 위해 PhotonRigidbodyView 추가 (변위/속도 동기화)
-                // 프리팹에 미리 넣지 않았다면 런타임에 설치
+                // 비마스터에서 차량이 '멈춘 것처럼' 보이는 문제 해결을 위해 PhotonRigidbodyView 추가
                 var rbView = vehicle.GetComponent<Photon.Pun.PhotonRigidbodyView>();
                 if (rbView == null)
                 {
                     rbView = vehicle.AddComponent<Photon.Pun.PhotonRigidbodyView>();
-                    // 기본 속성들은 인스펙터에서 조정 가능. 여기서는 속도/각속도 동기화 활성화 목적
                     rbView.m_SynchronizeVelocity = true;
                     rbView.m_SynchronizeAngularVelocity = true;
                     Debug.Log($"[MapVehicleSpawner] PhotonRigidbodyView added to Vehicle {i} for network sync.");
                 }
 
-                // Rigidbody 설정 확인 및 조정 (중력 문제 해결)
+                // Rigidbody 설정 확인 및 조정
                 var rb = vehicle.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
-                    rb.useGravity = true; // 유니티 기본 중력 활성화
-                    rb.mass = 1500f; // 차량 무게 (기본값이 너무 가벼우면 조정)
-                    rb.linearDamping = 0.5f; // 공기 저항 (너무 높으면 끌림)
-                    rb.angularDamping = 0.5f; // 회전 저항
+                    rb.useGravity = true;
+                    rb.mass = 1500f;
+                    rb.linearDamping = 0.5f;
+                    rb.angularDamping = 0.5f;
                     Debug.Log($"[MapVehicleSpawner] Vehicle {i} Rigidbody adjusted: gravity=true, mass={rb.mass}");
                 }
 
-                // 바닥에 맞춰 위치 정밀 조정: 콜라이더 하단을 지면에 맞춤
+                // 바닥에 맞춰 위치 정밀 조정
                 if (Physics.Raycast(sp.position + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 200f))
                 {
                     var col = vehicle.GetComponentInChildren<Collider>();
                     if (col != null)
                     {
-                        // 현재 콜라이더의 월드 좌표에서 하단 Y를 계산
                         float bottomY = col.bounds.center.y - col.bounds.extents.y;
                         float deltaY = hit.point.y - bottomY;
                         vehicle.transform.position += new Vector3(0f, deltaY, 0f);
@@ -263,15 +221,53 @@ namespace Ilumisoft.SkillDrive.Network
                     }
                     else
                     {
-                        // 콜라이더가 없으면 약간 내리기 (보수적)
                         vehicle.transform.position = hit.point;
                         Debug.Log($"[MapVehicleSpawner] Vehicle {i} grounded without collider info at Y={hit.point.y:F2}");
                     }
                 }
             }
 
-            photonView.RPC("RPC_LogSpawn", RpcTarget.AllBuffered);
+            // 스폰 완료 후 좌석 일괄 배정
+            if (PhotonNetwork.IsMasterClient)
+            {
+                RecalculateAndBroadcastSeats();
+            }
         }
+
+        // 좌석 재계산: 플레이어 join 순서 기반 (추후 커스터마이즈를 위한 단일 진입점)
+        private void RecalculateAndBroadcastSeats()
+        {
+            if (!PhotonNetwork.IsMasterClient) return;
+            var players = PhotonNetwork.PlayerList.OrderBy(p => p.ActorNumber).ToArray();
+
+            // 규칙:
+            // index0 -> Vehicle0 throttle+steering (혼자일 때)
+            // index1 -> Vehicle0 steering (둘 이상), index0은 Vehicle0 throttle
+            // index2 -> Vehicle1 throttle (셋 이상)
+            // index3 -> Vehicle1 steering (넷 이상)
+
+            seatAssignments[0].throttle = players.Length >= 1 ? players[0].ActorNumber : -1;
+            seatAssignments[0].steering = players.Length >= 2 ? players[1].ActorNumber : seatAssignments[0].throttle; // 1명일 때 혼자 둘 다
+            seatAssignments[1].throttle = players.Length >= 3 ? players[2].ActorNumber : -1;
+            seatAssignments[1].steering = players.Length >= 4 ? players[3].ActorNumber : seatAssignments[1].throttle; // 3명일 때 혼자 둘 다
+
+            for (int i = 0; i < spawnedVehicles.Length; i++)
+            {
+                if (spawnedVehicles[i] == null) continue;
+                var pv = spawnedVehicles[i].GetComponent<PhotonView>();
+                if (pv == null) continue;
+                var throttle = seatAssignments[i].throttle;
+                var steering = seatAssignments[i].steering;
+                // Always broadcast seats (even -1) so non-assigned vehicles disable their cameras on all clients
+                pv.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttle, steering);
+                Debug.Log($"[MapVehicleSpawner] Reassign vehicle {i} -> throttle:{throttle}, steering:{steering}");
+            }
+        }
+
+        #region Player Join/Leave Hooks (manual add since not inheriting from callback interface in file)
+        // Public method to be called externally by a small Photon callback bridge if needed.
+        public void OnPlayerListChanged() { if (PhotonNetwork.IsMasterClient) RecalculateAndBroadcastSeats(); }
+        #endregion
 
         [PunRPC]
         void RPC_LogSpawn()

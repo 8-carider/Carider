@@ -113,12 +113,21 @@ namespace Ilumisoft.SkillDrive.Network
                     Debug.Log("[VehicleCameraManager] Added CinemachineBrain to Main Camera at runtime.");
                 }
             }
+
+            // Start disabled at runtime to avoid random camera selection before seat assignment
+            if (Application.isPlaying && virtualCamera != null && PhotonNetwork.IsConnected)
+            {
+                virtualCamera.enabled = false;
+            }
         }
 
         public void SetCameraActive(bool active, int actorNumber)
         {
             if (virtualCamera != null)
             {
+                // Toggle component enabled state to opt-in/out of Brain selection
+                virtualCamera.enabled = active;
+
                 if (active)
                 {
                     // Lower priority of other virtual cameras on this client
