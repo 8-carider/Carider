@@ -72,12 +72,12 @@ namespace Ilumisoft.SkillDrive.Game
             if (!inMultiplayer)
             {
                 countdown.StartCountdown();
-                Debug.Log("[GameManager] Countdown started (single player mode)");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogGameplay("[GameManager] Countdown started (single player mode)");
             }
             else
             {
                 countdown.StopTimer();
-                Debug.Log("[GameManager] Countdown disabled (multiplayer mode)");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogGameplay("[GameManager] Countdown disabled (multiplayer mode)");
             }
 
             isGameOver = false;
@@ -110,7 +110,7 @@ namespace Ilumisoft.SkillDrive.Game
                 // Make sure this is only called once
                 isGameOver = true;
 
-                Debug.Log($"[GameManager] EndLevel called. won={won}. (timeLimit may have expired or all collected)");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogGameplay($"[GameManager] EndLevel called. won={won}. (timeLimit may have expired or all collected)");
 
                 var audioClip = won ? successSFX : failSFX;
 
@@ -133,7 +133,7 @@ namespace Ilumisoft.SkillDrive.Game
                 }
                 else if (vehicle == null)
                 {
-                    Debug.LogWarning("[GameManager] Vehicle not found on 'player' object. Skipping movement lock.");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogGameplay("[GameManager] Vehicle not found on 'player' object. Skipping movement lock.");
                 }
 
                 if(won)

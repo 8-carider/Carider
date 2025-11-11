@@ -40,7 +40,7 @@ namespace Ilumisoft.SkillDrive.Network
         {
             throttleSeatActorNumber = throttleActor;
             steeringSeatActorNumber = steeringActor;
-            Debug.Log($"[VehicleSeatManager] Seats assigned on {gameObject.name} -> Throttle:{throttleActor} Steering:{steeringActor}");
+            // Debug.Log($"[VehicleSeatManager] Seats assigned on {gameObject.name} -> Throttle:{throttleActor} Steering:{steeringActor}");
 
             // 로컬 카메라 활성/비활성은 좌석 배정 정보만으로 결정 (RPC 인자 불일치 문제 방지)
             var cam = GetComponent<VehicleCameraManager>();
@@ -108,6 +108,16 @@ namespace Ilumisoft.SkillDrive.Network
         public (int throttle, int steering) GetAssignedActors()
         {
             return (throttleSeatActorNumber, steeringSeatActorNumber);
+        }
+
+        // Set name consistently across clients (from spawner)
+        [PunRPC]
+        public void RPC_SetRuntimeName(string runtimeName)
+        {
+            if (!string.IsNullOrEmpty(runtimeName))
+            {
+                gameObject.name = runtimeName;
+            }
         }
 
     }

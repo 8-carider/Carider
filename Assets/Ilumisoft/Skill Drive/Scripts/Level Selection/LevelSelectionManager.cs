@@ -66,11 +66,11 @@ namespace Ilumisoft.SkillDrive.LevelSelection
         {
             sceneLoader = FindAnyObjectByType<SceneLoader>();
 
-            // 디버그: 각 레벨의 잠금 상태와 LastLevel 값 출력
-            Debug.Log($"[LevelSelectionManager] LastLevel = {LastLevel}");
+            // Optional debug (disabled by default via SkillDriveDebug flags)
+            Ilumisoft.SkillDrive.SkillDriveDebug.LogUI($"[LevelSelectionManager] LastLevel = {LastLevel}");
             for (int i = 1; i <= levelPreviews.Count; i++)
             {
-                Debug.Log($"[LevelSelectionManager] Level {i} locked? {LevelLockManager.IsLocked(i)}");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogUI($"[LevelSelectionManager] Level {i} locked? {LevelLockManager.IsLocked(i)}");
             }
 
             SetupLevelPreviewsAndButtons();

@@ -125,6 +125,7 @@ namespace Ilumisoft.SkillDrive.Network
         {
             if (virtualCamera != null)
             {
+                bool wasAssigned = isAssigned;
                 // Toggle component enabled state to opt-in/out of Brain selection
                 virtualCamera.enabled = active;
 
@@ -146,8 +147,13 @@ namespace Ilumisoft.SkillDrive.Network
                 {
                     virtualCamera.Priority.Value = 0;
                 }
+                // Log when this camera becomes the active one for the local view
+                if (active && !wasAssigned)
+                {
+                    Debug.Log($"[Camera] Now following {gameObject.name}");
+                }
                 isAssigned = active;
-                Debug.Log($"[VehicleCameraManager] Camera {(active ? "enabled" : "disabled")} for actor {actorNumber} on vehicle {gameObject.name}");
+                // Debug.Log($"[VehicleCameraManager] Camera {(active ? "enabled" : "disabled")} for actor {actorNumber} on vehicle {gameObject.name}");
             }
         }
 

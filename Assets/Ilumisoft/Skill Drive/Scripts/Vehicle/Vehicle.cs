@@ -66,6 +66,13 @@ namespace Ilumisoft.SkillDrive
             inputManager.Initialize(this);
             groundDetection.Initialize(this);
 
+            // Disable PlayerInput early to avoid control-scheme pairing warnings on remote clients
+            var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+            if (playerInput != null && playerInput.enabled)
+            {
+                playerInput.enabled = false;
+            }
+
             // Ensure VehicleSeatManager exists on the same GameObject as the PhotonView on ALL clients
             // This avoids RPC "method not found" caused by adding the component only on master at runtime.
             var pv = GetComponent<PhotonView>();
@@ -75,7 +82,15 @@ namespace Ilumisoft.SkillDrive
                 if (seatMgr == null)
                 {
                     pv.gameObject.AddComponent<VehicleSeatManager>();
-                    Debug.Log("[Vehicle] Ensured VehicleSeatManager on PhotonView GameObject at Awake");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogVehicle("[Vehicle] Ensured VehicleSeatManager on PhotonView GameObject at Awake", this);
+                }
+
+                // Ensure a VehicleCameraManager exists on all clients (components added only on master won't sync)
+                var camMgr = pv.gameObject.GetComponent<Ilumisoft.SkillDrive.Network.VehicleCameraManager>();
+                if (camMgr == null)
+                {
+                    pv.gameObject.AddComponent<Ilumisoft.SkillDrive.Network.VehicleCameraManager>();
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogVehicle("[Vehicle] Ensured VehicleCameraManager on PhotonView GameObject at Awake", this);
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace Ilumisoft.SkillDrive.Network
                 if (p1 != null && p2 != null)
                 {
                     vehicleSpawnPoints = new Transform[2] { p1.transform, p2.transform };
-                    Debug.Log("[MapVehicleSpawner] Auto-assigned spawn points from Point1/Point2.");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Auto-assigned spawn points from Point1/Point2.");
                 }
             }
         }
@@ -62,26 +62,26 @@ namespace Ilumisoft.SkillDrive.Network
         {
             if (!PhotonNetwork.IsConnected || !PhotonNetwork.InRoom)
             {
-                Debug.LogWarning("[MapVehicleSpawner] Not in room.");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Not in room.");
                 return;
             }
 
             if (!PhotonNetwork.IsMasterClient)
             {
-                Debug.Log("[MapVehicleSpawner] Only master spawns vehicles.");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Only master spawns vehicles.");
                 return;
             }
 
             // 이미 스폰했으면 절대 다시 안 함
             if (hasSpawned)
             {
-                Debug.Log("[MapVehicleSpawner] Already spawned vehicles. Ignoring duplicate spawn request.");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Already spawned vehicles. Ignoring duplicate spawn request.");
                 return;
             }
 
             if (vehicleSpawnPoints == null || vehicleSpawnPoints.Length < 2)
             {
-                Debug.LogError("[MapVehicleSpawner] Need at least 2 spawn points for two vehicles.");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Need at least 2 spawn points for two vehicles.");
                 return;
             }
 
@@ -92,19 +92,28 @@ namespace Ilumisoft.SkillDrive.Network
                 var sp = vehicleSpawnPoints[i];
                 if (sp == null)
                 {
-                    Debug.LogError($"[MapVehicleSpawner] Spawn point {i} is null.");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Spawn point {i} is null.");
                     continue;
                 }
 
                 var vehicle = PhotonNetwork.Instantiate(vehiclePrefabName, sp.position, sp.rotation);
                 spawnedVehicles[i] = vehicle;
+                
+                // Set vehicle name to include number (Vehicle 1, Vehicle 2)
+                vehicle.name = $"Vehicle {i + 1}";
+                // Broadcast name to all clients to ensure consistency (late joiners & remote instantiation differences)
+                var pvRename = vehicle.GetComponent<PhotonView>();
+                if (pvRename != null)
+                {
+                    pvRename.RPC("RPC_SetRuntimeName", RpcTarget.AllBuffered, vehicle.name);
+                }
 
                 // PlayerInput는 네트워크 좌석 시스템으로 대체되므로 비활성화하여 제어 스킴 경고 방지
                 var playerInput = vehicle.GetComponent<UnityEngine.InputSystem.PlayerInput>();
                 if (playerInput != null)
                 {
                     playerInput.enabled = false;
-                    Debug.Log($"[MapVehicleSpawner] Disabled PlayerInput on Vehicle {i} to avoid control scheme pairing.");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Disabled PlayerInput on Vehicle {i} to avoid control scheme pairing.");
                 }
 
                 // 카메라 매니저 추가
@@ -127,7 +136,7 @@ namespace Ilumisoft.SkillDrive.Network
                     if (seatMgr == null)
                     {
                         seatMgr = vpv.gameObject.AddComponent<VehicleSeatManager>();
-                        Debug.Log($"[MapVehicleSpawner] VehicleSeatManager attached to ROOT PhotonView GameObject on Vehicle {i}");
+                        Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] VehicleSeatManager attached to ROOT PhotonView GameObject on Vehicle {i}");
                     }
                 }
 
@@ -138,7 +147,7 @@ namespace Ilumisoft.SkillDrive.Network
                     respawnHandler = vehicle.AddComponent<Ilumisoft.SkillDrive.VehicleRespawnHandler>();
                 }
                 respawnHandler.SetSpawnPoint(sp);
-                Debug.Log($"[MapVehicleSpawner] Vehicle {i} respawn handler configured with spawn point: {sp.name}");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} respawn handler configured with spawn point: {sp.name}");
 
                 // 이동 권한: 마스터가 물리 시뮬레이션을 하고 나머지는 동기화만 받도록 설정
                 var vehicleComp = vehicle.GetComponent<Ilumisoft.SkillDrive.Vehicle>();
@@ -148,7 +157,7 @@ namespace Ilumisoft.SkillDrive.Network
                     vehicleComp.CanMove = allowMove;
                     if (!allowMove)
                     {
-                        Debug.Log($"[MapVehicleSpawner] Vehicle {i} movement disabled locally (non-authoritative client). Waiting for network sync.");
+                        Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} movement disabled locally (non-authoritative client). Waiting for network sync.");
                     }
 
                     // 커스텀 중력 값 조정
@@ -161,7 +170,7 @@ namespace Ilumisoft.SkillDrive.Network
                         {
                             physics.Gravity = 0f;
                             physics.FallGravity = 15f;
-                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} custom gravity adjusted: ground=0, fall=15");
+                            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} custom gravity adjusted: ground=0, fall=15");
                         }
                     }
 
@@ -181,8 +190,8 @@ namespace Ilumisoft.SkillDrive.Network
                                 mask |= (1 << groundLayerIndex);
                             }
                             groundDetection.GroundLayers = mask;
-                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} ground raycast distance set to {groundDetection.RaycastDist}");
-                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} ground layer mask set to {groundDetection.GroundLayers.value}");
+                            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} ground raycast distance set to {groundDetection.RaycastDist}");
+                            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} ground layer mask set to {groundDetection.GroundLayers.value}");
                         }
                     }
                 }
@@ -194,7 +203,7 @@ namespace Ilumisoft.SkillDrive.Network
                     rbView = vehicle.AddComponent<Photon.Pun.PhotonRigidbodyView>();
                     rbView.m_SynchronizeVelocity = true;
                     rbView.m_SynchronizeAngularVelocity = true;
-                    Debug.Log($"[MapVehicleSpawner] PhotonRigidbodyView added to Vehicle {i} for network sync.");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] PhotonRigidbodyView added to Vehicle {i} for network sync.");
                 }
 
                 // Rigidbody 설정 확인 및 조정
@@ -205,7 +214,7 @@ namespace Ilumisoft.SkillDrive.Network
                     rb.mass = 1500f;
                     rb.linearDamping = 0.5f;
                     rb.angularDamping = 0.5f;
-                    Debug.Log($"[MapVehicleSpawner] Vehicle {i} Rigidbody adjusted: gravity=true, mass={rb.mass}");
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} Rigidbody adjusted: gravity=true, mass={rb.mass}");
                 }
 
                 // 바닥에 맞춰 위치 정밀 조정
@@ -217,12 +226,12 @@ namespace Ilumisoft.SkillDrive.Network
                         float bottomY = col.bounds.center.y - col.bounds.extents.y;
                         float deltaY = hit.point.y - bottomY;
                         vehicle.transform.position += new Vector3(0f, deltaY, 0f);
-                        Debug.Log($"[MapVehicleSpawner] Vehicle {i} snapped to ground. spY={sp.position.y:F2}, hitY={hit.point.y:F2}, deltaY={deltaY:F2}");
+                        Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} snapped to ground. spY={sp.position.y:F2}, hitY={hit.point.y:F2}, deltaY={deltaY:F2}");
                     }
                     else
                     {
                         vehicle.transform.position = hit.point;
-                        Debug.Log($"[MapVehicleSpawner] Vehicle {i} grounded without collider info at Y={hit.point.y:F2}");
+                        Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {i} grounded without collider info at Y={hit.point.y:F2}");
                     }
                 }
             }
@@ -260,7 +269,7 @@ namespace Ilumisoft.SkillDrive.Network
                 var steering = seatAssignments[i].steering;
                 // Always broadcast seats (even -1) so non-assigned vehicles disable their cameras on all clients
                 pv.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttle, steering);
-                Debug.Log($"[MapVehicleSpawner] Reassign vehicle {i} -> throttle:{throttle}, steering:{steering}");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Reassign vehicle {i} -> throttle:{throttle}, steering:{steering}");
             }
         }
 
@@ -272,7 +281,7 @@ namespace Ilumisoft.SkillDrive.Network
         [PunRPC]
         void RPC_LogSpawn()
         {
-            Debug.Log("[MapVehicleSpawner] Vehicles spawned (RPC sync). Ready for seat assignment.");
+            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Vehicles spawned (RPC sync). Ready for seat assignment.");
         }
 
         [PunRPC]
@@ -282,7 +291,7 @@ namespace Ilumisoft.SkillDrive.Network
             PhotonView targetPV = PhotonView.Find(vehicleViewID);
             if (targetPV == null)
             {
-                Debug.LogWarning($"[MapVehicleSpawner] RPC_AssignCamera: PhotonView {vehicleViewID} not found on client.");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] RPC_AssignCamera: PhotonView {vehicleViewID} not found on client.");
                 return;
             }
             var vehicle = targetPV.gameObject;
@@ -293,7 +302,7 @@ namespace Ilumisoft.SkillDrive.Network
             }
             else
             {
-                Debug.LogWarning($"[MapVehicleSpawner] RPC_AssignCamera: VehicleCameraManager missing on ViewID {vehicleViewID}");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] RPC_AssignCamera: VehicleCameraManager missing on ViewID {vehicleViewID}");
             }
         }
     }
