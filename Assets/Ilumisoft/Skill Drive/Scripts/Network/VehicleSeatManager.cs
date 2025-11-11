@@ -7,7 +7,8 @@ namespace Ilumisoft.SkillDrive.Network
 {
     // Attach to each spawned vehicle at runtime by MapVehicleSpawner
     // Receives input from players and applies combined steering/throttle
-    public class VehicleSeatManager : MonoBehaviourPun
+    // RPC calls are received through the vehicle's main PhotonView
+    public class VehicleSeatManager : MonoBehaviour
     {
         [SerializeField] private int throttleSeatActorNumber = -1; // up/down player
         [SerializeField] private int steeringSeatActorNumber = -1; // left/right player
@@ -30,12 +31,6 @@ namespace Ilumisoft.SkillDrive.Network
             if (vehiclePlayerInput != null)
             {
                 vehiclePlayerInput.SetMovementInput(combinedInput);
-                
-                // Debug logging (remove after testing)
-                if (combinedInput.magnitude > 0.01f)
-                {
-                    Debug.Log($"[VehicleSeatManager] Applying input: steering={combinedInput.x:F2}, throttle={combinedInput.y:F2}");
-                }
             }
         }
 

@@ -146,12 +146,14 @@ namespace Ilumisoft.SkillDrive.Network
                     // 좌석 배정 (버퍼링되어 나중에 합류한 플레이어도 동일 상태 유지)
                     if (throttleActor != -1)
                     {
-                        seatMgr.photonView.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttleActor, steeringActor);
-
-                        // 차량의 PhotonView ID를 이용해 모든 클라이언트가 정확히 해당 차량을 찾도록 함
+                        // 차량의 PhotonView를 통해 RPC 전송
                         var vpv = vehicle.GetComponent<PhotonView>();
                         if (vpv != null)
                         {
+                            // 차량의 PhotonView로 RPC 호출 (VehicleSeatManager가 받음)
+                            vpv.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttleActor, steeringActor);
+                            
+                            // 카메라 배정
                             photonView.RPC("RPC_AssignCamera", RpcTarget.AllBuffered, vpv.ViewID, throttleActor, steeringActor);
                             Debug.Log($"[MapVehicleSpawner] Vehicle {i} (ViewID {vpv.ViewID}) assigned -> throttle:{throttleActor}, steering:{steeringActor}");
                         }
@@ -166,15 +168,22 @@ namespace Ilumisoft.SkillDrive.Network
                     }
                 }
 
-                // Vehicle 이동은 오너(마스터)가 담당
+                // 이동 권한: 마스터가 물리 시뮬레이션을 하고 나머지는 동기화만 받도록 설정
+                // (비권한 클라이언트에서도 입력은 RPC로 전달됨)
                 var vehicleComp = vehicle.GetComponent<Ilumisoft.SkillDrive.Vehicle>();
                 if (vehicleComp != null)
                 {
-                    vehicleComp.CanMove = PhotonNetwork.IsMasterClient;
-                    
+                    // 오프라인(Photon 미연결) 또는 싱글 테스트 시에는 항상 이동 허용
+                    // 온라인 룸에서는 마스터만 권한 시뮬레이션 (간단한 authoritative 모델)
+                    bool allowMove = !PhotonNetwork.IsConnected || PhotonNetwork.IsMasterClient;
+                    vehicleComp.CanMove = allowMove;
+                    if (!allowMove)
+                    {
+                        Debug.Log($"[MapVehicleSpawner] Vehicle {i} movement disabled locally (non-authoritative client). Waiting for network sync.");
+                    }
+
                     // 커스텀 중력 값 조정 (너무 강한 중력이 차량을 땅에 눌러서 끌림 현상 발생)
-                    // Reflection을 통해 physics 필드에 접근
-                    var physicsField = typeof(Ilumisoft.SkillDrive.Vehicle).GetField("physics", 
+                    var physicsField = typeof(Ilumisoft.SkillDrive.Vehicle).GetField("physics",
                         System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                     if (physicsField != null)
                     {
@@ -186,6 +195,18 @@ namespace Ilumisoft.SkillDrive.Network
                             Debug.Log($"[MapVehicleSpawner] Vehicle {i} custom gravity adjusted: ground=0, fall=15");
                         }
                     }
+                }
+
+                // 비마스터에서 차량이 '멈춘 것처럼' 보이는 문제 해결을 위해 PhotonRigidbodyView 추가 (변위/속도 동기화)
+                // 프리팹에 미리 넣지 않았다면 런타임에 설치
+                var rbView = vehicle.GetComponent<Photon.Pun.PhotonRigidbodyView>();
+                if (rbView == null)
+                {
+                    rbView = vehicle.AddComponent<Photon.Pun.PhotonRigidbodyView>();
+                    // 기본 속성들은 인스펙터에서 조정 가능. 여기서는 속도/각속도 동기화 활성화 목적
+                    rbView.m_SynchronizeVelocity = true;
+                    rbView.m_SynchronizeAngularVelocity = true;
+                    Debug.Log($"[MapVehicleSpawner] PhotonRigidbodyView added to Vehicle {i} for network sync.");
                 }
 
                 // Rigidbody 설정 확인 및 조정 (중력 문제 해결)

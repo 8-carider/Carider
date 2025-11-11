@@ -95,6 +95,8 @@ namespace Ilumisoft.SkillDrive.Game
                 // Make sure this is only called once
                 isGameOver = true;
 
+                Debug.Log($"[GameManager] EndLevel called. won={won}. (timeLimit may have expired or all collected)");
+
                 var audioClip = won ? successSFX : failSFX;
 
                 if (audioSource != null && audioClip != null)
@@ -102,10 +104,22 @@ namespace Ilumisoft.SkillDrive.Game
                     audioSource.PlayOneShot(audioClip);
                 }
 
-                var vehicle = player.GetComponent<Vehicle>();
+                var vehicle = player != null ? player.GetComponent<Vehicle>() : null;
 
-                vehicle.CanMove = false;
-                vehicle.Rigidbody.linearDamping = 2.0f;
+                // 멀티플레이(Photon 룸)에서는 차량 이동을 강제로 막지 않음. 싱글/오프라인에서만 락.
+                bool inMultiplayer = false;
+#if PHOTON_UNITY_NETWORKING
+                inMultiplayer = Photon.Pun.PhotonNetwork.IsConnected && Photon.Pun.PhotonNetwork.InRoom;
+#endif
+                if (vehicle != null && !inMultiplayer)
+                {
+                    vehicle.CanMove = false;
+                    vehicle.Rigidbody.linearDamping = 2.0f;
+                }
+                else if (vehicle == null)
+                {
+                    Debug.LogWarning("[GameManager] Vehicle not found on 'player' object. Skipping movement lock.");
+                }
 
                 if(won)
                 {

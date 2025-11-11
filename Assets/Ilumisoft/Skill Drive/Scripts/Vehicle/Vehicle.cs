@@ -156,8 +156,24 @@ namespace Ilumisoft.SkillDrive
             if (IsGrounded && CanMove)
             {
                 var force = FinalStats.Acceleration * Input.y;
-
-                Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
+                if (Mathf.Abs(force) > 0.01f)
+                {
+                    Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
+                }
+            }
+            else
+            {
+                // 진단용 로그: 왜 움직이지 않는지 한 번만 출력 (스팸 방지)
+                if (!_reportedNoMove && IsGrounded && !CanMove)
+                {
+                    Debug.Log("[Vehicle] Acceleration skipped: CanMove == false (authoritative remote or misconfiguration)." );
+                    _reportedNoMove = true;
+                }
+                else if (!_reportedNoMove && !IsGrounded)
+                {
+                    Debug.Log("[Vehicle] Acceleration skipped: not grounded (raycast miss). Consider increasing RaycastDist or checking pivot height." );
+                    _reportedNoMove = true;
+                }
             }
         }
 
@@ -193,5 +209,8 @@ namespace Ilumisoft.SkillDrive
         {
             groundDetection.OnDrawGizmosSelected(this);
         }
+
+        // 진단 플래그 (로그 1회 출력용)
+        private bool _reportedNoMove = false;
     }
 }

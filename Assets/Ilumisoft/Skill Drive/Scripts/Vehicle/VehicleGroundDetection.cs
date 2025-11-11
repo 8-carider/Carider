@@ -9,7 +9,7 @@ namespace Ilumisoft.SkillDrive
         public LayerMask GroundLayers = Physics.DefaultRaycastLayers;
 
         [Tooltip("How far to raycast when checking for ground")]
-        public float RaycastDist = 0.25f;
+    public float RaycastDist = 1.0f; // 기본값을 조금 늘려서 차체가 낮은 경우 감지 불가 방지
 
         Vehicle vehicle;
 
