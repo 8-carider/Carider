@@ -41,6 +41,12 @@ MonoBehaviour:
   - RespawnSpaceship
   - RPC_AddCollectable
   - RPC_LogSpawn
+  - RPC_SendSteering
+  - RPC_SendThrottle
+  - RPC_SetSeats
+  - RPC_SetSteering
+  - RPC_SetThrottle
+  - RPC_AssignCamera
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

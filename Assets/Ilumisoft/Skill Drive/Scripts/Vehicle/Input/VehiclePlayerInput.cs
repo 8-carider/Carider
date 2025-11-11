@@ -31,6 +31,12 @@ namespace Ilumisoft.SkillDrive.Input
             movementInput = movementValue.Get<Vector2>();
         }
 
+        // Allow external systems (e.g., networking seat manager) to set input directly
+        public void SetMovementInput(Vector2 value)
+        {
+            movementInput = value;
+        }
+
         private void Reset()
         {
             // Automatically add and setup the PlayerInput component if none exists

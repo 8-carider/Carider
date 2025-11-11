@@ -81,6 +81,15 @@ namespace Ilumisoft.SkillDrive.Network
                 PhotonNetwork.AutomaticallySyncScene = true;
             }
 
+            // Create PlayerSeatInput once for local player
+            if (FindObjectOfType<PlayerSeatInput>() == null)
+            {
+                GameObject inputObj = new GameObject("PlayerSeatInput");
+                inputObj.AddComponent<PlayerSeatInput>();
+                DontDestroyOnLoad(inputObj);
+                Debug.Log("[NetworkManager] PlayerSeatInput created for local player");
+            }
+
             // 마스터 클라이언트만 씬 로드 호출 (자동 동기화됨)
             if (PhotonNetwork.IsMasterClient)
             {
