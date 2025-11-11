@@ -38,12 +38,21 @@ namespace Ilumisoft.SkillDrive.Network
         // 랜덤 룸에 참가 (없으면 생성)
         public void JoinOrCreateRoom()
         {
+            Debug.Log("[NetworkManager] JoinOrCreateRoom 호출됨");
+            
             if (!PhotonNetwork.IsConnected)
             {
-                Debug.LogError("Photon에 연결되지 않았습니다!");
+                Debug.LogError("[NetworkManager] Photon에 연결되지 않았습니다!");
                 return;
             }
 
+            if (!PhotonNetwork.InLobby)
+            {
+                Debug.LogError("[NetworkManager] 로비에 들어가지 않았습니다!");
+                return;
+            }
+
+            Debug.Log("[NetworkManager] 랜덤 룸 참가 시도...");
             PhotonNetwork.JoinRandomRoom();
         }
 
@@ -64,6 +73,20 @@ namespace Ilumisoft.SkillDrive.Network
         public override void OnJoinedRoom()
         {
             Debug.Log($"룸에 참가함! 플레이어 수: {PhotonNetwork.CurrentRoom.PlayerCount}");
+
+            // 모든 클라이언트를 Level Selection 씬으로 동기화 이동
+            // PhotonNetwork.AutomaticallySyncScene 가 TRUE인지 확인 필요 (Project Settings or 코드에서 설정)
+            if (!PhotonNetwork.AutomaticallySyncScene)
+            {
+                PhotonNetwork.AutomaticallySyncScene = true;
+            }
+
+            // 마스터 클라이언트만 씬 로드 호출 (자동 동기화됨)
+            if (PhotonNetwork.IsMasterClient)
+            {
+                Debug.Log("마스터 클라이언트 - Level Selection 씬 로드");
+                PhotonNetwork.LoadLevel("Level Selection");
+            }
         }
 
         public override void OnPlayerEnteredRoom(Player newPlayer)

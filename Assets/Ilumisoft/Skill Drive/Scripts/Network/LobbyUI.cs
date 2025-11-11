@@ -61,16 +61,24 @@ namespace Ilumisoft.SkillDrive.Network
 
         private void OnJoinButtonClicked()
         {
+            Debug.Log("[LobbyUI] Join 버튼 클릭됨!");
+            
             if (playerNameInput != null && !string.IsNullOrEmpty(playerNameInput.text))
             {
                 PhotonNetwork.NickName = playerNameInput.text;
+                Debug.Log($"[LobbyUI] 플레이어 이름 설정: {playerNameInput.text}");
             }
 
             UpdateStatusText("게임 참가 중...");
             
             if (networkManager != null)
             {
+                Debug.Log("[LobbyUI] NetworkManager.JoinOrCreateRoom() 호출");
                 networkManager.JoinOrCreateRoom();
+            }
+            else
+            {
+                Debug.LogError("[LobbyUI] NetworkManager를 찾을 수 없습니다!");
             }
         }
 
