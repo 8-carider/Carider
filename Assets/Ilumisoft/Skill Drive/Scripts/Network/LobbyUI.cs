@@ -47,19 +47,17 @@ namespace Ilumisoft.SkillDrive.Network
 
         private void Update()
         {
-            // 테스트용: J 키 누르면 강제로 Join 실행
-            #if UNITY_EDITOR
-            if (UnityEngine.Input.GetKeyDown(KeyCode.J))
+            // Enter 키로 Join 실행 (빌드/에디터 모두 작동)
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Return) || UnityEngine.Input.GetKeyDown(KeyCode.KeypadEnter))
             {
-                Debug.Log("[LobbyUI] J 키로 강제 Join 호출!");
+                Debug.Log("[LobbyUI] Enter 키로 Join 호출!");
                 OnJoinButtonClicked();
             }
-            #endif
 
             // 연결 상태 업데이트
             if (PhotonNetwork.IsConnected && PhotonNetwork.InLobby)
             {
-                UpdateStatusText("준비 완료! 게임 참가 가능");
+                UpdateStatusText("준비 완료! Enter 또는 Join 버튼 클릭");
                 if (joinButton != null)
                     joinButton.interactable = true;
             }

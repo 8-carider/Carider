@@ -62,5 +62,21 @@ namespace Ilumisoft.SkillDrive.Network
             if (steeringSeatActorNumber == -1 || actor != steeringSeatActorNumber) return;
             combinedInput.x = Mathf.Clamp(x, -1f, 1f);
         }
+
+        /// <summary>
+        /// Check if a player is assigned to this vehicle (throttle or steering)
+        /// </summary>
+        public bool IsPlayerAssigned(int actorNumber)
+        {
+            return actorNumber == throttleSeatActorNumber || actorNumber == steeringSeatActorNumber;
+        }
+
+        /// <summary>
+        /// Get assigned seat actors for external systems
+        /// </summary>
+        public (int throttle, int steering) GetAssignedActors()
+        {
+            return (throttleSeatActorNumber, steeringSeatActorNumber);
+        }
     }
 }

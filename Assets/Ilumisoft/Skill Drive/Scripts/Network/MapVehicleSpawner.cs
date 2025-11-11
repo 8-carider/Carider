@@ -13,6 +13,7 @@ namespace Ilumisoft.SkillDrive.Network
         [SerializeField] private bool autoSpawnOnStart = true;
 
         private GameObject[] spawnedVehicles;
+        private bool hasSpawned = false; // 중복 스폰 완전 방지
 
         private void Awake()
         {
@@ -49,11 +50,10 @@ namespace Ilumisoft.SkillDrive.Network
                 return;
             }
 
-            // 이미 차량이 존재하면 중복 스폰 방지
-            var existing = FindObjectsOfType<Ilumisoft.SkillDrive.Vehicle>();
-            if (existing != null && existing.Length >= 2)
+            // 이미 스폰했으면 절대 다시 안 함
+            if (hasSpawned)
             {
-                Debug.Log("[MapVehicleSpawner] Vehicles already present. Skipping spawn.");
+                Debug.Log("[MapVehicleSpawner] Already spawned vehicles. Ignoring duplicate spawn request.");
                 return;
             }
 
@@ -63,6 +63,7 @@ namespace Ilumisoft.SkillDrive.Network
                 return;
             }
 
+            hasSpawned = true; // 스폰 시작 즉시 플래그 설정
             spawnedVehicles = new GameObject[2];
             for (int i = 0; i < 2; i++)
             {
@@ -97,6 +98,15 @@ namespace Ilumisoft.SkillDrive.Network
                 {
                     seatMgr = vehicle.AddComponent<VehicleSeatManager>();
                 }
+
+                // 리스폰 핸들러 추가 및 스폰 포인트 설정
+                var respawnHandler = vehicle.GetComponent<Ilumisoft.SkillDrive.VehicleRespawnHandler>();
+                if (respawnHandler == null)
+                {
+                    respawnHandler = vehicle.AddComponent<Ilumisoft.SkillDrive.VehicleRespawnHandler>();
+                }
+                respawnHandler.SetSpawnPoint(sp);
+                Debug.Log($"[MapVehicleSpawner] Vehicle {i} respawn handler configured with spawn point: {sp.name}");
                 
                 // 마스터 클라이언트만 좌석 배정
                 if (PhotonNetwork.IsMasterClient)
