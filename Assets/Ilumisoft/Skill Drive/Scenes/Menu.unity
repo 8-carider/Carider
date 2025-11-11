@@ -273,9 +273,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Connecting...
-
-'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -749,7 +747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &360771502
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1861,9 +1859,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1419463154}
   - {fileID: 360771502}
   - {fileID: 1302303281}
-  - {fileID: 1419463154}
   - {fileID: 188004956}
   m_Father: {fileID: 658101693}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2379,6 +2377,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1290175133}
   - component: {fileID: 1290175132}
+  - component: {fileID: 1290175134}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -2415,6 +2414,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1290175134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290175131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99c84bf76bcec39409a6a3f98ec1dc47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Network.LobbyUI
+  playerNameInput: {fileID: 1302303280}
+  joinButton: {fileID: 1419463151}
+  statusText: {fileID: 188004954}
+  lobbyPanel: {fileID: 960458992}
 --- !u!1 &1300170656
 GameObject:
   m_ObjectHideFlags: 0
@@ -2996,6 +3011,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4357519437633950667, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5523545482650444700, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+      propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9096915204064122240, guid: 25a452f70e5abfa41a042d556397f778, type: 3}

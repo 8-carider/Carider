@@ -14,13 +14,26 @@ namespace Ilumisoft.SkillDrive.Network
 
         private NetworkManager networkManager;
 
+        private void Awake()
+        {
+            Debug.Log("[LobbyUI] Awake() 호출됨 - 스크립트 활성화됨!");
+        }
+
         private void Start()
         {
+            Debug.Log("[LobbyUI] Start() 호출됨");
+            
             networkManager = FindAnyObjectByType<NetworkManager>();
+            Debug.Log($"[LobbyUI] NetworkManager 찾기 결과: {(networkManager != null ? "성공" : "실패")}");
             
             if (joinButton != null)
             {
+                Debug.Log("[LobbyUI] Join 버튼 리스너 등록");
                 joinButton.onClick.AddListener(OnJoinButtonClicked);
+            }
+            else
+            {
+                Debug.LogError("[LobbyUI] joinButton이 null입니다! Inspector에서 할당하세요.");
             }
 
             // 기본 플레이어 이름 설정
@@ -34,6 +47,15 @@ namespace Ilumisoft.SkillDrive.Network
 
         private void Update()
         {
+            // 테스트용: J 키 누르면 강제로 Join 실행
+            #if UNITY_EDITOR
+            if (UnityEngine.Input.GetKeyDown(KeyCode.J))
+            {
+                Debug.Log("[LobbyUI] J 키로 강제 Join 호출!");
+                OnJoinButtonClicked();
+            }
+            #endif
+
             // 연결 상태 업데이트
             if (PhotonNetwork.IsConnected && PhotonNetwork.InLobby)
             {
@@ -44,6 +66,8 @@ namespace Ilumisoft.SkillDrive.Network
             else if (PhotonNetwork.IsConnected)
             {
                 UpdateStatusText("로비 참가 중...");
+                if (joinButton != null)
+                    joinButton.interactable = false;
             }
             else
             {
