@@ -73,15 +73,11 @@ namespace Ilumisoft.SkillDrive.Network
 
                 foreach (var m in cachedManagers)
                 {
-                    if (m != null)
+                    if (m != null && m.photonView != null)
                     {
-                        // 차량의 PhotonView를 통해 RPC 전송
-                        var vehiclePV = m.GetComponent<PhotonView>();
-                        if (vehiclePV != null)
-                        {
-                            vehiclePV.RPC("RPC_SetSteering", RpcTarget.All, horizontal, myActor);
-                            vehiclePV.RPC("RPC_SetThrottle", RpcTarget.All, vertical, myActor);
-                        }
+                        // VehicleSeatManager는 차량 GameObject에 붙어 있으므로 photonView가 차량의 PhotonView를 가리킴
+                        m.photonView.RPC("RPC_SetSteering", RpcTarget.All, horizontal, myActor);
+                        m.photonView.RPC("RPC_SetThrottle", RpcTarget.All, vertical, myActor);
                     }
                 }
 

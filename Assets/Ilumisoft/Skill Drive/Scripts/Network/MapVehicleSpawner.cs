@@ -92,11 +92,21 @@ namespace Ilumisoft.SkillDrive.Network
                     cameraMgr = vehicle.AddComponent<VehicleCameraManager>();
                 }
 
-                // 좌석 매니저 추가
-                var seatMgr = vehicle.GetComponent<VehicleSeatManager>();
-                if (seatMgr == null)
+                // 좌석 매니저를 '루트 Vehicle GameObject의 PhotonView'에 부착하여 RPC 검색 이슈 방지
+                var vpv = vehicle.GetComponent<PhotonView>();
+                if (vpv == null)
                 {
-                    seatMgr = vehicle.AddComponent<VehicleSeatManager>();
+                    Debug.LogError($"[MapVehicleSpawner] PhotonView not found on Vehicle {i}. RPC will not work.");
+                }
+                else
+                {
+                    // 루트의 PhotonView가 붙은 같은 GO에 보장
+                    var seatMgr = vpv.gameObject.GetComponent<VehicleSeatManager>();
+                    if (seatMgr == null)
+                    {
+                        seatMgr = vpv.gameObject.AddComponent<VehicleSeatManager>();
+                        Debug.Log($"[MapVehicleSpawner] VehicleSeatManager attached to ROOT PhotonView GameObject on Vehicle {i}");
+                    }
                 }
 
                 // 리스폰 핸들러 추가 및 스폰 포인트 설정
@@ -146,16 +156,13 @@ namespace Ilumisoft.SkillDrive.Network
                     // 좌석 배정 (버퍼링되어 나중에 합류한 플레이어도 동일 상태 유지)
                     if (throttleActor != -1)
                     {
-                        // 차량의 PhotonView를 통해 RPC 전송
-                        var vpv = vehicle.GetComponent<PhotonView>();
-                        if (vpv != null)
+                        // 루트 PhotonView로 RPC 호출 (VehicleSeatManager가 같은 GO에 존재)
+                        var vpvAssign = vehicle.GetComponent<PhotonView>();
+                        if (vpvAssign != null)
                         {
-                            // 차량의 PhotonView로 RPC 호출 (VehicleSeatManager가 받음)
-                            vpv.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttleActor, steeringActor);
-                            
-                            // 카메라 배정
-                            photonView.RPC("RPC_AssignCamera", RpcTarget.AllBuffered, vpv.ViewID, throttleActor, steeringActor);
-                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} (ViewID {vpv.ViewID}) assigned -> throttle:{throttleActor}, steering:{steeringActor}");
+                            vpvAssign.RPC("RPC_SetSeats", RpcTarget.AllBuffered, throttleActor, steeringActor);
+                            photonView.RPC("RPC_AssignCamera", RpcTarget.AllBuffered, vpvAssign.ViewID, throttleActor, steeringActor);
+                            Debug.Log($"[MapVehicleSpawner] Vehicle {i} (ViewID {vpvAssign.ViewID}) assigned -> throttle:{throttleActor}, steering:{steeringActor}");
                         }
                         else
                         {

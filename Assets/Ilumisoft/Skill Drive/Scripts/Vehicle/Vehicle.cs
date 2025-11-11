@@ -1,4 +1,6 @@
 ﻿using Ilumisoft.SkillDrive.Input;
+using Photon.Pun; // Ensure we can access PhotonView
+using Ilumisoft.SkillDrive.Network; // For VehicleSeatManager
 using UnityEngine;
 
 namespace Ilumisoft.SkillDrive
@@ -63,6 +65,19 @@ namespace Ilumisoft.SkillDrive
 
             inputManager.Initialize(this);
             groundDetection.Initialize(this);
+
+            // Ensure VehicleSeatManager exists on the same GameObject as the PhotonView on ALL clients
+            // This avoids RPC "method not found" caused by adding the component only on master at runtime.
+            var pv = GetComponent<PhotonView>();
+            if (pv != null && PhotonNetwork.IsConnected)
+            {
+                var seatMgr = pv.gameObject.GetComponent<VehicleSeatManager>();
+                if (seatMgr == null)
+                {
+                    pv.gameObject.AddComponent<VehicleSeatManager>();
+                    Debug.Log("[Vehicle] Ensured VehicleSeatManager on PhotonView GameObject at Awake");
+                }
+            }
         }
 
         /// <summary>

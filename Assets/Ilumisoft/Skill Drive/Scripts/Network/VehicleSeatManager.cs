@@ -7,8 +7,8 @@ namespace Ilumisoft.SkillDrive.Network
 {
     // Attach to each spawned vehicle at runtime by MapVehicleSpawner
     // Receives input from players and applies combined steering/throttle
-    // RPC calls are received through the vehicle's main PhotonView
-    public class VehicleSeatManager : MonoBehaviour
+    // Uses MonoBehaviourPun to access photonView and receive RPC calls
+    public class VehicleSeatManager : MonoBehaviourPun
     {
         [SerializeField] private int throttleSeatActorNumber = -1; // up/down player
         [SerializeField] private int steeringSeatActorNumber = -1; // left/right player
@@ -23,6 +23,7 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 Debug.LogError("[VehicleSeatManager] VehiclePlayerInput not found!");
             }
+            // VehiclePhotonViewID 관련 코드 제거 (MonoBehaviourPun이 자동으로 photonView 제공)
         }
 
         private void FixedUpdate()
@@ -73,5 +74,6 @@ namespace Ilumisoft.SkillDrive.Network
         {
             return (throttleSeatActorNumber, steeringSeatActorNumber);
         }
+
     }
 }
