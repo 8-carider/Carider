@@ -92,6 +92,14 @@ namespace Ilumisoft.SkillDrive
                     pv.gameObject.AddComponent<Ilumisoft.SkillDrive.Network.VehicleCameraManager>();
                     Ilumisoft.SkillDrive.SkillDriveDebug.LogVehicle("[Vehicle] Ensured VehicleCameraManager on PhotonView GameObject at Awake", this);
                 }
+
+                // Remote clients: avoid local physics fighting with network state
+                if (!PhotonNetwork.IsMasterClient && Rigidbody != null)
+                {
+                    // Let transform be driven by network; interpolate for smoothness
+                    Rigidbody.useGravity = false; // gravity from local physics disabled
+                    Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+                }
             }
         }
 
@@ -134,6 +142,7 @@ namespace Ilumisoft.SkillDrive
         /// </summary>
         protected virtual void ApplyGravity()
         {
+            if (!CanMove) return; // Non-authoritative clients do not apply forces
             // 언덕/경사 위에서 근접 상태도 약하게 접지로 취급해 낙하를 완화
             float factor;
             if (groundDetection.IsGrounded)
@@ -158,7 +167,7 @@ namespace Ilumisoft.SkillDrive
         /// </summary>
         protected virtual void ApplyLateralFriction()
         {
-            if (IsGrounded)
+            if (CanMove && IsGrounded)
             {
                 // Calculate how much the vehicle is moving left or right
                 float lateralSpeed = Vector3.Dot(Rigidbody.linearVelocity, transform.right);

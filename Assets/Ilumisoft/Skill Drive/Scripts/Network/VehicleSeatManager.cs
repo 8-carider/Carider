@@ -12,6 +12,7 @@ namespace Ilumisoft.SkillDrive.Network
     {
         [SerializeField] private int throttleSeatActorNumber = -1; // up/down player
         [SerializeField] private int steeringSeatActorNumber = -1; // left/right player
+        public enum SeatType { Throttle = 0, Steering = 1, Both = 2 }
 
         private Vector2 combinedInput; // x: steering, y: throttle
         private VehiclePlayerInput vehiclePlayerInput;
@@ -118,6 +119,55 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 gameObject.name = runtimeName;
             }
+        }
+
+        /// <summary>
+        /// Client calls this on the desired vehicle's PhotonView to request a seat.
+        /// Master processes the request, unassigns the requester from other vehicles, and broadcasts new seats.
+        /// </summary>
+        [PunRPC]
+        public void RPC_RequestSeat(int seatType, int requestingActor)
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                // Only master updates assignments; non-master ignores
+                return;
+            }
+
+            // Remove requester from any other vehicle seats
+            var allManagers = FindObjectsOfType<VehicleSeatManager>();
+            foreach (var mgr in allManagers)
+            {
+                if (mgr == null) continue;
+                var (t, s) = mgr.GetAssignedActors();
+                bool changed = false;
+                if (t == requestingActor) { t = -1; changed = true; }
+                if (s == requestingActor) { s = -1; changed = true; }
+                if (changed)
+                {
+                    mgr.photonView.RPC("RPC_SetSeats", RpcTarget.AllBuffered, t, s);
+                }
+            }
+
+            // Apply request on THIS vehicle
+            int newThrottle = throttleSeatActorNumber;
+            int newSteering = steeringSeatActorNumber;
+
+            switch ((SeatType)seatType)
+            {
+                case SeatType.Throttle:
+                    newThrottle = requestingActor;
+                    break;
+                case SeatType.Steering:
+                    newSteering = requestingActor;
+                    break;
+                case SeatType.Both:
+                    newThrottle = requestingActor;
+                    newSteering = requestingActor;
+                    break;
+            }
+
+            photonView.RPC("RPC_SetSeats", RpcTarget.AllBuffered, newThrottle, newSteering);
         }
 
     }

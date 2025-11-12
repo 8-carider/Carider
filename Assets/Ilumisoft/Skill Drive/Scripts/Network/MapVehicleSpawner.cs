@@ -20,6 +20,10 @@ namespace Ilumisoft.SkillDrive.Network
     // 좌석 상태 캐시 (마스터만 결정, RPC로 반영)
     private struct SeatAssignment { public int throttle; public int steering; }
     private SeatAssignment[] seatAssignments = new SeatAssignment[2]; // 2대 차량
+    
+    // 수동 좌석 할당: key = actorNumber, value = (vehicleIndex, isThrottle)
+    private System.Collections.Generic.Dictionary<int, (int vehicle, bool isThrottle)> manualAssignments 
+        = new System.Collections.Generic.Dictionary<int, (int vehicle, bool isThrottle)>();
 
         private void Awake()
         {
@@ -243,23 +247,61 @@ namespace Ilumisoft.SkillDrive.Network
             }
         }
 
-        // 좌석 재계산: 플레이어 join 순서 기반 (추후 커스터마이즈를 위한 단일 진입점)
+        // 좌석 재계산: 수동 배정 우선, 빈 자리는 join 순서로 자동 채움
         private void RecalculateAndBroadcastSeats()
         {
             if (!PhotonNetwork.IsMasterClient) return;
             var players = PhotonNetwork.PlayerList.OrderBy(p => p.ActorNumber).ToArray();
 
-            // 규칙:
-            // index0 -> Vehicle0 throttle+steering (혼자일 때)
-            // index1 -> Vehicle0 steering (둘 이상), index0은 Vehicle0 throttle
-            // index2 -> Vehicle1 throttle (셋 이상)
-            // index3 -> Vehicle1 steering (넷 이상)
+            // 초기화: 모든 좌석 비움
+            seatAssignments[0].throttle = -1;
+            seatAssignments[0].steering = -1;
+            seatAssignments[1].throttle = -1;
+            seatAssignments[1].steering = -1;
 
-            seatAssignments[0].throttle = players.Length >= 1 ? players[0].ActorNumber : -1;
-            seatAssignments[0].steering = players.Length >= 2 ? players[1].ActorNumber : seatAssignments[0].throttle; // 1명일 때 혼자 둘 다
-            seatAssignments[1].throttle = players.Length >= 3 ? players[2].ActorNumber : -1;
-            seatAssignments[1].steering = players.Length >= 4 ? players[3].ActorNumber : seatAssignments[1].throttle; // 3명일 때 혼자 둘 다
+            // 1단계: 수동 배정 적용
+            foreach (var kvp in manualAssignments)
+            {
+                int actorNumber = kvp.Key;
+                int vIndex = kvp.Value.vehicle;
+                bool isThrottle = kvp.Value.isThrottle;
 
+                if (vIndex < 0 || vIndex >= seatAssignments.Length) continue;
+                if (!players.Any(p => p.ActorNumber == actorNumber)) continue; // 플레이어가 방에 없으면 무시
+
+                if (isThrottle)
+                    seatAssignments[vIndex].throttle = actorNumber;
+                else
+                    seatAssignments[vIndex].steering = actorNumber;
+            }
+
+            // 2단계: 자동 배정 - 수동 배정되지 않은 플레이어들을 빈 자리에 채움
+            var unassignedPlayers = players
+                .Where(p => !manualAssignments.ContainsKey(p.ActorNumber))
+                .OrderBy(p => p.ActorNumber)
+                .ToArray();
+
+            int autoIndex = 0;
+            // Vehicle 0 throttle
+            if (seatAssignments[0].throttle == -1 && autoIndex < unassignedPlayers.Length)
+                seatAssignments[0].throttle = unassignedPlayers[autoIndex++].ActorNumber;
+            // Vehicle 0 steering
+            if (seatAssignments[0].steering == -1 && autoIndex < unassignedPlayers.Length)
+                seatAssignments[0].steering = unassignedPlayers[autoIndex++].ActorNumber;
+            // Vehicle 1 throttle
+            if (seatAssignments[1].throttle == -1 && autoIndex < unassignedPlayers.Length)
+                seatAssignments[1].throttle = unassignedPlayers[autoIndex++].ActorNumber;
+            // Vehicle 1 steering
+            if (seatAssignments[1].steering == -1 && autoIndex < unassignedPlayers.Length)
+                seatAssignments[1].steering = unassignedPlayers[autoIndex++].ActorNumber;
+
+            // 3단계: 혼자 조작 규칙 적용 (throttle만 배정되고 steering이 빈 경우)
+            if (seatAssignments[0].throttle != -1 && seatAssignments[0].steering == -1)
+                seatAssignments[0].steering = seatAssignments[0].throttle;
+            if (seatAssignments[1].throttle != -1 && seatAssignments[1].steering == -1)
+                seatAssignments[1].steering = seatAssignments[1].throttle;
+
+            // RPC 브로드캐스트
             for (int i = 0; i < spawnedVehicles.Length; i++)
             {
                 if (spawnedVehicles[i] == null) continue;
@@ -277,6 +319,36 @@ namespace Ilumisoft.SkillDrive.Network
         // Public method to be called externally by a small Photon callback bridge if needed.
         public void OnPlayerListChanged() { if (PhotonNetwork.IsMasterClient) RecalculateAndBroadcastSeats(); }
         #endregion
+
+        // 수동 좌석 배정 (마스터 클라이언트만 호출, UI에서 사용)
+        public void AssignSeatManually(int actorNumber, int vehicleIndex, bool isThrottle)
+        {
+            if (!PhotonNetwork.IsMasterClient) return;
+            
+            // 기존 배정 제거 (한 플레이어는 한 자리만)
+            manualAssignments.Remove(actorNumber);
+            
+            // 새 배정 추가
+            manualAssignments[actorNumber] = (vehicleIndex, isThrottle);
+            
+            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork(
+                $"[MapVehicleSpawner] Manual seat assigned: Actor {actorNumber} -> Vehicle {vehicleIndex} ({(isThrottle ? "Throttle" : "Steering")})");
+            
+            // 좌석 재계산 및 브로드캐스트
+            RecalculateAndBroadcastSeats();
+        }
+
+        [PunRPC]
+        void RPC_RequestSeat(int actorNumber, int vehicleIndex, bool isThrottle)
+        {
+            // 마스터 클라이언트만 처리
+            if (!PhotonNetwork.IsMasterClient) return;
+            
+            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork(
+                $"[MapVehicleSpawner] RPC_RequestSeat received: Actor {actorNumber} requests Vehicle {vehicleIndex} ({(isThrottle ? "Throttle" : "Steering")})");
+            
+            AssignSeatManually(actorNumber, vehicleIndex, isThrottle);
+        }
 
         [PunRPC]
         void RPC_LogSpawn()
