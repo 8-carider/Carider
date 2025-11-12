@@ -62,7 +62,7 @@ namespace Ilumisoft.SkillDrive.Network
 
                 virtualCamera = vcamObj.AddComponent<CinemachineCamera>();
 
-                // Setup follow and look at
+                // Setup follow and look at - 항상 부모 transform을 추적
                 virtualCamera.Follow = transform;
                 virtualCamera.LookAt = transform;
 
@@ -81,6 +81,10 @@ namespace Ilumisoft.SkillDrive.Network
 
             if (virtualCamera != null)
             {
+                // 카메라가 이미 있어도 Follow/LookAt 타겟을 확실히 설정
+                virtualCamera.Follow = transform;
+                virtualCamera.LookAt = transform;
+                
                 // 기본은 비활성 우선순위 (런타임)
                 virtualCamera.Priority.Value = Application.isPlaying ? 0 : virtualCamera.Priority.Value;
 
@@ -126,6 +130,14 @@ namespace Ilumisoft.SkillDrive.Network
             if (virtualCamera != null)
             {
                 bool wasAssigned = isAssigned;
+                
+                // 카메라가 활성화될 때마다 Follow/LookAt 타겟을 재확인
+                if (active)
+                {
+                    virtualCamera.Follow = transform;
+                    virtualCamera.LookAt = transform;
+                }
+                
                 // Toggle component enabled state to opt-in/out of Brain selection
                 virtualCamera.enabled = active;
 

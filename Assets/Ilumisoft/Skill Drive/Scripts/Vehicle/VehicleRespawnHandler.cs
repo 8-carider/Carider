@@ -91,6 +91,24 @@ namespace Ilumisoft.SkillDrive
             transform.position = spawnPoint.position;
             transform.rotation = spawnPoint.rotation;
 
+            // 리스폰 후 카메라가 다시 따라오도록 재활성화
+            if (PhotonNetwork.IsConnected)
+            {
+                var seatManager = GetComponent<Ilumisoft.SkillDrive.Network.VehicleSeatManager>();
+                var cameraManager = GetComponent<Ilumisoft.SkillDrive.Network.VehicleCameraManager>();
+                
+                if (seatManager != null && cameraManager != null)
+                {
+                    int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
+                    // 로컬 플레이어가 이 차량에 배정되어 있으면 카메라 재활성화
+                    if (seatManager.IsPlayerAssigned(localActor))
+                    {
+                        cameraManager.SetCameraActive(true, localActor);
+                        Debug.Log($"[VehicleRespawnHandler] Camera reactivated after respawn for vehicle {gameObject.name}");
+                    }
+                }
+            }
+
             Debug.Log($"[VehicleRespawnHandler] Vehicle respawned at {spawnPoint.position}");
         }
 
