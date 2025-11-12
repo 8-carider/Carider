@@ -43,6 +43,8 @@ namespace Ilumisoft.SkillDrive.Network
             if (FindObjectOfType<MapVehicleSpawner>() != null)
             {
                 Debug.Log("[PlayerSpawner] MapVehicleSpawner detected. Skipping per-player spawn.");
+                // 완전히 비활성화 (씬에서 제거)
+                Destroy(this);
                 return;
             }
 

@@ -70,9 +70,12 @@ namespace Ilumisoft.SkillDrive
 
         private void Start()
         {
-            if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom && PhotonNetwork.IsMasterClient)
+            // MapVehicleSpawner가 있으면 절대 차량 생성하지 않음
+            if (FindObjectOfType<Ilumisoft.SkillDrive.Network.MapVehicleSpawner>() != null)
             {
-                // 마스터가 모든 플레이어 스폰 위치 결정 또는 그냥 각자 스폰
+                Debug.Log("[PlayerSpawner] MapVehicleSpawner detected in scene. Skipping per-player spawn.");
+                Destroy(this);
+                return;
             }
 
             SpawnLocalPlayer();
@@ -82,7 +85,6 @@ namespace Ilumisoft.SkillDrive
         {
             if (!PhotonNetwork.IsConnected) return;
 
-            // 간단한 스폰 위치 선택 (플레이어 ID 기반)
             int index = (PhotonNetwork.LocalPlayer.ActorNumber - 1) % spawnPoints.Length;
             var sp = spawnPoints[index];
             PhotonNetwork.Instantiate(vehiclePrefabName, sp.position, sp.rotation);
