@@ -19,15 +19,13 @@ namespace Ilumisoft.SkillDrive.Network
         [SerializeField] private Button vehicle2ThrottleButton;
         [SerializeField] private Button vehicle2SteeringButton;
         [SerializeField] private TextMeshProUGUI statusText;
-        [SerializeField] private Button confirmButton;
         [SerializeField] private Button startGameButton; // 마스터 전용 시작 버튼
 
         [Header("Settings")]
         [SerializeField] private bool showInLevelSelection = true;
 
-        private int selectedVehicle = -1; // 0 or 1
-        private bool selectedIsThrottle = true; // true = throttle, false = steering
-        private bool hasConfirmed = false;
+    private int selectedVehicle = -1; // 0 or 1 (for temporary highlight)
+    private bool selectedIsThrottle = true; // true = throttle, false = steering (for temporary highlight)
         private bool isPanelLockedForSession = false; // 한 번 확정하면 레벨 클리어까지 재오픈 불가
 
         private float refreshTimer = 0f;
@@ -51,6 +49,28 @@ namespace Ilumisoft.SkillDrive.Network
 
             SetupButtons();
             UpdateStatusText("Select your seat");
+
+            // Start 버튼 자동 바인딩(필드 미지정 시 이름으로 찾기)
+            if (startGameButton == null)
+            {
+                if (selectionPanel != null)
+                {
+                    var buttons = selectionPanel.GetComponentsInChildren<Button>(true);
+                    foreach (var b in buttons)
+                    {
+                        if (b != null && b.name == "Button_Start")
+                        {
+                            startGameButton = b;
+                            break;
+                        }
+                    }
+                }
+                if (startGameButton == null)
+                {
+                    var go = GameObject.Find("Button_Start");
+                    if (go != null) startGameButton = go.GetComponent<Button>();
+                }
+            }
 
             if (startGameButton != null)
             {
@@ -86,59 +106,75 @@ namespace Ilumisoft.SkillDrive.Network
                 UpdateButtonText(vehicle2SteeringButton, "Vehicle 2\nSteering");
             }
 
-            if (confirmButton != null)
-            {
-                confirmButton.onClick.AddListener(OnConfirmClicked);
-                confirmButton.interactable = false;
-            }
+            // Confirm 버튼은 제거됨
         }
 
         private void OnSeatButtonClicked(int vehicleIndex, bool isThrottle)
         {
-            selectedVehicle = vehicleIndex;
-            selectedIsThrottle = isThrottle;
-
-            string vehicleName = $"Vehicle {vehicleIndex + 1}";
-            string role = isThrottle ? "Throttle" : "Steering";
-            UpdateStatusText($"Selected: {vehicleName} {role}");
-
-            if (confirmButton != null)
-            {
-                confirmButton.interactable = true;
-            }
-
-            // Highlight selected button
-            HighlightButton(vehicleIndex, isThrottle);
+            // 즉시 토글: 이미 내가 점유 중이면 해제 요청, 아니면 점유 요청
+            ToggleSeat(vehicleIndex, isThrottle);
         }
 
-        private void OnConfirmClicked()
+        private void ToggleSeat(int vehicleIndex, bool isThrottle)
         {
-            if (selectedVehicle < 0 || hasConfirmed) return;
-
-            hasConfirmed = true;
+            if (!PhotonNetwork.IsConnected || !PhotonNetwork.InRoom) return;
             int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
 
-            // Always send through MapVehicleSpawner's PhotonView
-            var spawner = FindObjectOfType<MapVehicleSpawner>();
-            if (spawner != null)
+            // 현재 좌석 배정 상태 조회
+            int v1Throttle = -1, v1Steering = -1, v2Throttle = -1, v2Steering = -1;
+            var managers = FindObjectsOfType<VehicleSeatManager>();
+            foreach (var m in managers)
             {
-                var spawnerPV = spawner.GetComponent<PhotonView>();
-                if (spawnerPV != null)
-                {
-                    spawnerPV.RPC("RPC_RequestSeat", RpcTarget.MasterClient, myActor, selectedVehicle, selectedIsThrottle);
-                    UpdateStatusText("Request sent...");
-                    if (confirmButton != null) confirmButton.interactable = false;
-                }
-                else
-                {
-                    UpdateStatusText("Error: No PhotonView");
-                    hasConfirmed = false;
-                }
+                var (t, s) = m.GetAssignedActors();
+                if (m.name.Contains("Vehicle 1"))
+                { v1Throttle = t; v1Steering = s; }
+                else if (m.name.Contains("Vehicle 2"))
+                { v2Throttle = t; v2Steering = s; }
+            }
+
+            bool iOwnThisSeat = false;
+            if (vehicleIndex == 0)
+            {
+                iOwnThisSeat = isThrottle ? (v1Throttle == myActor) : (v1Steering == myActor);
             }
             else
             {
-                UpdateStatusText("Error: No Spawner");
-                hasConfirmed = false;
+                iOwnThisSeat = isThrottle ? (v2Throttle == myActor) : (v2Steering == myActor);
+            }
+
+            var spawner = FindObjectOfType<MapVehicleSpawner>();
+            if (spawner == null) { UpdateStatusText("Error: No Spawner"); return; }
+            var spawnerPV = spawner.GetComponent<PhotonView>();
+            if (spawnerPV == null) { UpdateStatusText("Error: No PhotonView"); return; }
+
+            // 로컬 사전 규칙 체크: 다른 차량에 이미 배정되어 있으면 요청 차단
+            bool iOwnOtherVehicle = false;
+            if (vehicleIndex == 0)
+            {
+                // 요청 차량이 0인데, 차량 1의 어느 좌석이든 내가 가지고 있으면 금지
+                iOwnOtherVehicle = (v2Throttle == myActor) || (v2Steering == myActor);
+            }
+            else
+            {
+                iOwnOtherVehicle = (v1Throttle == myActor) || (v1Steering == myActor);
+            }
+            if (!iOwnThisSeat && iOwnOtherVehicle)
+            {
+                UpdateStatusText("같은 차량 내 좌석만 선택할 수 있습니다.");
+                return;
+            }
+
+            if (iOwnThisSeat)
+            {
+                // 내가 점유한 좌석이면 해제 요청
+                spawnerPV.RPC("RPC_ReleaseSeat", RpcTarget.MasterClient, myActor, vehicleIndex, isThrottle);
+                UpdateStatusText("Release request sent...");
+            }
+            else
+            {
+                // 점유 요청
+                spawnerPV.RPC("RPC_RequestSeat", RpcTarget.MasterClient, myActor, vehicleIndex, isThrottle);
+                UpdateStatusText("Request sent...");
             }
         }
 
@@ -398,7 +434,7 @@ namespace Ilumisoft.SkillDrive.Network
                 }
             }
             
-            // 모든 조건 만족 시 게임 시작 가능
+            // 2, 3, 4명 어떤 조합이든 허용 (이미 위에서 교차 제어 금지 검증됨)
             return true;
         }
 
@@ -410,20 +446,7 @@ namespace Ilumisoft.SkillDrive.Network
 
         public void OnSeatRequestResult(bool success, string message)
         {
-            if (!success)
-            {
-                hasConfirmed = false; // 다시 선택 가능
-                if (confirmButton != null) confirmButton.interactable = true;
-            }
-            else
-            {
-                // 성공 시 패널 숨기고 세션 동안 잠금
-                isPanelLockedForSession = true;
-                if (selectionPanel != null)
-                {
-                    selectionPanel.SetActive(false);
-                }
-            }
+            // 패널은 숨기지 않고 계속 토글 가능
             UpdateStatusText(message);
         }
 
@@ -448,7 +471,6 @@ namespace Ilumisoft.SkillDrive.Network
 
         public override void OnLeftRoom()
         {
-            hasConfirmed = false;
             selectedVehicle = -1;
             isPanelLockedForSession = false; // 방을 나가면 잠금 해제
         }

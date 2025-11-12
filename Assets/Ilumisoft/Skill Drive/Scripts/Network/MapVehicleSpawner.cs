@@ -165,5 +165,34 @@ namespace Ilumisoft.SkillDrive.Network
         {
             seatsLocked = true;
         }
+
+        // 좌석 해제 RPC (토글용)
+        [PunRPC]
+        void RPC_ReleaseSeat(int actorNumber, int vehicleIndex, bool isThrottle)
+        {
+            if (!PhotonNetwork.IsMasterClient || seatsLocked) return;
+            if (vehicleIndex < 0 || vehicleIndex > 1) return;
+
+            if (playerSeats.TryGetValue(actorNumber, out var rec))
+            {
+                // 다른 차량이면 아무 것도 안 함 (현재 구조상 한 차량만 보유)
+                if (rec.vehicle != vehicleIndex) return;
+                if (isThrottle) rec.throttle = false; else rec.steering = false;
+
+                // 둘 다 false 면 완전히 제거
+                if (!rec.throttle && !rec.steering)
+                {
+                    playerSeats.Remove(actorNumber);
+                }
+                else
+                {
+                    playerSeats[actorNumber] = rec; // 업데이트 저장
+                }
+
+                BroadcastSeats();
+                // 결과 콜백 (성공 메시지)
+                SendSeatRequestResult(actorNumber, true, "좌석 해제 완료");
+            }
+        }
     }
 }
