@@ -59,6 +59,15 @@ namespace Ilumisoft.SkillDrive.Network
         {
             if (PhotonNetwork.IsMasterClient && hasSpawned)
             {
+                // 나간 플레이어의 수동 배정 제거
+                if (manualAssignments.ContainsKey(otherPlayer.ActorNumber))
+                {
+                    var assignment = manualAssignments[otherPlayer.ActorNumber];
+                    manualAssignments.Remove(otherPlayer.ActorNumber);
+                    Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork(
+                        $"[MapVehicleSpawner] Removed seat assignment for departed player {otherPlayer.ActorNumber} from Vehicle {assignment.vehicle} ({(assignment.isThrottle ? "Throttle" : "Steering")})");
+                }
+                
                 RecalculateAndBroadcastSeats();
             }
         }
@@ -260,7 +269,7 @@ namespace Ilumisoft.SkillDrive.Network
             seatAssignments[1].throttle = -1;
             seatAssignments[1].steering = -1;
 
-            // 1단계: 수동 배정 적용
+            // 1단계: 수동 배정 적용 (플레이어가 방을 나가도 좌석 유지)
             foreach (var kvp in manualAssignments)
             {
                 int actorNumber = kvp.Key;
@@ -268,7 +277,12 @@ namespace Ilumisoft.SkillDrive.Network
                 bool isThrottle = kvp.Value.isThrottle;
 
                 if (vIndex < 0 || vIndex >= seatAssignments.Length) continue;
-                if (!players.Any(p => p.ActorNumber == actorNumber)) continue; // 플레이어가 방에 없으면 무시
+                
+                // 플레이어가 방에 없으면 수동 배정에서 제거
+                if (!players.Any(p => p.ActorNumber == actorNumber))
+                {
+                    continue; // 좌석은 비워둠 (자동 재배정하지 않음)
+                }
 
                 if (isThrottle)
                     seatAssignments[vIndex].throttle = actorNumber;
@@ -296,11 +310,12 @@ namespace Ilumisoft.SkillDrive.Network
             if (seatAssignments[1].steering == -1 && autoIndex < unassignedPlayers.Length)
                 seatAssignments[1].steering = unassignedPlayers[autoIndex++].ActorNumber;
 
-            // 3단계: 혼자 조작 규칙 적용 (throttle만 배정되고 steering이 빈 경우)
-            if (seatAssignments[0].throttle != -1 && seatAssignments[0].steering == -1)
-                seatAssignments[0].steering = seatAssignments[0].throttle;
-            if (seatAssignments[1].throttle != -1 && seatAssignments[1].steering == -1)
-                seatAssignments[1].steering = seatAssignments[1].throttle;
+            // 3단계: 혼자 조작 규칙 제거 - 플레이어가 나가면 그 역할은 비워둠
+            // (다른 플레이어가 자동으로 두 역할을 다 맡지 않도록)
+            // if (seatAssignments[0].throttle != -1 && seatAssignments[0].steering == -1)
+            //     seatAssignments[0].steering = seatAssignments[0].throttle;
+            // if (seatAssignments[1].throttle != -1 && seatAssignments[1].steering == -1)
+            //     seatAssignments[1].steering = seatAssignments[1].throttle;
 
             // RPC 브로드캐스트
             for (int i = 0; i < spawnedVehicles.Length; i++)

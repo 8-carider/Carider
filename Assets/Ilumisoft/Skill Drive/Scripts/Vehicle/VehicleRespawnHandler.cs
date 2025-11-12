@@ -107,6 +107,13 @@ namespace Ilumisoft.SkillDrive
                         Debug.Log($"[VehicleRespawnHandler] Camera reactivated after respawn for vehicle {gameObject.name}");
                     }
                 }
+                
+                // 리스폰 후 UI 업데이트 (다른 플레이어 위치도 보이도록)
+                var seatUI = FindObjectOfType<Ilumisoft.SkillDrive.Network.SeatSelectionUI>();
+                if (seatUI != null)
+                {
+                    seatUI.ForceRefreshUI();
+                }
             }
 
             Debug.Log($"[VehicleRespawnHandler] Vehicle respawned at {spawnPoint.position}");

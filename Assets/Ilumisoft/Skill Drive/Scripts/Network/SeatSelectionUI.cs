@@ -387,6 +387,17 @@ namespace Ilumisoft.SkillDrive.Network
             }
         }
 
+        /// <summary>
+        /// 외부에서 UI 강제 업데이트 (리스폰 후 등)
+        /// </summary>
+        public void ForceRefreshUI()
+        {
+            if (!isPanelLockedForSession && PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
+            {
+                RefreshSeatOccupancyVisuals();
+            }
+        }
+
         public override void OnLeftRoom()
         {
             hasConfirmed = false;
