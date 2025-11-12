@@ -261,12 +261,32 @@ namespace Ilumisoft.SkillDrive.Network
             // 시작 버튼 활성 조건
             if (startGameButton != null && PhotonNetwork.IsMasterClient)
             {
-                startGameButton.interactable = AllFourUniqueSeatsFilled();
-            }
-
-            if (AllFourUniqueSeatsFilled())
-            {
-                UpdateStatusText("All seats ready - Master can start");
+                bool allSeatsReady = AllFourUniqueSeatsFilled();
+                startGameButton.interactable = allSeatsReady;
+                
+                if (allSeatsReady)
+                {
+                    UpdateStatusText("All seats ready - Master can start");
+                }
+                else
+                {
+                    // 몇 명이 배정되었는지 확인
+                    System.Collections.Generic.HashSet<int> currentActors = new System.Collections.Generic.HashSet<int>();
+                    foreach (var m in managers)
+                    {
+                        var (t, s) = m.GetAssignedActors();
+                        if (t != -1) currentActors.Add(t);
+                        if (s != -1) currentActors.Add(s);
+                    }
+                    
+                    int filledSeats = 0;
+                    if (v1Throttle != -1) filledSeats++;
+                    if (v1Steering != -1) filledSeats++;
+                    if (v2Throttle != -1) filledSeats++;
+                    if (v2Steering != -1) filledSeats++;
+                    
+                    UpdateStatusText($"Waiting: {filledSeats}/4 seats filled, {currentActors.Count} unique players");
+                }
             }
         }
 
@@ -342,16 +362,44 @@ namespace Ilumisoft.SkillDrive.Network
         private bool AllFourUniqueSeatsFilled()
         {
             var managers = FindObjectsOfType<VehicleSeatManager>();
-            System.Collections.Generic.HashSet<int> actors = new System.Collections.Generic.HashSet<int>();
+            int v1Throttle = -1, v1Steering = -1, v2Throttle = -1, v2Steering = -1;
+            
             foreach (var m in managers)
             {
-                var (t,s) = m.GetAssignedActors();
-                if (m.name.Contains("Vehicle 1")) { if (t!=-1) actors.Add(t); if (s!=-1) actors.Add(s); }
-                else if (m.name.Contains("Vehicle 2")) { if (t!=-1) actors.Add(t); if (s!=-1) actors.Add(s); }
+                var (t, s) = m.GetAssignedActors();
+                if (m.name.Contains("Vehicle 1"))
+                {
+                    v1Throttle = t;
+                    v1Steering = s;
+                }
+                else if (m.name.Contains("Vehicle 2"))
+                {
+                    v2Throttle = t;
+                    v2Steering = s;
+                }
             }
-            if (actors.Count != 4) return false;
-            // 각 좌석이 -1 아니고 중복 없음 확인
-            return actors.Count == 4;
+            
+            // 모든 좌석이 배정되어 있어야 함 (빈 좌석 없음)
+            if (v1Throttle == -1 || v1Steering == -1 || v2Throttle == -1 || v2Steering == -1)
+            {
+                return false;
+            }
+            
+            // 각 차량별로 누가 배정되었는지 확인
+            System.Collections.Generic.HashSet<int> vehicle1Actors = new System.Collections.Generic.HashSet<int> { v1Throttle, v1Steering };
+            System.Collections.Generic.HashSet<int> vehicle2Actors = new System.Collections.Generic.HashSet<int> { v2Throttle, v2Steering };
+            
+            // 차량 1과 차량 2의 플레이어가 겹치면 안 됨 (한 사람이 두 차량 동시 제어 불가)
+            foreach (int actor in vehicle1Actors)
+            {
+                if (vehicle2Actors.Contains(actor))
+                {
+                    return false; // 같은 사람이 두 차량에 배정됨
+                }
+            }
+            
+            // 모든 조건 만족 시 게임 시작 가능
+            return true;
         }
 
         [PunRPC]

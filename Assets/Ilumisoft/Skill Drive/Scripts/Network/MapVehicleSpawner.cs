@@ -6,16 +6,17 @@ using System.Linq;
 namespace Ilumisoft.SkillDrive.Network
 {
     // Put this in each GAME LEVEL scene (not in Level Selection).
-    // Provide two spawn points for two shared vehicles.
+    // Spawns exactly 2 shared vehicles for all players.
+    // Players can control vehicles through seat assignments (same vehicle or different vehicles).
     // Master client spawns both vehicles; all players receive them via Photon.
     [RequireComponent(typeof(PhotonView))]
     public class MapVehicleSpawner : MonoBehaviourPunCallbacks
     {
         [SerializeField] private string vehiclePrefabName = "Vehicle";
-        [SerializeField] private Transform[] vehicleSpawnPoints; // Expect length >= 2
+        [SerializeField] private Transform[] vehicleSpawnPoints; // Exactly 2 spawn points
         [SerializeField] private bool autoSpawnOnStart = true;
 
-        private GameObject[] spawnedVehicles;
+        private GameObject[] spawnedVehicles; // 항상 2대 고정
         private bool hasSpawned = false; // 중복 스폰 완전 방지
 
     // 좌석 상태 캐시 (마스터만 결정, RPC로 반영)
@@ -95,12 +96,15 @@ namespace Ilumisoft.SkillDrive.Network
 
             if (vehicleSpawnPoints == null || vehicleSpawnPoints.Length < 2)
             {
-                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Need at least 2 spawn points for two vehicles.");
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Need exactly 2 spawn points. Game always uses 2 vehicles.");
                 return;
             }
 
             hasSpawned = true; // 스폰 시작 즉시 플래그 설정
-            spawnedVehicles = new GameObject[2];
+            spawnedVehicles = new GameObject[2]; // 항상 2대만
+            
+            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Spawning 2 vehicles (fixed). Players will share these vehicles.");
+            
             for (int i = 0; i < 2; i++)
             {
                 var sp = vehicleSpawnPoints[i];
@@ -386,13 +390,24 @@ namespace Ilumisoft.SkillDrive.Network
             Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork(
                 $"[MapVehicleSpawner] RPC_RequestSeat received: Actor {actorNumber} requests Vehicle {vehicleIndex} ({(isThrottle ? "Throttle" : "Steering")})");
 
-            // 이미 그 좌석을 다른 플레이어가 차지했는지 검사 (수동 배정 사전 기준)
+            // 1. 동일한 좌석을 다른 플레이어가 차지했는지 검사
             foreach (var kvp in manualAssignments)
             {
                 if (kvp.Value.vehicle == vehicleIndex && kvp.Value.isThrottle == isThrottle && kvp.Key != actorNumber)
                 {
-                    // 다른 사람이 사용 중
                     SendSeatRequestResult(actorNumber, false, "이미 다른 플레이어가 선택한 좌석입니다.");
+                    return;
+                }
+            }
+
+            // 2. 요청한 플레이어가 이미 다른 차량을 선택했는지 검사
+            if (manualAssignments.ContainsKey(actorNumber))
+            {
+                var currentAssignment = manualAssignments[actorNumber];
+                // 다른 차량의 좌석을 이미 가지고 있으면 거부
+                if (currentAssignment.vehicle != vehicleIndex)
+                {
+                    SendSeatRequestResult(actorNumber, false, "이미 다른 차량을 선택했습니다. 같은 차량의 좌석만 선택 가능합니다.");
                     return;
                 }
             }
