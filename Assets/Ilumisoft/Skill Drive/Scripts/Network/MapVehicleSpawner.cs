@@ -49,6 +49,14 @@ namespace Ilumisoft.SkillDrive.Network
             var sp = new GameObject($"SpawnPoint_Vehicle{index+1}").transform;
             sp.position = v.transform.position; sp.rotation = v.transform.rotation; sp.parent = v.transform.parent;
             respawn.SetSpawnPoint(sp);
+            
+            // 게임 시작 전까지 차량 조작 비활성화
+            var vehicleComp = v.GetComponent<Ilumisoft.SkillDrive.Vehicle>();
+            if (vehicleComp != null)
+            {
+                vehicleComp.CanMove = false;
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle {index+1} movement disabled until game start");
+            }
         }
 
         private void Start()
@@ -163,7 +171,35 @@ namespace Ilumisoft.SkillDrive.Network
         [PunRPC]
         void RPC_StartGame()
         {
-            seatsLocked = true;
+            if (!seatsLocked)
+            {
+                seatsLocked = true;
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Game start triggered. Seats locked.");
+                
+                // 모든 차량의 CanMove를 활성화
+                if (vehicles != null)
+                {
+                    foreach (var vehicle in vehicles)
+                    {
+                        if (vehicle != null)
+                        {
+                            var vehicleComp = vehicle.GetComponent<Ilumisoft.SkillDrive.Vehicle>();
+                            if (vehicleComp != null)
+                            {
+                                vehicleComp.CanMove = true;
+                                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle '{vehicle.name}' movement enabled");
+                            }
+                        }
+                    }
+                }
+                
+                // UI 패널 닫기
+                var ui = FindObjectOfType<SeatSelectionUI>();
+                if (ui != null)
+                {
+                    ui.HidePanel();
+                }
+            }
         }
 
         // 좌석 해제 RPC (토글용)

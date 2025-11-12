@@ -195,8 +195,12 @@ namespace Ilumisoft.SkillDrive.Network
                 {
                     pv.RPC("RPC_StartGame", RpcTarget.All);
                     UpdateStatusText("Game Starting!");
-                    if (selectionPanel != null) selectionPanel.SetActive(false);
                 }
+            }
+            // Start 버튼 즉시 숨김 (마스터 포함 모든 클라이언트에서는 RPC_StartGame에서 패널 닫힘 처리)
+            if (startGameButton != null)
+            {
+                startGameButton.gameObject.SetActive(false);
             }
         }
 
@@ -455,6 +459,10 @@ namespace Ilumisoft.SkillDrive.Network
             if (selectionPanel != null)
             {
                 selectionPanel.SetActive(false);
+                if (startGameButton != null)
+                {
+                    startGameButton.gameObject.SetActive(false);
+                }
             }
         }
 
