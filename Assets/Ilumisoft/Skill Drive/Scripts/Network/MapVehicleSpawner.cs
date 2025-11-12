@@ -8,6 +8,7 @@ namespace Ilumisoft.SkillDrive.Network
     // Put this in each GAME LEVEL scene (not in Level Selection).
     // Provide two spawn points for two shared vehicles.
     // Master client spawns both vehicles; all players receive them via Photon.
+    [RequireComponent(typeof(PhotonView))]
     public class MapVehicleSpawner : MonoBehaviourPunCallbacks
     {
         [SerializeField] private string vehiclePrefabName = "Vehicle";
@@ -328,6 +329,21 @@ namespace Ilumisoft.SkillDrive.Network
             // 기존 배정 제거 (한 플레이어는 한 자리만)
             manualAssignments.Remove(actorNumber);
             
+            // 타인이 이미 동일 좌석을 점유했다면 제거하여 좌석 중복 방지
+            var toRemove = new System.Collections.Generic.List<int>();
+            foreach (var kvp in manualAssignments)
+            {
+                if (kvp.Value.vehicle == vehicleIndex && kvp.Value.isThrottle == isThrottle)
+                {
+                    toRemove.Add(kvp.Key);
+                }
+            }
+            foreach (var key in toRemove)
+            {
+                manualAssignments.Remove(key);
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Removed previous occupant Actor {key} from Vehicle {vehicleIndex} {(isThrottle ? "Throttle" : "Steering")} seat");
+            }
+            
             // 새 배정 추가
             manualAssignments[actorNumber] = (vehicleIndex, isThrottle);
             
@@ -338,16 +354,71 @@ namespace Ilumisoft.SkillDrive.Network
             RecalculateAndBroadcastSeats();
         }
 
+        private bool seatsLocked = false; // 게임 시작 후 좌석 변경 금지
+
         [PunRPC]
         void RPC_RequestSeat(int actorNumber, int vehicleIndex, bool isThrottle)
         {
             // 마스터 클라이언트만 처리
             if (!PhotonNetwork.IsMasterClient) return;
-            
+
+            if (seatsLocked)
+            {
+                SendSeatRequestResult(actorNumber, false, "게임이 이미 시작되어 좌석 변경이 잠겼습니다.");
+                return;
+            }
+
             Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork(
                 $"[MapVehicleSpawner] RPC_RequestSeat received: Actor {actorNumber} requests Vehicle {vehicleIndex} ({(isThrottle ? "Throttle" : "Steering")})");
-            
+
+            // 이미 그 좌석을 다른 플레이어가 차지했는지 검사 (수동 배정 사전 기준)
+            foreach (var kvp in manualAssignments)
+            {
+                if (kvp.Value.vehicle == vehicleIndex && kvp.Value.isThrottle == isThrottle && kvp.Key != actorNumber)
+                {
+                    // 다른 사람이 사용 중
+                    SendSeatRequestResult(actorNumber, false, "이미 다른 플레이어가 선택한 좌석입니다.");
+                    return;
+                }
+            }
+
+            // 좌석 배정 실행
             AssignSeatManually(actorNumber, vehicleIndex, isThrottle);
+            SendSeatRequestResult(actorNumber, true, "좌석 배정 성공");
+        }
+
+        private void SendSeatRequestResult(int actorNumber, bool success, string message)
+        {
+            var target = PhotonNetwork.CurrentRoom?.GetPlayer(actorNumber);
+            if (target == null) return;
+            
+            var pv = GetComponent<PhotonView>();
+            if (pv != null)
+            {
+                pv.RPC("RPC_SeatRequestResult", target, success, message);
+            }
+        }
+
+        [PunRPC]
+        void RPC_SeatRequestResult(bool success, string message)
+        {
+            // SeatSelectionUI로 전달
+            var ui = FindObjectOfType<SeatSelectionUI>();
+            if (ui != null)
+            {
+                ui.OnSeatRequestResult(success, message);
+            }
+            Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Seat request result -> success:{success} message:{message}");
+        }
+
+        [PunRPC]
+        void RPC_StartGame()
+        {
+            if (!seatsLocked)
+            {
+                seatsLocked = true;
+                Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Game start triggered. Seats locked.");
+            }
         }
 
         [PunRPC]

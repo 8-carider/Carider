@@ -50,6 +50,8 @@ MonoBehaviour:
   - RPC_Respawn
   - RPC_SetRuntimeName
   - RPC_RequestSeat
+  - RPC_SeatRequestResult
+  - RPC_StartGame
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
