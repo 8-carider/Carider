@@ -115,24 +115,32 @@ namespace Ilumisoft.SkillDrive.Network
 
         private void OnEnterClicked()
         {
+            Debug.Log("[LobbyPanelManager] Enter button clicked");
+            
             if (!PhotonNetwork.IsMasterClient)
             {
                 UpdateStatusText("Only master can start");
+                Debug.LogWarning("[LobbyPanelManager] Not master client");
                 return;
             }
 
             int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+            Debug.Log($"[LobbyPanelManager] Player count: {playerCount}");
+            
             if (playerCount < 2 || playerCount > 4)
             {
                 UpdateStatusText("Need 2-4 players");
+                Debug.LogWarning($"[LobbyPanelManager] Invalid player count: {playerCount}");
                 return;
             }
 
             // Lobby 패널 숨기고 맵 선택 UI 표시
+            Debug.Log("[LobbyPanelManager] Hiding lobby panel");
             HideLobbyPanel();
 
             if (mapSelectionUI != null)
             {
+                Debug.Log("[LobbyPanelManager] Showing map selection UI");
                 mapSelectionUI.ShowMapSelectionUI();
             }
             else
