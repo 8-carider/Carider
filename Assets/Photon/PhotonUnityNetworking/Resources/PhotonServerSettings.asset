@@ -53,6 +53,9 @@ MonoBehaviour:
   - RPC_SeatRequestResult
   - RPC_StartGame
   - RPC_ReleaseSeat
+  - RPC_OnTimeUp
+  - RPC_SyncTimer
+  - RPC_BeginCountdown
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

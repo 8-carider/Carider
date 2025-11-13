@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Ilumisoft.SkillDrive.Game;
 
 namespace Ilumisoft.SkillDrive.Network
 {
@@ -197,10 +198,55 @@ namespace Ilumisoft.SkillDrive.Network
                     UpdateStatusText("Game Starting!");
                 }
             }
+
+            // GameManager의 Countdown을 네트워크로 시작 (기존 시스템 프리팹 재사용)
+            float timeLimit = 120f;
+            if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("TimeLimit"))
+            {
+                object v = PhotonNetwork.CurrentRoom.CustomProperties["TimeLimit"];
+                if (v is float f) timeLimit = f;
+                else if (v is int i) timeLimit = i;
+                else if (float.TryParse(v.ToString(), out var parsed)) timeLimit = parsed;
+            }
+
+            // 이 UI의 PhotonView를 사용해 모든 클라이언트에서 카운트다운 시작
+            photonView.RPC("RPC_BeginCountdown", RpcTarget.AllBuffered, timeLimit);
+
             // Start 버튼 즉시 숨김 (마스터 포함 모든 클라이언트에서는 RPC_StartGame에서 패널 닫힘 처리)
             if (startGameButton != null)
             {
                 startGameButton.gameObject.SetActive(false);
+            }
+        }
+
+        [PunRPC]
+        private void RPC_BeginCountdown(float timeLimit)
+        {
+            var countdown = FindAnyObjectByType<Countdown>();
+            if (countdown != null)
+            {
+                // 기존 GameManager의 Countdown UI 재사용
+                countdown.SetTimeLimit(timeLimit);
+                // 중복 등록 방지 후 등록
+                countdown.OnTimeOut -= HandleCountdownTimeout;
+                countdown.OnTimeOut += HandleCountdownTimeout;
+                countdown.StartCountdown();
+            }
+            else
+            {
+                Debug.LogWarning("[SeatSelectionUI] Countdown component not found in scene.");
+            }
+        }
+
+        private void HandleCountdownTimeout()
+        {
+            // 마스터만 다음 맵으로 진행
+            if (PhotonNetwork.IsMasterClient)
+            {
+                if (GameSessionManager.Instance != null)
+                {
+                    GameSessionManager.Instance.CompleteCurrentMap();
+                }
             }
         }
 
