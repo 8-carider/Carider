@@ -182,21 +182,42 @@ namespace Ilumisoft.SkillDrive.Network
         // 마스터가 게임 시작
         private void OnStartGameClicked()
         {
-            if (!PhotonNetwork.IsMasterClient) return;
+            Debug.Log("[SeatSelectionUI] Start button clicked!");
+            
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                Debug.LogWarning("[SeatSelectionUI] Not master client!");
+                return;
+            }
+            
+            Debug.Log("[SeatSelectionUI] Checking if all seats filled...");
             if (!AllFourUniqueSeatsFilled())
             {
+                Debug.LogWarning("[SeatSelectionUI] Not all seats filled!");
                 UpdateStatusText("Not all seats filled");
                 return;
             }
+            
+            Debug.Log("[SeatSelectionUI] All seats filled. Finding MapVehicleSpawner...");
             var spawner = FindObjectOfType<MapVehicleSpawner>();
             if (spawner != null)
             {
+                Debug.Log("[SeatSelectionUI] MapVehicleSpawner found. Calling RPC_StartGame...");
                 var pv = spawner.GetComponent<PhotonView>();
                 if (pv != null)
                 {
                     pv.RPC("RPC_StartGame", RpcTarget.All);
                     UpdateStatusText("Game Starting!");
+                    Debug.Log("[SeatSelectionUI] RPC_StartGame called!");
                 }
+                else
+                {
+                    Debug.LogError("[SeatSelectionUI] PhotonView not found on MapVehicleSpawner!");
+                }
+            }
+            else
+            {
+                Debug.LogError("[SeatSelectionUI] MapVehicleSpawner not found!");
             }
 
             // GameManager의 Countdown을 네트워크로 시작 (기존 시스템 프리팹 재사용)

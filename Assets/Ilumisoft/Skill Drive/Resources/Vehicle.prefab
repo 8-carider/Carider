@@ -319,6 +319,7 @@ GameObject:
   - component: {fileID: 3648341979268610614}
   - component: {fileID: 3481607658636431275}
   - component: {fileID: 4801679502497476731}
+  - component: {fileID: 2873107728520497727}
   m_Layer: 2
   m_Name: Vehicle
   m_TagString: Player
@@ -513,6 +514,20 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &2873107728520497727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5258304601143362737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d82d0957bfbbe4db1fd9058ef3a777, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Network.VehicleSeatManager
+  throttleSeatActorNumber: -1
+  steeringSeatActorNumber: -1
 --- !u!1 &7264441110268226352
 GameObject:
   m_ObjectHideFlags: 0
