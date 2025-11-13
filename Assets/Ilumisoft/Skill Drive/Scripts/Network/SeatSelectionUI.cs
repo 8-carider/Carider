@@ -194,6 +194,16 @@ namespace Ilumisoft.SkillDrive.Network
             if (!AllFourUniqueSeatsFilled())
             {
                 Debug.LogWarning("[SeatSelectionUI] Not all seats filled!");
+                
+                // 디버그: 현재 좌석 상태 출력
+                var managers = FindObjectsOfType<VehicleSeatManager>();
+                Debug.Log($"[SeatSelectionUI] Found {managers.Length} VehicleSeatManagers");
+                foreach (var m in managers)
+                {
+                    var (t, s) = m.GetAssignedActors();
+                    Debug.Log($"[SeatSelectionUI] {m.name}: Throttle={t}, Steering={s}");
+                }
+                
                 UpdateStatusText("Not all seats filled");
                 return;
             }
@@ -202,10 +212,11 @@ namespace Ilumisoft.SkillDrive.Network
             var spawner = FindObjectOfType<MapVehicleSpawner>();
             if (spawner != null)
             {
-                Debug.Log("[SeatSelectionUI] MapVehicleSpawner found. Calling RPC_StartGame...");
+                Debug.Log($"[SeatSelectionUI] MapVehicleSpawner found: {spawner.name}");
                 var pv = spawner.GetComponent<PhotonView>();
                 if (pv != null)
                 {
+                    Debug.Log($"[SeatSelectionUI] PhotonView found. ViewID: {pv.ViewID}, IsMine: {pv.IsMine}, Owner: {pv.Owner}");
                     pv.RPC("RPC_StartGame", RpcTarget.All);
                     UpdateStatusText("Game Starting!");
                     Debug.Log("[SeatSelectionUI] RPC_StartGame called!");

@@ -56,6 +56,7 @@ MonoBehaviour:
   - RPC_OnTimeUp
   - RPC_SyncTimer
   - RPC_BeginCountdown
+  - RPC_SendInput
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

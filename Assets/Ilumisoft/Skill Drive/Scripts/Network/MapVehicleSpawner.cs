@@ -171,26 +171,43 @@ namespace Ilumisoft.SkillDrive.Network
         [PunRPC]
         void RPC_StartGame()
         {
+            Debug.Log("[MapVehicleSpawner] RPC_StartGame received!");
+            Debug.Log($"[MapVehicleSpawner] seatsLocked = {seatsLocked}");
+            
             if (!seatsLocked)
             {
                 seatsLocked = true;
+                Debug.Log("[MapVehicleSpawner] Game start triggered. Seats locked.");
                 Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork("[MapVehicleSpawner] Game start triggered. Seats locked.");
                 
                 // 모든 차량의 CanMove를 활성화
+                Debug.Log($"[MapVehicleSpawner] Vehicles array is null? {vehicles == null}");
                 if (vehicles != null)
                 {
-                    foreach (var vehicle in vehicles)
+                    Debug.Log($"[MapVehicleSpawner] Vehicles count: {vehicles.Length}");
+                    for (int i = 0; i < vehicles.Length; i++)
                     {
+                        var vehicle = vehicles[i];
+                        Debug.Log($"[MapVehicleSpawner] Vehicle[{i}] is null? {vehicle == null}");
+                        
                         if (vehicle != null)
                         {
+                            Debug.Log($"[MapVehicleSpawner] Vehicle[{i}] name: {vehicle.name}");
                             var vehicleComp = vehicle.GetComponent<Ilumisoft.SkillDrive.Vehicle>();
+                            Debug.Log($"[MapVehicleSpawner] Vehicle component found? {vehicleComp != null}");
+                            
                             if (vehicleComp != null)
                             {
                                 vehicleComp.CanMove = true;
+                                Debug.Log($"[MapVehicleSpawner] Vehicle '{vehicle.name}' movement enabled - CanMove set to true");
                                 Ilumisoft.SkillDrive.SkillDriveDebug.LogNetwork($"[MapVehicleSpawner] Vehicle '{vehicle.name}' movement enabled");
                             }
                         }
                     }
+                }
+                else
+                {
+                    Debug.LogError("[MapVehicleSpawner] Vehicles array is NULL!");
                 }
                 
                 // UI 패널 닫기
