@@ -12,9 +12,15 @@ namespace Ilumisoft.SkillDrive.Game
 
         private Network.VehicleSeatManager seatManager;
 
-        private void Awake()
+        public void ResetCollectableCount()
         {
             CollectedCount = 0;
+            OnCollectableCollected?.Invoke();
+        }
+
+        private void Awake()
+        {
+            // CollectedCount = 0; // 이 줄은 삭제해도 됨
             seatManager = GetComponent<Network.VehicleSeatManager>();
             if (seatManager == null)
             {
