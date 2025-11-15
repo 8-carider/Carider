@@ -118,6 +118,7 @@ Material:
     - _Distortion_Scale: 200
     - _Distprtion_Amount: 0.01
     - _DstBlend: 10
+    - _DstBlendAlpha: 10
     - _Foam_Amount: 0.25
     - _Foam_Cutoff: 0.05
     - _Foam_Scale: 1000
@@ -138,6 +139,7 @@ Material:
     - _Smoothness: 1
     - _Speed: 0.025
     - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
     - _Strength: 0.25
     - _Surface: 1
     - _WorkflowMode: 1
