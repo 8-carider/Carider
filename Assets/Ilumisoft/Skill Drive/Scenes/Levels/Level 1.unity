@@ -365,10 +365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccf5a6ab76a0a34ab62bc436ed75518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: 'In each level you need to pass all waypoint markers in time.
-
-    Let''s
-    get started with something simple'
+  text: Use W, A, S, D keys well to win!
 --- !u!114 &207520266
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -381,12 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccf5a6ab76a0a34ab62bc436ed75518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: 'WE only have a short time frame, so let''s get that done fast.
-
-    There
-    are 15 levels with increasing degree of difficulty
-
-'
+  text: If you gather more within the time limit, you win
 --- !u!114 &207520267
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -399,8 +391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccf5a6ab76a0a34ab62bc436ed75518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: "I AM YOUR evaluation assistant - called <b>eva</b>. \nI will analyse and
-    evaluate your skills"
+  text: Work with each other to collect many objects
 --- !u!114 &207520268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,10 +404,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ccf5a6ab76a0a34ab62bc436ed75518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: 'Welcome to <b>Skill Drive</b>, the virtual test environment developed to
-
-    review
-    your agility. '
+  text: Welcome to Carider!
 --- !u!1001 &328974197
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1750,6 +1738,34 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_fontSize
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400676046348914, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 130
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400676046348914, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400676046348914, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400676046348914, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -2916,15 +2932,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -20.182213
+      value: -22.352188
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 16.682333
+      value: 16.962334
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 37.015705
+      value: 37.257584
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalRotation.w
