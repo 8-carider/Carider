@@ -2540,6 +2540,10 @@ PrefabInstance:
       propertyPath: moveWithCustomTransform
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3481607658636431275, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      propertyPath: sceneViewId
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5258304600681777590, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
       propertyPath: vmCam
       value: 
