@@ -1303,6 +1303,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2709624709517295409, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+      propertyPath: backgroundMusic
+      value: 
+      objectReference: {fileID: 8300000, guid: 6141d45cdb9ca184a8a2c671c4c4898b, type: 3}
     - target: {fileID: 3148238885775753242, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: field of view
       value: 32.755875
