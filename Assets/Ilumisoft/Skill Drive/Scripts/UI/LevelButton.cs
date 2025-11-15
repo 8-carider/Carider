@@ -35,13 +35,22 @@ namespace Ilumisoft.SkillDrive.UI
 
         private void Start()
         {
-            bool isLocked = LevelLockManager.IsLocked(levelIndex);
+            // --- 원본 코드 (잠금 확인 및 적용) ---
+            // bool isLocked = LevelLockManager.IsLocked(levelIndex);
+            // text.gameObject.SetActive(!isLocked);
+            // lockImage.gameObject.SetActive(isLocked);
+            // button.interactable = !isLocked;
 
-            text.gameObject.SetActive(!isLocked);
-            lockImage.gameObject.SetActive(isLocked);
+            // --- 수정된 코드: 모든 맵을 항상 잠금 해제 상태로 설정 ---
 
-            button.interactable = !isLocked;
+            // 1. 잠금 이미지를 비활성화합니다.
+            lockImage.gameObject.SetActive(false);
 
+            // 2. 텍스트 (레벨 번호/이름)를 활성화합니다.
+            text.gameObject.SetActive(true);
+
+            // 3. 버튼을 항상 클릭 가능하게 설정합니다.
+            button.interactable = true;
         }
 
         private void OnClick()
