@@ -139,7 +139,7 @@ namespace Ilumisoft.SkillDrive.Game
             {
                 // LevelSelect 씬으로 복귀
                 Debug.Log($"[GameSessionManager] Returning to LevelSelect. {TotalMaps - newPlayedCount} maps remaining.");
-                PhotonNetwork.LoadLevel("LevelSelect");
+                PhotonNetwork.LoadLevel("Level Selection");
             }
         }
 
