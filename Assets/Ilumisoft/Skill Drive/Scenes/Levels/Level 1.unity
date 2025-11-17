@@ -792,7 +792,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5258304601143362748, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1542388086}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 612440857}
+    - targetCorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 612440856}
   m_SourcePrefab: {fileID: 100100000, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
 --- !u!114 &612440851 stripped
 MonoBehaviour:
@@ -810,6 +816,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5258304601143362748, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
   m_PrefabInstance: {fileID: 612440850}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &612440853 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 612440850}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &612440854 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5258304601143362738, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 612440850}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28604db03ff51e4a8604a4576bfb048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &612440855 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 612440850}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &612440856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612440853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 612440854}
+  maxAngle: 30
+  rotationOffset: 0
+--- !u!114 &612440857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612440855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 612440854}
+  maxAngle: 30
+  rotationOffset: 0
 --- !u!1001 &652148836
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -876,7 +933,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5258304601143362748, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
       insertIndex: -1
       addedObject: {fileID: 731867550}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 652148843}
+    - targetCorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 652148842}
   m_SourcePrefab: {fileID: 100100000, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
 --- !u!114 &652148837 stripped
 MonoBehaviour:
@@ -894,6 +957,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5258304601143362748, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
   m_PrefabInstance: {fileID: 652148836}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &652148839 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 652148836}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &652148840 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5258304601143362738, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 652148836}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28604db03ff51e4a8604a4576bfb048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &652148841 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 652148836}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &652148842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652148839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 652148840}
+  maxAngle: 30
+  rotationOffset: 0
+--- !u!114 &652148843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652148841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 652148840}
+  maxAngle: 30
+  rotationOffset: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2932,15 +3046,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -22.352188
+      value: -20.182205
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 16.962334
+      value: 16.682333
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 37.257584
+      value: 37.015705
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalRotation.w

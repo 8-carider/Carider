@@ -539,8 +539,65 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 205700142}
+    - targetCorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 205700141}
   m_SourcePrefab: {fileID: 100100000, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+--- !u!114 &205700138 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5258304601143362738, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 205700137}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28604db03ff51e4a8604a4576bfb048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &205700139 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 205700137}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &205700140 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 205700137}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &205700141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205700139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 205700138}
+  maxAngle: 30
+  rotationOffset: 0
+--- !u!114 &205700142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205700140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 205700138}
+  maxAngle: 30
+  rotationOffset: 0
 --- !u!1 &365480386
 GameObject:
   m_ObjectHideFlags: 0
@@ -2458,8 +2515,65 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 683613210542039081}
+    - targetCorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 683613210542039080}
   m_SourcePrefab: {fileID: 100100000, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+--- !u!114 &683613210542039077 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5258304601143362738, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 683613210542039076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d28604db03ff51e4a8604a4576bfb048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &683613210542039078 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1335634825453594628, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 683613210542039076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &683613210542039079 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6896624609601625146, guid: 32f57a23e09f5de4f82166c51517da71, type: 3}
+  m_PrefabInstance: {fileID: 683613210542039076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &683613210542039080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683613210542039078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 683613210542039077}
+  maxAngle: 30
+  rotationOffset: 0
+--- !u!114 &683613210542039081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683613210542039079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4ffa48a245cead48bcdafd074bfc95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Effects.VehicleWheelTurnEffect
+  vehicle: {fileID: 683613210542039077}
+  maxAngle: 30
+  rotationOffset: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
