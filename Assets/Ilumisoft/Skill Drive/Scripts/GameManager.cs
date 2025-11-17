@@ -7,6 +7,14 @@ namespace Ilumisoft.SkillDrive.Game
     [RequireComponent(typeof(CollectableManager), typeof(AudioSource))]
     public class GameManager : MonoBehaviour
     {
+        [Header("Result UI Panels")]
+        [SerializeField] private GameObject showWinUI;
+        [SerializeField] private GameObject showLoseUI;
+        [SerializeField] private float resultPanelDuration = 4f;
+
+        [Header("Scene Management")]
+        [SerializeField] private Ilumisoft.SkillDrive.SceneLoader sceneLoader = null; // 인스펙터에 Scene Loader 오브젝트 할당
+    
         public static bool IsRetry = false;
 
         [SerializeField]
@@ -88,7 +96,7 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         private void OnAllCollected()
         {
-            EndLevel(won: true);
+            JudgeAndShowResult();
         }
 
         /// <summary>
@@ -96,8 +104,129 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         private void OnTimeOut()
         {
-            EndLevel(won: false);
+
+            JudgeAndShowResult();
         }
+
+        /// <summary>
+        /// 차량별 수집품 개수 비교 후 결과 패널 표시 및 자동 씬 전환
+        /// </summary>
+        private void JudgeAndShowResult()
+        {
+            Debug.Log("JudgeAndShowResult 호출됨");
+            // 1. 내 차량 찾기
+            var myVehicle = FindMyVehicle();
+            if (myVehicle == null)
+            {
+                Debug.LogWarning("[GameManager] 내 VehicleCollectables를 찾지 못했습니다.");
+                EndLevel(false);
+                return;
+            }
+
+            // 2. 모든 차량의 수집품 개수 비교
+            var allVehicles = FindObjectsOfType<Ilumisoft.SkillDrive.Game.VehicleCollectables>();
+            int myCount = myVehicle.CollectedCount;
+            int maxOther = int.MinValue;
+            foreach (var v in allVehicles)
+            {
+                if (v != myVehicle)
+                {
+                    if (v.CollectedCount > maxOther) maxOther = v.CollectedCount;
+                }
+            }
+
+            // 3. 결과 판정
+            string result = "draw";
+            if (myCount > maxOther) result = "win";
+            else if (myCount < maxOther) result = "lose";
+
+            // 4. 결과 패널 표시
+            if (showWinUI != null) showWinUI.SetActive(false);
+            if (showLoseUI != null) showLoseUI.SetActive(false);
+            if (result == "win" && showWinUI != null) {
+                Debug.Log("Win 패널 활성화");
+                showWinUI.SetActive(true);
+            }
+            else if (result == "lose" && showLoseUI != null) {
+                Debug.Log("Lose 패널 활성화");
+                showLoseUI.SetActive(true);
+            }
+            // draw일 때는 둘 다 안 띄움(원하면 별도 패널 추가 가능)
+
+            // 5. 4초 후 자동 씬 전환
+            Debug.Log("씬 전환 코루틴 시작, 딜레이: " + resultPanelDuration);
+            StartCoroutine(GoToNextSceneAfterDelay(resultPanelDuration));
+        }
+
+        /// <summary>
+        /// 내 VehicleCollectables 찾기 (내가 조종한 차량)
+        /// </summary>
+        private Ilumisoft.SkillDrive.Game.VehicleCollectables FindMyVehicle()
+        {
+            // Photon이 연결되어 있으면 ActorNumber로, 아니면 Player 태그로 찾기
+#if PHOTON_UNITY_NETWORKING
+            if (Photon.Pun.PhotonNetwork.IsConnected && Photon.Pun.PhotonNetwork.LocalPlayer != null)
+            {
+                int myActor = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+                var all = FindObjectsOfType<Ilumisoft.SkillDrive.Game.VehicleCollectables>();
+                foreach (var v in all)
+                {
+                    var seatMgr = v.GetComponent<Ilumisoft.SkillDrive.Network.VehicleSeatManager>();
+                    if (seatMgr != null)
+                    {
+                        var (t, s) = seatMgr.GetAssignedActors();
+                        if (t == myActor || s == myActor)
+                            return v;
+                    }
+                }
+            }
+#endif
+            // 싱글플레이어 등: Player 태그로 찾기
+            var playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null)
+                return playerObj.GetComponent<Ilumisoft.SkillDrive.Game.VehicleCollectables>();
+            return null;
+        }
+
+        private System.Collections.IEnumerator GoToNextSceneAfterDelay(float delay)
+        {
+            Debug.Log("GoToNextSceneAfterDelay 시작, delay: " + delay);
+            yield return new WaitForSeconds(delay);
+            Debug.Log("GoToNextSceneAfterDelay 끝, 씬 전환 시도");
+
+            // 결과 씬 또는 LevelSelection으로 이동 (마지막 맵이면 ResultScene)
+            bool isLastMap = false;
+            var gsm = Ilumisoft.SkillDrive.Game.GameSessionManager.Instance;
+            if (gsm != null)
+            {
+                isLastMap = (gsm.PlayedMapsCount >= gsm.TotalMaps);
+            }
+            string nextScene = isLastMap ? "ResultScene" : "Level Selection";
+
+#if PHOTON_UNITY_NETWORKING
+            if (Photon.Pun.PhotonNetwork.IsMasterClient)
+            {
+                if (sceneLoader != null)
+                {
+                    sceneLoader.LoadScene(nextScene);
+                }
+                else
+                {
+                    Photon.Pun.PhotonNetwork.LoadLevel(nextScene);
+                }
+            }
+#else
+            if (sceneLoader != null)
+            {
+                sceneLoader.LoadScene(nextScene);
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(nextScene);
+            }
+#endif
+        }
+        
 
         /// <summary>
         /// Ends the current level
