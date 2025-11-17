@@ -49,6 +49,7 @@ namespace Ilumisoft.SkillDrive.Audio
                 {
                     audioSource.clip = backgroundMusic;
                     audioSource.outputAudioMixerGroup = audioMixerGroup;
+                    audioSource.loop = true;
                     audioSource.Play();
                 }
             }
