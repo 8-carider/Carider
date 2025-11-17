@@ -87,6 +87,7 @@ namespace Ilumisoft.SkillDrive.Network
             var players = PhotonNetwork.PlayerList;
             string text = $"Players ({players.Length}/4):\n";
 
+
             for (int i = 0; i < players.Length; i++)
             {
                 var player = players[i];
@@ -107,7 +108,8 @@ namespace Ilumisoft.SkillDrive.Network
                 {
                     role = " (P4)";
                 }
-                text += $"- {player.NickName}{role}\n";
+                string youTag = (player == PhotonNetwork.LocalPlayer) ? " <- you" : "";
+                text += $"- {player.NickName}{role}{youTag}\n";
             }
 
             playerListText.text = text;
