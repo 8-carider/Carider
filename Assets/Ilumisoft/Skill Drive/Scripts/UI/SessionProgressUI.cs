@@ -8,12 +8,19 @@ namespace Ilumisoft.SkillDrive.Game
     /// LevelSelect 씬에서 세션 진행 상황 표시
     /// "맵 선택: 2/5 완료" 같은 정보 표시
     /// </summary>
-    public class SessionProgressUI : MonoBehaviour
+    public class SessionProgressUI : MonoBehaviourPunCallbacks
     {
         [SerializeField] private TextMeshProUGUI progressText;
         [SerializeField] private TextMeshProUGUI instructionText;
 
+
         private void Start()
+        {
+            UpdateProgressDisplay();
+        }
+
+        // Photon 룸 프로퍼티 변경 시 자동 갱신
+        public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
         {
             UpdateProgressDisplay();
         }

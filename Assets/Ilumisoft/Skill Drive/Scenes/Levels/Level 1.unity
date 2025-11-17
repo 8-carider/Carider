@@ -2736,7 +2736,7 @@ PrefabInstance:
       objectReference: {fileID: 5709810654877547134}
     - target: {fileID: 373460459887380685, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: resultPanelDuration
-      value: 100
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 373460459887380685, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: onFail.m_PersistentCalls.m_Calls.Array.size
@@ -3312,15 +3312,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -22.352219
+      value: -20.18222
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 16.962334
+      value: 16.682333
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 37.257584
+      value: 37.015705
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalRotation.w
