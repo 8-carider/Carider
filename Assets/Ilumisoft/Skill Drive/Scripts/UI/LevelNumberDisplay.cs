@@ -16,7 +16,7 @@ namespace Ilumisoft.SkillDrive.UI
         {
             int levelNumber = levelData.GetLevelNumber(gameObject.scene);
 
-            text.text = $"Level {levelNumber}";
+            text.text = $"MAP {levelNumber}";
         }
     }
 }
