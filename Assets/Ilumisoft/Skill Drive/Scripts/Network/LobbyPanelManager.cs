@@ -86,10 +86,27 @@ namespace Ilumisoft.SkillDrive.Network
 
             var players = PhotonNetwork.PlayerList;
             string text = $"Players ({players.Length}/4):\n";
-            
-            foreach (var player in players)
+
+            for (int i = 0; i < players.Length; i++)
             {
-                string role = player.IsMasterClient ? " (Master)" : "";
+                var player = players[i];
+                string role = "";
+                if (player.IsMasterClient)
+                {
+                    role = " (Master)";
+                }
+                else if (i == 1)
+                {
+                    role = " (P2)";
+                }
+                else if (i == 2)
+                {
+                    role = " (P3)";
+                }
+                else if (i == 3)
+                {
+                    role = " (P4)";
+                }
                 text += $"- {player.NickName}{role}\n";
             }
 
