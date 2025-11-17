@@ -89,10 +89,10 @@ namespace Ilumisoft.SkillDrive.Game
         {
             if (mapCountDropdown == null) return;
 
-            // 1~11개 맵 선택 옵션
+            // 1~5개 맵 선택 옵션
             mapCountDropdown.ClearOptions();
             List<string> options = new List<string>();
-            for (int i = 1; i <= 11; i++)
+            for (int i = 1; i <= 5; i++)
             {
                 options.Add($"{i} Maps");
             }
