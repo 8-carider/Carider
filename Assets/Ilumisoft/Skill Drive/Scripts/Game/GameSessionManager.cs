@@ -133,13 +133,13 @@ namespace Ilumisoft.SkillDrive.Game
             if (newPlayedCount >= TotalMaps)
             {
                 // 모든 맵 완료 - 결과 화면 표시
-                ShowFinalResults();
+                // ShowFinalResults();
             }
             else
             {
                 // LevelSelect 씬으로 복귀
                 Debug.Log($"[GameSessionManager] Returning to LevelSelect. {TotalMaps - newPlayedCount} maps remaining.");
-                PhotonNetwork.LoadLevel("Level Selection");
+                // PhotonNetwork.LoadLevel("Level Selection");
             }
         }
 
