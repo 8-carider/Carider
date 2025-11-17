@@ -56,6 +56,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Ilumisoft/Skill Drive/Scenes/Levels/Level 15.unity
     guid: 38f720b3fa2e120428fa599f735635e3
+  - enabled: 1
+    path: Assets/Ilumisoft/Skill Drive/Scenes/ResultScene.unity
+    guid: 831c9c326cb30dd4e97d9408117f43c4
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: cddf6fd2cc976934b9d6fd2d4a03d85e, type: 3}
   m_UseUCBPForAssetBundles: 0
