@@ -81,22 +81,21 @@ namespace Ilumisoft.SkillDrive.Game
 
         private void SpawnNewCollectable()
         {
-            if (collectablePrefab == null) return;
+            // Photon 네트워크 동기화로 Collectable 생성 (마스터 클라이언트만 생성)
+            #if PHOTON_UNITY_NETWORKING
+            if (!Photon.Pun.PhotonNetwork.IsMasterClient) return;
+            #endif
 
-            // 여러 번 시도하여 겹치지 않는 지면 위치를 찾는다
+            string prefabName = collectablePrefab != null ? collectablePrefab.name : "Collectable";
+
             for (int attempt = 0; attempt < maxSpawnAttempts; attempt++)
             {
                 float randomX = Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
                 float randomZ = Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-
                 Vector3 probePos = transform.position + new Vector3(randomX, 10f, randomZ);
-
-                // groundLayer에만 히트하도록 레이어 마스크 사용
                 if (Physics.Raycast(probePos, Vector3.down, out RaycastHit hit, 30f, groundLayer))
                 {
-                    Vector3 spawnPosition = hit.point + Vector3.up * 0.5f; // 지면 위 0.5 유닛
-
-                    // 주변에 이미 수집품이 있는지 검사
+                    Vector3 spawnPosition = hit.point + Vector3.up * 0.5f;
                     Collider[] overlaps = Physics.OverlapSphere(spawnPosition, spawnCheckRadius);
                     bool hasCollectableNearby = false;
                     foreach (var col in overlaps)
@@ -107,31 +106,29 @@ namespace Ilumisoft.SkillDrive.Game
                             break;
                         }
                     }
-
                     if (hasCollectableNearby)
-                    {
-                        // 겹치는게 있으면 다음 시도
                         continue;
-                    }
-
-                    // 유효 위치에 생성
+#if PHOTON_UNITY_NETWORKING
+                    GameObject newCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
+#else
                     GameObject newCollectable = Instantiate(collectablePrefab, spawnPosition, Quaternion.identity);
+#endif
                     Collectable collectableComponent = newCollectable.GetComponent<Collectable>();
-
                     if (collectableComponent != null)
                     {
                         collectableComponent.OnCollect += OnCollect;
-                        amount++; // 전체 수집품 개수 증가
-                        OnCollectableSpawned?.Invoke(); // 생성 이벤트 발생
+                        amount++;
+                        OnCollectableSpawned?.Invoke();
                     }
-
                     return;
                 }
             }
-
-            // 모든 시도가 실패하면, 마지막으로는 groundLayer 무시하고 임의 위치에 생성(보완)
             Vector3 fallbackPos = transform.position + new Vector3(Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f), 0.5f, Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f));
+#if PHOTON_UNITY_NETWORKING
+            GameObject fallbackCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
+#else
             GameObject fallbackCollectable = Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
+#endif
             var fallbackComp = fallbackCollectable.GetComponent<Collectable>();
             if (fallbackComp != null)
             {
