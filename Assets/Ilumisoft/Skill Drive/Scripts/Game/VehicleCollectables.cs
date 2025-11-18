@@ -61,29 +61,33 @@ namespace Ilumisoft.SkillDrive.Game
             // 네트워크로 동기화
             if (photonView != null && photonView.IsMine)
             {
-                // 운전자 정보 함께 전송
-                int driverActor = -1;
+                // 운전자/조향자 정보 함께 전송
+                int throttleActor = -1;
+                int steeringActor = -1;
                 if (seatManager != null)
                 {
-                    var (throttleActor, steeringActor) = seatManager.GetAssignedActors();
-                    driverActor = throttleActor != -1 ? throttleActor : steeringActor;
+                    var actors = seatManager.GetAssignedActors();
+                    throttleActor = actors.throttle;
+                    steeringActor = actors.steering;
                 }
-                photonView.RPC("RPC_AddCollectable", RpcTarget.OthersBuffered, driverActor, amountToAdd);
+                photonView.RPC("RPC_AddCollectable", RpcTarget.OthersBuffered, throttleActor, steeringActor, amountToAdd);
             }
         }
 
         [PunRPC]
-        private void RPC_AddCollectable(int driverActor,int amountToAdd)
+        private void RPC_AddCollectable(int throttleActor, int steeringActor, int amountToAdd)
         {
-            CollectedCount+=amountToAdd;
+            CollectedCount += amountToAdd;
             OnCollectableCollected?.Invoke();
 
-            // driverActor를 throttleActor, steeringActor로 확장하여 두 명 모두에게 카운트(동일인물 중복 방지)
-            // 기존 RPC는 driverActor만 받으므로, 네트워크 동기화 시에는 throttleActor와 steeringActor를 모두 보내야 더 완벽함
-            // 여기서는 driverActor만 처리(기존 구조 유지)
-            if (driverActor != -1)
+            // 두 명 모두에게 카운트(동일인물 중복 방지)
+            if (throttleActor != -1)
             {
-                PlayerCollectableStats.Instance.AddCollectableForPlayer(driverActor, amountToAdd);
+                PlayerCollectableStats.Instance.AddCollectableForPlayer(throttleActor, amountToAdd);
+            }
+            if (steeringActor != -1 && steeringActor != throttleActor)
+            {
+                PlayerCollectableStats.Instance.AddCollectableForPlayer(steeringActor, amountToAdd);
             }
         }
     }
