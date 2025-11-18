@@ -35,10 +35,14 @@ namespace Ilumisoft.SkillDrive.Game
 #if PHOTON_UNITY_NETWORKING
                 if (PhotonNetwork.InRoom)
                 {
+                    PhotonView photonView = PhotonView.Get(this);
+                    if (photonView != null && !photonView.IsMine)
+                    {
+                        photonView.RequestOwnership();
+                    }
                     // 마스터가 아니면 마스터에게 RPC로 제거 요청
                     if (!PhotonNetwork.IsMasterClient)
                     {
-                        PhotonView photonView = PhotonView.Get(this);
                         if (photonView != null)
                         {
                             photonView.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
