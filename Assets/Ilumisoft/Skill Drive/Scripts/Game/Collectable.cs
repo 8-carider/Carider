@@ -27,7 +27,7 @@ namespace Ilumisoft.SkillDrive.Game
                 var vehicleCollectables = other.GetComponent<VehicleCollectables>();
                 if (vehicleCollectables != null)
                 {
-                    vehicleCollectables.AddCollectable();
+                    vehicleCollectables.AddCollectable(1);
                 }
 
                 OnCollect?.Invoke();

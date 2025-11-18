@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5489907549188334752}
   - component: {fileID: 5489907549188334753}
+  - component: {fileID: 7463445504634241287}
+  - component: {fileID: -6922251839090703315}
   m_Layer: 0
   m_Name: Collectable2
   m_TagString: Untagged
@@ -60,6 +62,42 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &7463445504634241287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5489907549188334767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 1
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &-6922251839090703315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5489907549188334767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16875d4d92c09354cbf5f401a02eb038, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Collectable2
+  scoreAmount: 5
+  particlesPrefab: {fileID: 2879622467641632436, guid: c44dd4419c3c31a4785e5ab016df3114, type: 3}
 --- !u!1 &5489907549315065674
 GameObject:
   m_ObjectHideFlags: 0
