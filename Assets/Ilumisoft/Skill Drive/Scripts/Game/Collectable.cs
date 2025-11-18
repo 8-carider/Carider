@@ -28,7 +28,18 @@ namespace Ilumisoft.SkillDrive.Game
 
                 OnCollect?.Invoke();
 
+#if PHOTON_UNITY_NETWORKING
+                if (Photon.Pun.PhotonNetwork.InRoom && Photon.Pun.PhotonView.Get(this).IsMine)
+                {
+                    Photon.Pun.PhotonNetwork.Destroy(gameObject);
+                }
+                else
+                {
+                    gameObject.SetActive(false);
+                }
+#else
                 gameObject.SetActive(false);
+#endif
             }
         }
     }
