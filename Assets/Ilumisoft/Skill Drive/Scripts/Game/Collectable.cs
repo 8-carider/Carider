@@ -18,10 +18,25 @@ namespace Ilumisoft.SkillDrive.Game
         {
             if (other.CompareTag("Player"))
             {
+#if PHOTON_UNITY_NETWORKING
+                if (particlesPrefab != null)
+                {
+                    if (PhotonNetwork.InRoom)
+                    {
+                        // 파티클 프리팹은 Resources 폴더에 있어야 하며, 이름이 정확히 일치해야 함
+                        PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
+                    }
+                    else
+                    {
+                        Instantiate(particlesPrefab, transform.position, transform.rotation);
+                    }
+                }
+#else
                 if (particlesPrefab != null)
                 {
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
                 }
+#endif
 
                 // 차량의 VehicleCollectables 컴포넌트 업데이트
                 var vehicleCollectables = other.GetComponent<VehicleCollectables>();
