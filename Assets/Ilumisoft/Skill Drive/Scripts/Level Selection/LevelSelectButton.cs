@@ -34,7 +34,7 @@ namespace Ilumisoft.SkillDrive.LevelSelection
         {
             this.levelSelectManager = levelSelectManager;
             this.levelNumber = levelNumber;
-            text.text = $"LEVEL {levelNumber}";
+            text.text = $"MAP {levelNumber}";
         }
 
         public void OnSelect(BaseEventData eventData)
