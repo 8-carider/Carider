@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5489907549188334752}
   - component: {fileID: 5489907549188334753}
-  - component: {fileID: 8926925937495008091}
   m_Layer: 0
-  m_Name: Collectable 2
+  m_Name: Collectable2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,20 +60,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8926925937495008091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5489907549188334767}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 771d2344c762b5f43923fc4b0f917485, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Collectable2
-  scoreValue: 5
-  particlesPrefab: {fileID: 2879622467641632436, guid: c44dd4419c3c31a4785e5ab016df3114, type: 3}
 --- !u!1 &5489907549315065674
 GameObject:
   m_ObjectHideFlags: 0
