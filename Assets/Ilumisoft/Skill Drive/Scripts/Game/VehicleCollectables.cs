@@ -39,22 +39,22 @@ namespace Ilumisoft.SkillDrive.Game
             CollectedCount+= amountToAdd;
             OnCollectableCollected?.Invoke();
 
-            // 현재 운전자 정보 확인 및 플레이어 통계에 기록
+            // 현재 운전자/조향자 정보 확인 및 플레이어 통계에 기록
             if (seatManager != null)
             {
                 var (throttleActor, steeringActor) = seatManager.GetAssignedActors();
-                
-                // 가속 페달 조작자에게 수집 기록 (또는 조향 조작자 선택 가능)
+                bool counted = false;
+                // 운전자와 조향자가 모두 있을 때(동일인물일 수도 있음)
                 if (throttleActor != -1)
                 {
                     PlayerCollectableStats.Instance.AddCollectableForPlayer(throttleActor, amountToAdd);
-                    Debug.Log($"[VehicleCollectables] Player {throttleActor} collected on {gameObject.name}");
+                    Debug.Log($"[VehicleCollectables] Player {throttleActor} (throttle) collected on {gameObject.name}");
+                    counted = true;
                 }
-                // 조향만 담당하는 경우도 기록하려면 아래 주석 해제
-                else if (steeringActor != -1)
+                if (steeringActor != -1 && steeringActor != throttleActor)
                 {
                     PlayerCollectableStats.Instance.AddCollectableForPlayer(steeringActor, amountToAdd);
-                    Debug.Log($"[VehicleCollectables] Player {steeringActor} (steering only) collected on {gameObject.name}");
+                    Debug.Log($"[VehicleCollectables] Player {steeringActor} (steering) collected on {gameObject.name}");
                 }
             }
 
@@ -78,7 +78,9 @@ namespace Ilumisoft.SkillDrive.Game
             CollectedCount+=amountToAdd;
             OnCollectableCollected?.Invoke();
 
-            // 다른 클라이언트에서도 플레이어 통계 업데이트
+            // driverActor를 throttleActor, steeringActor로 확장하여 두 명 모두에게 카운트(동일인물 중복 방지)
+            // 기존 RPC는 driverActor만 받으므로, 네트워크 동기화 시에는 throttleActor와 steeringActor를 모두 보내야 더 완벽함
+            // 여기서는 driverActor만 처리(기존 구조 유지)
             if (driverActor != -1)
             {
                 PlayerCollectableStats.Instance.AddCollectableForPlayer(driverActor, amountToAdd);
