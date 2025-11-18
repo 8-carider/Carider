@@ -1,5 +1,9 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using UnityEngine.Events;
+#if PHOTON_UNITY_NETWORKING
+using Photon.Pun;
+#endif
 
 namespace Ilumisoft.SkillDrive.Game
 {
@@ -29,9 +33,21 @@ namespace Ilumisoft.SkillDrive.Game
                 OnCollect?.Invoke();
 
 #if PHOTON_UNITY_NETWORKING
-                if (Photon.Pun.PhotonNetwork.InRoom && Photon.Pun.PhotonView.Get(this).IsMine)
+                if (PhotonNetwork.InRoom)
                 {
-                    Photon.Pun.PhotonNetwork.Destroy(gameObject);
+                    // 마스터가 아니면 마스터에게 RPC로 제거 요청
+                    if (!PhotonNetwork.IsMasterClient)
+                    {
+                        PhotonView photonView = PhotonView.Get(this);
+                        if (photonView != null)
+                        {
+                            photonView.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
+                        }
+                    }
+                    else
+                    {
+                        PhotonNetwork.Destroy(gameObject);
+                    }
                 }
                 else
                 {
@@ -42,5 +58,16 @@ namespace Ilumisoft.SkillDrive.Game
 #endif
             }
         }
+
+#if PHOTON_UNITY_NETWORKING
+        [PunRPC]
+        private void RPC_RequestDestroy()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(gameObject);
+            }
+        }
+#endif
     }
 }
