@@ -1,4 +1,19 @@
-﻿using UnityEngine;
+﻿    private void Start()
+    {
+        // Ground 레이어 위에 자동으로 위치 조정
+        int groundLayer = LayerMask.NameToLayer("Ground");
+        if (groundLayer >= 0)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
+            {
+                Vector3 pos = transform.position;
+                pos.y = hit.point.y;
+                transform.position = pos;
+            }
+        }
+    }
+using UnityEngine;
 using Photon.Pun;
 
 public class Collectable2 : MonoBehaviourPun 
@@ -16,12 +31,11 @@ public class Collectable2 : MonoBehaviourPun
 
         if (other.CompareTag("Player"))
         {
-            #if PHOTON_UNITY_NETWORKING
+#if PHOTON_UNITY_NETWORKING
             if (particlesPrefab != null)
             {
                 if (PhotonNetwork.InRoom)
                 {
-                    // 파티클 프리팹은 Resources 폴더에 있어야 하며, 이름이 정확히 일치해야 함
                     PhotonNetwork.Instantiate("Collect Particles 2", transform.position, transform.rotation);
                 }
                 else
@@ -29,12 +43,12 @@ public class Collectable2 : MonoBehaviourPun
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
                 }
             }
-            #else
+#else
             if (particlesPrefab != null)
             {
                 Instantiate(particlesPrefab, transform.position, transform.rotation);
             }
-            #endif
+#endif
 
             var vehicle = other.GetComponentInParent<Ilumisoft.SkillDrive.Game.VehicleCollectables>();
             if (vehicle != null)
@@ -42,33 +56,46 @@ public class Collectable2 : MonoBehaviourPun
                 vehicle.AddCollectable(this.scoreAmount);
             }
 
-            if (photonView != null)
-            {
-                photonView.RPC("DeactivateCollectableRPC", RpcTarget.OthersBuffered);
-            }
-            
-            gameObject.SetActive(false);
-        }
-    }
-
-    [PunRPC]
-    private void DeactivateCollectableRPC()
-    {
-        if (particlesPrefab != null)
-        {
-            #if PHOTON_UNITY_NETWORKING
+#if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
-                PhotonNetwork.Instantiate("Collect Particles 2", transform.position, transform.rotation);
+                if (photonView != null && !photonView.IsMine)
+                {
+                    photonView.RequestOwnership();
+                    return;
+                }
+                // 소유자(또는 마스터)가 파괴를 시도
+                if (!PhotonNetwork.IsMasterClient)
+                {
+                    if (photonView != null)
+                    {
+                        photonView.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
+                    }
+                }
+                else
+                {
+                    PhotonNetwork.Destroy(gameObject);
+                }
             }
             else
             {
-                Instantiate(particlesPrefab, transform.position, transform.rotation);
+                gameObject.SetActive(false);
             }
-            #else
-            Instantiate(particlesPrefab, transform.position, transform.rotation);
-            #endif
+#else
+            gameObject.SetActive(false);
+#endif
         }
-        gameObject.SetActive(false);
     }
+
+
+#if PHOTON_UNITY_NETWORKING
+    [PunRPC]
+    private void RPC_RequestDestroy()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+#endif
 }

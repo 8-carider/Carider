@@ -35,22 +35,19 @@ namespace Ilumisoft.SkillDrive.UI
 
         private void Start()
         {
-            // --- 원본 코드 (잠금 확인 및 적용) ---
-            // bool isLocked = LevelLockManager.IsLocked(levelIndex);
-            // text.gameObject.SetActive(!isLocked);
-            // lockImage.gameObject.SetActive(isLocked);
-            // button.interactable = !isLocked;
+            // 모든 레벨을 자동으로 잠금 해제(언락) 처리
+            // 마지막 레벨 번호를 실제 프로젝트에 맞게 수정하세요 (예: 10)
+            int lastLevelNumber = 5;
+            for (int i = 2; i <= lastLevelNumber; i++)
+            {
+                Ilumisoft.SkillDrive.LevelLockManager.UnlockLevel(i);
+            }
 
-            // --- 수정된 코드: 모든 맵을 항상 잠금 해제 상태로 설정 ---
-
-            // 1. 잠금 이미지를 비활성화합니다.
-            lockImage.gameObject.SetActive(false);
-
-            // 2. 텍스트 (레벨 번호/이름)를 활성화합니다.
-            text.gameObject.SetActive(true);
-
-            // 3. 버튼을 항상 클릭 가능하게 설정합니다.
-            button.interactable = true;
+            // 원본 잠금 체크 코드 사용
+            bool isLocked = Ilumisoft.SkillDrive.LevelLockManager.IsLocked(levelIndex);
+            text.gameObject.SetActive(!isLocked);
+            lockImage.gameObject.SetActive(isLocked);
+            button.interactable = !isLocked;
         }
 
         private void OnClick()

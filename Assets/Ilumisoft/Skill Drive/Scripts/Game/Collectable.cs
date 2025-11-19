@@ -7,8 +7,25 @@ using Photon.Pun;
 
 namespace Ilumisoft.SkillDrive.Game
 {
-    public class Collectable : MonoBehaviour
-    {
+        public class Collectable : MonoBehaviour
+        {
+            private void Start()
+            {
+                // Ground 레이어 위에 자동으로 위치 조정
+                int groundLayer = LayerMask.NameToLayer("Ground");
+                if (groundLayer >= 0)
+                {
+                    RaycastHit hit;
+                    // 위에서 아래로 Raycast (Collectable이 공중에 있어도 동작)
+                    if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
+                    {
+                        Vector3 pos = transform.position;
+                        pos.y = hit.point.y;
+                        transform.position = pos;
+                    }
+                }
+            }
+    
         [SerializeField]
         GameObject particlesPrefab = null;
 
@@ -23,7 +40,6 @@ namespace Ilumisoft.SkillDrive.Game
                 {
                     if (PhotonNetwork.InRoom)
                     {
-                        // 파티클 프리팹은 Resources 폴더에 있어야 하며, 이름이 정확히 일치해야 함
                         PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
                     }
                     else
@@ -53,9 +69,11 @@ namespace Ilumisoft.SkillDrive.Game
                     PhotonView photonView = PhotonView.Get(this);
                     if (photonView != null && !photonView.IsMine)
                     {
+                        // 소유권이 없으면 먼저 요청만 하고, 파괴는 소유권이 넘어온 후에만 시도
                         photonView.RequestOwnership();
+                        return;
                     }
-                    // 마스터가 아니면 마스터에게 RPC로 제거 요청
+                    // 소유자(또는 마스터)가 파괴를 시도
                     if (!PhotonNetwork.IsMasterClient)
                     {
                         if (photonView != null)
