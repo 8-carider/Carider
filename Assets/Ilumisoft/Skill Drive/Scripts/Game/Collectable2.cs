@@ -1,23 +1,23 @@
-﻿    private void Start()
+﻿    using UnityEngine;
+    using Photon.Pun;
+
+    public class Collectable2 : MonoBehaviourPun 
     {
-        // Ground 레이어 위에 자동으로 위치 조정
-        int groundLayer = LayerMask.NameToLayer("Ground");
-        if (groundLayer >= 0)
+        private void Start()
         {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
+            // Ground 레이어 위에 자동으로 위치 조정
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            if (groundLayer >= 0)
             {
-                Vector3 pos = transform.position;
-                pos.y = hit.point.y;
-                transform.position = pos;
+                RaycastHit hit;
+                if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
+                {
+                    Vector3 pos = transform.position;
+                    pos.y = hit.point.y;
+                    transform.position = pos;
+                }
             }
         }
-    }
-using UnityEngine;
-using Photon.Pun;
-
-public class Collectable2 : MonoBehaviourPun 
-{
     [Header("Settings")]
     [SerializeField] public int scoreAmount = 5; // 점수 설정
 

@@ -45,6 +45,7 @@ namespace Ilumisoft.SkillDrive.Network
         private void EnsureVirtualCamera()
         {
             // Find or create Cinemachine Virtual Camera for this vehicle
+
             virtualCamera = GetComponentInChildren<CinemachineCamera>(true);
 
             bool shouldCreate = (virtualCamera == null) && (Application.isPlaying || previewInEditMode);
@@ -81,30 +82,43 @@ namespace Ilumisoft.SkillDrive.Network
 
             if (virtualCamera != null)
             {
-                // 카메라가 이미 있어도 Follow/LookAt 타겟을 확실히 설정
-                virtualCamera.Follow = transform;
-                virtualCamera.LookAt = transform;
-                
-                // 기본은 비활성 우선순위 (런타임)
-                virtualCamera.Priority.Value = Application.isPlaying ? 0 : virtualCamera.Priority.Value;
+                // Inspector에서 이미 세팅된 값이 있으면 덮어쓰지 않음
+                if (virtualCamera.Follow == null)
+                    virtualCamera.Follow = transform;
+                if (virtualCamera.LookAt == null)
+                    virtualCamera.LookAt = transform;
 
-                // Ensure required procedural components exist even if VCam pre-existed
+                // 기본 우선순위: Inspector 값 유지, 없으면 0
+                if (virtualCamera.Priority == null || (virtualCamera.Priority != null && virtualCamera.Priority.Value == 0))
+                    virtualCamera.Priority.Value = Application.isPlaying ? 0 : virtualCamera.Priority.Value;
+
+                // 필요한 컴포넌트가 없을 때만 추가
                 var vcamObj = virtualCamera.gameObject;
                 if (vcamObj.GetComponent<CinemachinePositionComposer>() == null)
                 {
                     vcamObj.AddComponent<CinemachinePositionComposer>();
                 }
-                if (vcamObj.GetComponent<CinemachineFollowZoom>() == null)
-                {
-                    vcamObj.AddComponent<CinemachineFollowZoom>();
-                }
-                // Critical: make sure we have a Rotation Composer so camera actually looks at the target
+                // CinemachineFollowZoom 자동 추가 제거: Inspector에서 직접 붙인 경우만 사용
                 if (vcamObj.GetComponent<CinemachineRotationComposer>() == null)
                 {
                     vcamObj.AddComponent<CinemachineRotationComposer>();
                 }
-                // Reset transform so procedural components drive pose predictably
-                vcamObj.transform.localRotation = Quaternion.identity;
+                // Inspector에서 세팅된 localRotation이 있으면 유지
+                // (덮어쓰지 않음)
+
+                // 항상 Rotation Control을 None으로 강제 설정 (3인칭 고정 시점)
+#if UNITY_EDITOR
+                // 에디터에서만 SerializedObject 사용
+                UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(virtualCamera);
+                var prop = so.FindProperty("m_RotationControl");
+                if (prop != null)
+                {
+                    prop.enumValueIndex = 0; // 0: None
+                    so.ApplyModifiedProperties();
+                }
+#else
+                // 런타임에서는 Inspector 세팅값만 유지 (코드로 강제 불가)
+#endif
             }
 
             // Ensure main camera has a CinemachineBrain so vcams can drive it (edit & play)
@@ -130,14 +144,16 @@ namespace Ilumisoft.SkillDrive.Network
             if (virtualCamera != null)
             {
                 bool wasAssigned = isAssigned;
-                
-                // 카메라가 활성화될 때마다 Follow/LookAt 타겟을 재확인
+
+                // 카메라가 활성화될 때마다 Follow/LookAt을 무조건 덮어쓰지 않고, null일 때만 세팅
                 if (active)
                 {
-                    virtualCamera.Follow = transform;
-                    virtualCamera.LookAt = transform;
+                    if (virtualCamera.Follow == null)
+                        virtualCamera.Follow = transform;
+                    if (virtualCamera.LookAt == null)
+                        virtualCamera.LookAt = transform;
                 }
-                
+
                 // Toggle component enabled state to opt-in/out of Brain selection
                 virtualCamera.enabled = active;
 

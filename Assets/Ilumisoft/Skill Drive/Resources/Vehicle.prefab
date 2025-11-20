@@ -314,13 +314,12 @@ GameObject:
   - component: {fileID: 5258304601143362750}
   - component: {fileID: 5258304601143362738}
   - component: {fileID: 5258304601143362749}
-  - component: {fileID: 4946290359492127349}
   - component: {fileID: 5258304601143362751}
   - component: {fileID: 3648341979268610614}
   - component: {fileID: 3481607658636431275}
-  - component: {fileID: 4801679502497476731}
   - component: {fileID: 2873107728520497727}
   - component: {fileID: 1511662364398400272}
+  - component: {fileID: 1180347776085165283}
   m_Layer: 2
   m_Name: Vehicle
   m_TagString: Player
@@ -413,36 +412,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39dee8d330a413f479d766f622b29fc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4946290359492127349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5258304601143362737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: cddf6fd2cc976934b9d6fd2d4a03d85e, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!65 &5258304601143362751
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -495,27 +464,10 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 4801679502497476731}
   - {fileID: 1511662364398400272}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &4801679502497476731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5258304601143362737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformView
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!114 &2873107728520497727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -542,6 +494,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 907abfbdcda91a9489b9b306ee26e3c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Network.VehicleNetworkController
+--- !u!114 &1180347776085165283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5258304601143362737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0923234ba45cd45b91d97f48c5b8f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Network.VehicleCameraManager
+  previewInEditMode: 1
 --- !u!1 &7264441110268226352
 GameObject:
   m_ObjectHideFlags: 0
@@ -553,8 +518,6 @@ GameObject:
   - component: {fileID: 6898630679066908296}
   - component: {fileID: 3569097299704043454}
   - component: {fileID: 3769423493916012517}
-  - component: {fileID: 4913755943612285536}
-  - component: {fileID: 5947713124728444704}
   m_Layer: 0
   m_Name: VehicleVCam
   m_TagString: Untagged
@@ -570,8 +533,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7264441110268226352}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.00024680758, y: 2.5319073, z: -310}
+  m_LocalRotation: {x: 0.12047862, y: -0.0000021676874, z: 0.00000026307626, w: 0.99271595}
+  m_LocalPosition: {x: 0.00025442435, y: 14.352126, z: -58.258186}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -590,10 +553,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 0
-    m_Value: 0
+    Enabled: 1
+    m_Value: 10
   OutputChannel: 1
-  StandbyUpdate: 2
+  StandbyUpdate: 0
   m_StreamingVersion: 20230301
   m_LegacyPriority: 0
   Target:
@@ -601,7 +564,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 60
+    FieldOfView: 40
     OrthographicSize: 10
     NearClipPlane: 0.1
     FarClipPlane: 5000
@@ -632,58 +595,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 886251e9a18ece04ea8e61686c173e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachinePositionComposer
-  CameraDistance: 300
+  CameraDistance: 60
   DeadZoneDepth: 0
   Composition:
-    ScreenPosition: {x: -0.00000032782555, y: -0.0013512671}
+    ScreenPosition: {x: 0, y: 0}
     DeadZone:
-      Enabled: 0
-      Size: {x: 0.2, y: 0.2}
+      Enabled: 1
+      Size: {x: 0, y: 0}
     HardLimits:
-      Enabled: 0
+      Enabled: 1
       Size: {x: 0.8, y: 0.8}
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
-  TargetOffset: {x: 0, y: 3, z: -10}
-  Damping: {x: 1.5, y: 2, z: 1}
+  TargetOffset: {x: 0, y: 0, z: 0}
+  Damping: {x: 1, y: 1, z: 1}
   Lookahead:
-    Enabled: 1
+    Enabled: 0
     Time: 0
     Smoothing: 0
     IgnoreY: 0
---- !u!114 &4913755943612285536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7264441110268226352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4700f9f03ad19f94baf0367cb7a9c988, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollowZoom
-  Width: 2
-  Damping: 1
-  FovRange: {x: 10, y: 60}
---- !u!114 &5947713124728444704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7264441110268226352}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2588cc5dedbb75e49a44aada63f7b939, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonAim
-  AimCollisionFilter:
-    serializedVersion: 2
-    m_Bits: 1
-  IgnoreTag: 
-  AimDistance: 25
-  NoiseCancellation: 1
 --- !u!1 &7292628461190982048
 GameObject:
   m_ObjectHideFlags: 0
