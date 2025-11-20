@@ -78,8 +78,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5edf2a67405daeb408247f783eeff0a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Network.MapVehicleSpawner
-  vehicle1: {fileID: 0}
-  vehicle2: {fileID: 0}
+  vehicle1: {fileID: 2655043417508162541, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+  vehicle2: {fileID: 7458286910403617294, guid: c7fcf5103374be747b18093901496527, type: 3}
 --- !u!114 &5718650383688744323
 MonoBehaviour:
   m_ObjectHideFlags: 0

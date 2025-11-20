@@ -68,10 +68,9 @@ namespace Ilumisoft.SkillDrive.Network
                 virtualCamera.LookAt = transform;
 
                 // Configure pipeline components for CM v3
-                // Use Position Composer for body, Follow Zoom for dynamic FOV, and Rotation Composer to look at target
+                // Position Composer와 Follow Zoom만 자동 추가, Rotation Composer는 Inspector에서 직접 추가/제거
                 vcamObj.AddComponent<CinemachinePositionComposer>();
                 vcamObj.AddComponent<CinemachineFollowZoom>();
-                vcamObj.AddComponent<CinemachineRotationComposer>();
 
                 createdByManager = true;
                 if (Application.isPlaying)
@@ -99,26 +98,10 @@ namespace Ilumisoft.SkillDrive.Network
                     vcamObj.AddComponent<CinemachinePositionComposer>();
                 }
                 // CinemachineFollowZoom 자동 추가 제거: Inspector에서 직접 붙인 경우만 사용
-                if (vcamObj.GetComponent<CinemachineRotationComposer>() == null)
-                {
-                    vcamObj.AddComponent<CinemachineRotationComposer>();
-                }
+                // Rotation Composer는 Inspector에서 직접 추가/제거 (코드로 강제 추가하지 않음)
                 // Inspector에서 세팅된 localRotation이 있으면 유지
                 // (덮어쓰지 않음)
-
-                // 항상 Rotation Control을 None으로 강제 설정 (3인칭 고정 시점)
-#if UNITY_EDITOR
-                // 에디터에서만 SerializedObject 사용
-                UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(virtualCamera);
-                var prop = so.FindProperty("m_RotationControl");
-                if (prop != null)
-                {
-                    prop.enumValueIndex = 0; // 0: None
-                    so.ApplyModifiedProperties();
-                }
-#else
-                // 런타임에서는 Inspector 세팅값만 유지 (코드로 강제 불가)
-#endif
+                // Rotation Control 등 Inspector 값은 코드에서 강제하지 않음
             }
 
             // Ensure main camera has a CinemachineBrain so vcams can drive it (edit & play)
