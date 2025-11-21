@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 #if PHOTON_UNITY_NETWORKING
 using Photon.Pun;
@@ -22,6 +21,35 @@ namespace Ilumisoft.SkillDrive.Game
                     Vector3 pos = transform.position;
                     pos.y = hit.point.y;
                     transform.position = pos;
+                }
+            }
+
+            // RadarSystem에 자동 등록 (딜레이 후)
+            StartCoroutine(RegisterToRadarDelayed());
+
+            // LocatableManager.Locatables 리스트 로그 출력
+            Debug.Log($"[LocatableManager] 현재 등록된 Locatable 개수: {Ilumisoft.RadarSystem.LocatableManager.Locatables.Count}");
+            foreach (var loc in Ilumisoft.RadarSystem.LocatableManager.Locatables)
+            {
+                Debug.Log($"[LocatableManager] 등록된 오브젝트: {loc.gameObject.name}");
+            }
+        }
+
+        private System.Collections.IEnumerator RegisterToRadarDelayed()
+        {
+            yield return new WaitForSeconds(0.1f); // 0.1초 딜레이
+
+            var locatableManagerType = System.Type.GetType("Ilumisoft.RadarSystem.LocatableManager, Ilumisoft.RadarSystem");
+            if (locatableManagerType != null)
+            {
+                var registerMethod = locatableManagerType.GetMethod("Register", new[] { typeof(GameObject) });
+                if (registerMethod != null)
+                {
+                    var managerInstance = GameObject.FindObjectOfType(locatableManagerType);
+                    if (managerInstance != null)
+                    {
+                        registerMethod.Invoke(managerInstance, new object[] { this.gameObject });
+                    }
                 }
             }
         }

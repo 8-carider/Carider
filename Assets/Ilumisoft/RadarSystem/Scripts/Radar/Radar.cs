@@ -44,6 +44,12 @@ namespace Ilumisoft.RadarSystem
         {
             LocatableManager.OnLocatableAdded += OnLocatableAdded;
             LocatableManager.OnLocatableRemoved += OnLocatableRemoved;
+
+            // 이미 등록된 Locatable도 강제로 아이콘 생성
+            foreach (var loc in LocatableManager.Locatables)
+            {
+                OnLocatableAdded(loc);
+            }
         }
 
         private void OnDisable()
