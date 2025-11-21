@@ -35,7 +35,7 @@ namespace Ilumisoft.SkillDrive.Game
 
         private void Awake()
         {
-            // Ground 레이어 자동 설정
+            // Ground 레이어 자동 설정만 남김
             if (groundLayer.value == -1)
             {
                 int layer = LayerMask.NameToLayer("Ground");
@@ -49,11 +49,13 @@ namespace Ilumisoft.SkillDrive.Game
                     Debug.LogWarning("[CollectableManager] Layer named 'Ground' not found. Please set Ground LayerMask in the inspector.");
                 }
             }
+        }
 
+        private void Start()
+        {
 #if PHOTON_UNITY_NETWORKING
             if (Photon.Pun.PhotonNetwork.IsMasterClient)
             {
-#endif
                 // 기존 맵에 존재하는 Collectable 제거 (초기화)
                 var preExistings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
                 if (preExistings != null)
@@ -63,15 +65,20 @@ namespace Ilumisoft.SkillDrive.Game
                         Destroy(c.gameObject);
                     }
                 }
-
                 SpawnCollectables();
-#if PHOTON_UNITY_NETWORKING
             }
 #endif
-
-            // 네트워크로 생성된 Collectable에도 이벤트 연결 (모든 인스턴스에서)
             AttachCollectEventsToAll();
+
+            // 콜렉터블 개수 및 상태 로그
+            var allCollects = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
+            Debug.Log($"[CollectableManager] 현재 씬에 존재하는 Collectable 개수: {allCollects.Length}");
+            foreach (var c in allCollects)
+            {
+                Debug.Log($"[CollectableManager] 오브젝트: {c.gameObject.name}, 활성화: {c.gameObject.activeInHierarchy}");
+            }
         }
+
         private void AttachCollectEventsToAll()
         {
             var allCollects = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
@@ -101,47 +108,21 @@ namespace Ilumisoft.SkillDrive.Game
 
         private void SpawnCollectables()
         {
-#if PHOTON_UNITY_NETWORKING
-            if (!Photon.Pun.PhotonNetwork.IsMasterClient)
-                return;
-#endif
-            // 기존에 남아있는 Collectable 모두 제거
-            var remainings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
-            if (remainings != null)
-            {
-                foreach (var c in remainings)
-                {
-                    Destroy(c.gameObject);
-                }
-            }
-
             spawned = 0;
             int attempts = 0;
-            string prefabName = "Collectable";
+            string prefabName = "Collectable"; // Resources 폴더 내 프리팹 이름
 
-            while (spawned < collectableCount && attempts < collectableCount * maxSpawnAttempts)
+            while (spawned < collectableCount && attempts < maxSpawnAttempts * collectableCount)
             {
-                float randomX = Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-                float randomZ = Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-                Vector3 probePos = transform.position + new Vector3(randomX, 10f, randomZ);
-                if (Physics.Raycast(probePos, Vector3.down, out RaycastHit hit, 30f, groundLayer))
+                Vector3 spawnPosition = transform.position + new Vector3(
+                    Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f),
+                    0.5f,
+                    Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
+                );
+
+                // 겹침 체크
+                if (!Physics.CheckSphere(spawnPosition, spawnCheckRadius, groundLayer))
                 {
-                    Vector3 spawnPosition = hit.point + Vector3.up * 0.5f;
-                    Collider[] overlaps = Physics.OverlapSphere(spawnPosition, spawnCheckRadius);
-                    bool hasCollectableNearby = false;
-                    foreach (var col in overlaps)
-                    {
-                        if (col.GetComponent<Collectable>() != null)
-                        {
-                            hasCollectableNearby = true;
-                            break;
-                        }
-                    }
-                    if (hasCollectableNearby)
-                    {
-                        attempts++;
-                        continue;
-                    }
 #if PHOTON_UNITY_NETWORKING
                     Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
 #else
@@ -155,7 +136,11 @@ namespace Ilumisoft.SkillDrive.Game
             // 부족하면 fallback으로 채우기
             while (spawned < collectableCount)
             {
-                Vector3 fallbackPos = transform.position + new Vector3(Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f), 0.5f, Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f));
+                Vector3 fallbackPos = transform.position + new Vector3(
+                    Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f),
+                    0.5f,
+                    Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
+                );
 #if PHOTON_UNITY_NETWORKING
                 Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
 #else
@@ -164,6 +149,7 @@ namespace Ilumisoft.SkillDrive.Game
                 spawned++;
             }
 
+            AttachCollectEventsToAll();
             OnCollectablesSpawned?.Invoke();
         }
     }

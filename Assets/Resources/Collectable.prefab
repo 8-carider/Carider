@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8725690898687185982}
   - component: {fileID: 5489907549188334753}
   - component: {fileID: 2729363202740736109}
+  - component: {fileID: -894979381818590515}
   m_Layer: 0
   m_Name: Collectable
   m_TagString: Untagged
@@ -97,6 +98,20 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &-894979381818590515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5489907549188334767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a35fd54ac079a8b47aa6549789157333, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Ilumisoft.RadarSystem::Ilumisoft.RadarSystem.Locatable
+  iconPrefab: {fileID: 4922837886278913688, guid: 64491c38b1af452409456a53259a0f43, type: 3}
+  clampOnRadar: 0
 --- !u!1 &5489907549315065674
 GameObject:
   m_ObjectHideFlags: 0
