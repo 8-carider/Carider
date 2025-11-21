@@ -1,6 +1,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using Ilumisoft.RadarSystem;
 
 namespace Ilumisoft.SkillDrive.Network
 {
@@ -101,6 +102,13 @@ namespace Ilumisoft.SkillDrive.Network
                 if (cam.transform.TryGetComponent<Unity.Cinemachine.CinemachineCamera>(out var vcam))
                 {
                     vcam.enabled = active;
+                }
+
+                // Radar 활성/비활성: 내 차량에만 Radar가 보이게
+                var radar = GetComponentInChildren<Radar>(true);
+                if (radar != null)
+                {
+                    radar.gameObject.SetActive(active);
                 }
             }
         }

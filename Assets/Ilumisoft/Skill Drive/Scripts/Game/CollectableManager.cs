@@ -7,35 +7,35 @@ namespace Ilumisoft.SkillDrive.Game
     {
         public UnityAction OnAllCollected;
         public UnityAction OnCollectableCollected;
-        public UnityAction OnCollectableSpawned;
+        public UnityAction OnCollectablesSpawned;
 
         public int CollectedCount => collected;
-        public int TotalCount => amount;
+        public int TotalCount => collectableCount;
 
         [SerializeField]
-        private GameObject collectablePrefab; // 수집품 프리팹 참조
+        private GameObject collectablePrefab;
 
-    [SerializeField]
-    private Vector2 spawnAreaSize = new Vector2(10f, 10f); // 생성 영역 크기
+        [SerializeField]
+        private Vector2 spawnAreaSize = new Vector2(10f, 10f);
 
-    [SerializeField, Tooltip("Layer mask used to detect ground when spawning collectables")]
-    private LayerMask groundLayer = ~0;
+        [SerializeField, Tooltip("Layer mask used to detect ground when spawning collectables")]
+        private LayerMask groundLayer = ~0;
 
-    [SerializeField, Tooltip("Maximum number of attempts to find a non-overlapping spawn position")]
-    private int maxSpawnAttempts = 10;
+        [SerializeField, Tooltip("Maximum number of attempts to find a non-overlapping spawn position")]
+        private int maxSpawnAttempts = 10;
 
-    [SerializeField, Tooltip("Radius used to check for overlapping collectables when spawning")]
-    private float spawnCheckRadius = 0.6f;
+        [SerializeField, Tooltip("Radius used to check for overlapping collectables when spawning")]
+        private float spawnCheckRadius = 0.6f;
 
-        Collectable[] collectables;
+        [SerializeField, Tooltip("한 번에 맵에 존재할 콜렉터블 개수")]
+        private int collectableCount = 10;
 
-        int amount = 0;
-        int collected = 0;
+        private int collected = 0;
+        private int spawned = 0;
 
         private void Awake()
         {
-            // 자동으로 Ground 레이어가 지정되어 있지 않다면 프로젝트에서 "Ground"라는 이름의 레이어를 찾아 설정합니다.
-            // Inspector에서 명시적으로 설정한 경우에는 덮어쓰지 않습니다.
+            // Ground 레이어 자동 설정
             if (groundLayer.value == -1)
             {
                 int layer = LayerMask.NameToLayer("Ground");
@@ -50,45 +50,50 @@ namespace Ilumisoft.SkillDrive.Game
                 }
             }
 
-            collectables = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
-
-            if (collectables != null)
+            // 기존 맵에 존재하는 Collectable 제거 (초기화)
+            var preExistings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
+            if (preExistings != null)
             {
-                amount = collectables.Length;
-
-                foreach (var collectable in collectables)
+                foreach (var c in preExistings)
                 {
-                    collectable.OnCollect += OnCollect;
+                    Destroy(c.gameObject);
                 }
             }
+
+            SpawnCollectables();
         }
 
         private void OnCollect()
         {
             collected++;
-
-            // 수집 이벤트 발생
             OnCollectableCollected?.Invoke();
 
-            // 새로운 수집품 생성
-            SpawnNewCollectable();
-
-            if (collected == amount)
+            if (collected >= collectableCount)
             {
                 OnAllCollected?.Invoke();
+                // 모두 먹었으면 다시 랜덤 위치에 일괄 생성
+                collected = 0;
+                SpawnCollectables();
             }
         }
 
-        private void SpawnNewCollectable()
+        private void SpawnCollectables()
         {
-            // Photon 네트워크 동기화로 Collectable 생성 (마스터 클라이언트만 생성)
-            #if PHOTON_UNITY_NETWORKING
-            if (!Photon.Pun.PhotonNetwork.IsMasterClient) return;
-            #endif
+            // 기존에 남아있는 Collectable 모두 제거
+            var remainings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
+            if (remainings != null)
+            {
+                foreach (var c in remainings)
+                {
+                    Destroy(c.gameObject);
+                }
+            }
 
+            spawned = 0;
+            int attempts = 0;
             string prefabName = collectablePrefab != null ? collectablePrefab.name : "Collectable";
 
-            for (int attempt = 0; attempt < maxSpawnAttempts; attempt++)
+            while (spawned < collectableCount && attempts < collectableCount * maxSpawnAttempts)
             {
                 float randomX = Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
                 float randomZ = Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
@@ -107,7 +112,10 @@ namespace Ilumisoft.SkillDrive.Game
                         }
                     }
                     if (hasCollectableNearby)
+                    {
+                        attempts++;
                         continue;
+                    }
 #if PHOTON_UNITY_NETWORKING
                     GameObject newCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
 #else
@@ -117,24 +125,30 @@ namespace Ilumisoft.SkillDrive.Game
                     if (collectableComponent != null)
                     {
                         collectableComponent.OnCollect += OnCollect;
-                        amount++;
-                        OnCollectableSpawned?.Invoke();
+                        spawned++;
                     }
-                    return;
+                }
+                attempts++;
+            }
+
+            // 부족하면 fallback으로 채우기
+            while (spawned < collectableCount)
+            {
+                Vector3 fallbackPos = transform.position + new Vector3(Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f), 0.5f, Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f));
+#if PHOTON_UNITY_NETWORKING
+                GameObject fallbackCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
+#else
+                GameObject fallbackCollectable = Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
+#endif
+                var fallbackComp = fallbackCollectable.GetComponent<Collectable>();
+                if (fallbackComp != null)
+                {
+                    fallbackComp.OnCollect += OnCollect;
+                    spawned++;
                 }
             }
-            Vector3 fallbackPos = transform.position + new Vector3(Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f), 0.5f, Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f));
-#if PHOTON_UNITY_NETWORKING
-            GameObject fallbackCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
-#else
-            GameObject fallbackCollectable = Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
-#endif
-            var fallbackComp = fallbackCollectable.GetComponent<Collectable>();
-            if (fallbackComp != null)
-            {
-                fallbackComp.OnCollect += OnCollect;
-                amount++;
-            }
+
+            OnCollectablesSpawned?.Invoke();
         }
     }
 }

@@ -61,7 +61,9 @@ namespace Ilumisoft.SkillDrive.Game
             collectableManager = GetComponent<CollectableManager>();
             audioSource = GetComponent<AudioSource>();
 
+            // 콜렉터블을 모두 먹어도 결과 패널을 띄우지 않음
             collectableManager.OnAllCollected += OnAllCollected;
+            // 시간 초과 시에만 결과 패널을 띄움
             countdown.OnTimeOut += OnTimeOut;
         }
 
@@ -96,7 +98,8 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         private void OnAllCollected()
         {
-            JudgeAndShowResult();
+            // 콜렉터블을 모두 먹어도 결과 패널을 띄우지 않음 (원한다면 여기서 EndLevel(true) 등으로 별도 처리 가능)
+            Debug.Log("모든 콜렉터블을 수집했으나, 시간 종료가 아니므로 결과 패널을 띄우지 않음");
         }
 
         /// <summary>
