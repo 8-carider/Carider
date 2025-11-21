@@ -7,25 +7,25 @@ using Photon.Pun;
 
 namespace Ilumisoft.SkillDrive.Game
 {
-        public class Collectable : MonoBehaviour
+    public class Collectable : MonoBehaviour
+    {
+        private void Start()
         {
-            private void Start()
+            // Ground 레이어 위에 자동으로 위치 조정
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            if (groundLayer >= 0)
             {
-                // Ground 레이어 위에 자동으로 위치 조정
-                int groundLayer = LayerMask.NameToLayer("Ground");
-                if (groundLayer >= 0)
+                RaycastHit hit;
+                // 위에서 아래로 Raycast (Collectable이 공중에 있어도 동작)
+                if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
                 {
-                    RaycastHit hit;
-                    // 위에서 아래로 Raycast (Collectable이 공중에 있어도 동작)
-                    if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
-                    {
-                        Vector3 pos = transform.position;
-                        pos.y = hit.point.y;
-                        transform.position = pos;
-                    }
+                    Vector3 pos = transform.position;
+                    pos.y = hit.point.y;
+                    transform.position = pos;
                 }
             }
-    
+        }
+
         [SerializeField]
         GameObject particlesPrefab = null;
 
@@ -35,6 +35,7 @@ namespace Ilumisoft.SkillDrive.Game
         {
             if (other.CompareTag("Player"))
             {
+
 #if PHOTON_UNITY_NETWORKING
                 if (particlesPrefab != null)
                 {
@@ -54,6 +55,7 @@ namespace Ilumisoft.SkillDrive.Game
                 }
 #endif
 
+
                 // 차량의 VehicleCollectables 컴포넌트 업데이트
                 var vehicleCollectables = other.GetComponent<VehicleCollectables>();
                 if (vehicleCollectables != null)
@@ -63,7 +65,7 @@ namespace Ilumisoft.SkillDrive.Game
 
                 OnCollect?.Invoke();
 
-#if PHOTON_UNITY_NETWORKING
+            #if PHOTON_UNITY_NETWORKING
                 if (PhotonNetwork.InRoom)
                 {
                     PhotonView photonView = PhotonView.Get(this);
@@ -88,10 +90,10 @@ namespace Ilumisoft.SkillDrive.Game
                 }
                 else
                 {
-                    gameObject.SetActive(false);
+                    Destroy(gameObject);
                 }
 #else
-                gameObject.SetActive(false);
+                Destroy(gameObject);
 #endif
             }
         }

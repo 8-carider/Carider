@@ -50,17 +50,39 @@ namespace Ilumisoft.SkillDrive.Game
                 }
             }
 
-            // 기존 맵에 존재하는 Collectable 제거 (초기화)
-            var preExistings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
-            if (preExistings != null)
+#if PHOTON_UNITY_NETWORKING
+            if (Photon.Pun.PhotonNetwork.IsMasterClient)
             {
-                foreach (var c in preExistings)
+#endif
+                // 기존 맵에 존재하는 Collectable 제거 (초기화)
+                var preExistings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
+                if (preExistings != null)
                 {
-                    Destroy(c.gameObject);
+                    foreach (var c in preExistings)
+                    {
+                        Destroy(c.gameObject);
+                    }
+                }
+
+                SpawnCollectables();
+#if PHOTON_UNITY_NETWORKING
+            }
+#endif
+
+            // 네트워크로 생성된 Collectable에도 이벤트 연결 (모든 인스턴스에서)
+            AttachCollectEventsToAll();
+        }
+        private void AttachCollectEventsToAll()
+        {
+            var allCollects = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
+            if (allCollects != null)
+            {
+                foreach (var c in allCollects)
+                {
+                    c.OnCollect -= OnCollect; // 중복 방지
+                    c.OnCollect += OnCollect;
                 }
             }
-
-            SpawnCollectables();
         }
 
         private void OnCollect()
@@ -79,6 +101,10 @@ namespace Ilumisoft.SkillDrive.Game
 
         private void SpawnCollectables()
         {
+#if PHOTON_UNITY_NETWORKING
+            if (!Photon.Pun.PhotonNetwork.IsMasterClient)
+                return;
+#endif
             // 기존에 남아있는 Collectable 모두 제거
             var remainings = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
             if (remainings != null)
@@ -91,7 +117,7 @@ namespace Ilumisoft.SkillDrive.Game
 
             spawned = 0;
             int attempts = 0;
-            string prefabName = collectablePrefab != null ? collectablePrefab.name : "Collectable";
+            string prefabName = "Collectable";
 
             while (spawned < collectableCount && attempts < collectableCount * maxSpawnAttempts)
             {
@@ -117,16 +143,11 @@ namespace Ilumisoft.SkillDrive.Game
                         continue;
                     }
 #if PHOTON_UNITY_NETWORKING
-                    GameObject newCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
+                    Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
 #else
-                    GameObject newCollectable = Instantiate(collectablePrefab, spawnPosition, Quaternion.identity);
+                    Instantiate(collectablePrefab, spawnPosition, Quaternion.identity);
 #endif
-                    Collectable collectableComponent = newCollectable.GetComponent<Collectable>();
-                    if (collectableComponent != null)
-                    {
-                        collectableComponent.OnCollect += OnCollect;
-                        spawned++;
-                    }
+                    spawned++;
                 }
                 attempts++;
             }
@@ -136,16 +157,11 @@ namespace Ilumisoft.SkillDrive.Game
             {
                 Vector3 fallbackPos = transform.position + new Vector3(Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f), 0.5f, Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f));
 #if PHOTON_UNITY_NETWORKING
-                GameObject fallbackCollectable = Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
+                Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
 #else
-                GameObject fallbackCollectable = Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
+                Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
 #endif
-                var fallbackComp = fallbackCollectable.GetComponent<Collectable>();
-                if (fallbackComp != null)
-                {
-                    fallbackComp.OnCollect += OnCollect;
-                    spawned++;
-                }
+                spawned++;
             }
 
             OnCollectablesSpawned?.Invoke();

@@ -34,7 +34,18 @@ namespace Ilumisoft.SkillDrive
         {
             yield return PlayTimelineAndWait();
 
+#if PHOTON_UNITY_NETWORKING
+            if (Photon.Pun.PhotonNetwork.IsConnected && Photon.Pun.PhotonNetwork.InRoom)
+            {
+                Photon.Pun.PhotonNetwork.LoadLevel(name);
+            }
+            else
+            {
+                SceneManager.LoadScene(name);
+            }
+#else
             SceneManager.LoadScene(name);
+#endif
         }
 
         IEnumerator LoadSceneCoroutine(int index)
