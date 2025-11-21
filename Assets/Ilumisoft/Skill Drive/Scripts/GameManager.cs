@@ -122,7 +122,8 @@ namespace Ilumisoft.SkillDrive.Game
             if (myVehicle == null)
             {
                 Debug.LogWarning("[GameManager] 내 VehicleCollectables를 찾지 못했습니다.");
-                EndLevel(false);
+                // EndLevel(false) 제거: 차량을 못 찾았을 때도 결과 패널만 띄움
+                // 필요하다면 여기서 추가 처리 가능
                 return;
             }
 
@@ -155,6 +156,14 @@ namespace Ilumisoft.SkillDrive.Game
                 showLoseUI.SetActive(true);
             }
             // draw일 때는 둘 다 안 띄움(원하면 별도 패널 추가 가능)
+
+            // 결과 패널이 뜰 때 차량 이동 제한
+            var vehicle = player != null ? player.GetComponent<Vehicle>() : null;
+            if (vehicle != null)
+            {
+                vehicle.CanMove = false;
+                vehicle.Rigidbody.linearDamping = 2.0f;
+            }
 
             // 5. 4초 후 자동 씬 전환
             Debug.Log("씬 전환 코루틴 시작, 딜레이: " + resultPanelDuration);
@@ -231,63 +240,5 @@ namespace Ilumisoft.SkillDrive.Game
         }
         
 
-        /// <summary>
-        /// Ends the current level
-        /// </summary>
-        /// <param name="won"></param>
-        public void EndLevel(bool won)
-        {
-            if (!isGameOver)
-            {
-                // Make sure this is only called once
-                isGameOver = true;
-
-                Ilumisoft.SkillDrive.SkillDriveDebug.LogGameplay($"[GameManager] EndLevel called. won={won}. (timeLimit may have expired or all collected)");
-
-                var audioClip = won ? successSFX : failSFX;
-
-                if (audioSource != null && audioClip != null)
-                {
-                    audioSource.PlayOneShot(audioClip);
-                }
-
-                var vehicle = player != null ? player.GetComponent<Vehicle>() : null;
-
-                // 멀티플레이(Photon 룸)에서는 차량 이동을 강제로 막지 않음. 싱글/오프라인에서만 락.
-                bool inMultiplayer = false;
-#if PHOTON_UNITY_NETWORKING
-                inMultiplayer = Photon.Pun.PhotonNetwork.IsConnected && Photon.Pun.PhotonNetwork.InRoom;
-#endif
-                if (vehicle != null && !inMultiplayer)
-                {
-                    vehicle.CanMove = false;
-                    vehicle.Rigidbody.linearDamping = 2.0f;
-                }
-                else if (vehicle == null)
-                {
-                    Ilumisoft.SkillDrive.SkillDriveDebug.LogGameplay("[GameManager] Vehicle not found on 'player' object. Skipping movement lock.");
-                }
-
-                if(won)
-                {
-                    UnlockNextLevel();
-
-                    OnComplete?.Invoke(); 
-                }
-                else
-                {
-                    OnFail?.Invoke();
-                }
-            }
-        }
-
-        void UnlockNextLevel()
-        {
-            // Get the level number of the current scene
-            int currentLevelNumber = levelData.GetLevelNumber(gameObject.scene);
-
-            // Unlock the next level
-            LevelLockManager.UnlockLevel(currentLevelNumber + 1);
-        }
     }
 }

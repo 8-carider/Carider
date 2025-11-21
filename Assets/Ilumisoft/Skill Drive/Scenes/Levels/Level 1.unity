@@ -2714,6 +2714,10 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 373460459887380680, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: spawnCheckRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380680, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: collectablePrefab
       value: 
       objectReference: {fileID: 5489907549188334767, guid: 5a557090392455a4c9b034a79ac9927c, type: 3}
