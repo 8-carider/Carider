@@ -117,6 +117,7 @@ namespace Ilumisoft.SkillDrive.LevelSelection
 
         void SetupLevelPreviewsAndButtons()
         {
+            bool isMaster = Photon.Pun.PhotonNetwork.IsMasterClient;
             for (int i = 0; i < levelPreviews.Count; i++)
             {
                 int levelNumber = i + 1;
@@ -128,6 +129,13 @@ namespace Ilumisoft.SkillDrive.LevelSelection
 
                 var buttonInstance = Instantiate(levelSelectButtonPrefab, buttonContainer.transform);
                 buttonInstance.Initialize(this, levelNumber);
+
+                // 마스터만 버튼 활성화
+                var btn = buttonInstance.GetComponent<Button>();
+                if (btn != null)
+                {
+                    btn.interactable = isMaster;
+                }
             }
         }
 
