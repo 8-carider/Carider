@@ -6,11 +6,16 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Photon.Pun;
+using Unity.Cinemachine;
 
 namespace Ilumisoft.SkillDrive.LevelSelection
 {
-    public class LevelSelectionManager : MonoBehaviour
+    public class LevelSelectionManager : MonoBehaviourPun
     {
+        [Header("Preview Cameras")]
+        [SerializeField]
+        CinemachineVirtualCamera[] previewVCams = null;
         public static int LastLevel = -1;
 
         [Header("Button Setup")]
@@ -164,6 +169,16 @@ namespace Ilumisoft.SkillDrive.LevelSelection
                 currentIndex = levelNumber - 1;
 
                 levelPreviews[currentIndex].Select();
+
+                // 마스터가 선택한 vcam 인덱스를 모든 클라이언트에 동기화
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    PhotonView photonView = GetComponent<PhotonView>();
+                    if (photonView != null)
+                    {
+                        photonView.RPC("RPC_SwitchPreviewVCam", RpcTarget.All, currentIndex);
+                    }
+                }
             }, 0.5f));
         }
 
@@ -215,6 +230,16 @@ namespace Ilumisoft.SkillDrive.LevelSelection
             yield return new WaitForSecondsRealtime(delay);
 
             action?.Invoke();
+        }
+
+        [PunRPC]
+        void RPC_SwitchPreviewVCam(int vcamIndex)
+        {
+            // 모든 preview vcam 중 선택된 것만 활성화
+            for (int i = 0; i < previewVCams.Length; i++)
+            {
+                previewVCams[i].gameObject.SetActive(i == vcamIndex);
+            }
         }
     }
 }

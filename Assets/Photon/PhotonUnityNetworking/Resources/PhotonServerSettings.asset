@@ -59,6 +59,8 @@ MonoBehaviour:
   - RPC_SendInput
   - RPC_RequestDestroy
   - DeactivateCollectableRPC
+  - RPC_SwitchPreviewVCam
+  - RPC_SyncCamera
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
