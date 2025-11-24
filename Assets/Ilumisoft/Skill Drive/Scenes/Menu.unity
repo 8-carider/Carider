@@ -848,7 +848,7 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0, g: 0, b: 0, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -1757,6 +1757,7 @@ GameObject:
   - component: {fileID: 960458995}
   - component: {fileID: 960458994}
   - component: {fileID: 960458997}
+  - component: {fileID: 960458998}
   m_Layer: 5
   m_Name: LobbyPanel
   m_TagString: Untagged
@@ -1842,6 +1843,20 @@ MonoBehaviour:
   enterButton: {fileID: 582183663}
   statusText: {fileID: 1258413202}
   mapSelectionUI: {fileID: 1203680180}
+--- !u!114 &960458998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 960458992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e04d3ce6e77f32943a15e465aae64bdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsUI
+  statsText: {fileID: 0}
+  updateInterval: 0.5
 --- !u!1 &983899023
 GameObject:
   m_ObjectHideFlags: 0
