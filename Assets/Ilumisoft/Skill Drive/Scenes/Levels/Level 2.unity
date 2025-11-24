@@ -244,8 +244,20 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: d757eda8b5241624db64e8805a4940d3, type: 2}
+    - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
       propertyPath: m_fontSizeBase
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -751087735306096826, guid: d757eda8b5241624db64e8805a4940d3, type: 2}
+    - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8686400675053550956, guid: 9b6ee62bd80af5f49a4625c9a2ad2a88, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
