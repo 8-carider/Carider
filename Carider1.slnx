@@ -4,6 +4,7 @@
   <Project Path="PhotonUnityNetworking.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="PhotonUnityNetworking.Demos.csproj" />
+  <Project Path="Ilumisoft.RadarSystem.csproj" />
   <Project Path="PhotonUnityNetworking.Utilities.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="PunDemos.DemoHubEditor.csproj" />

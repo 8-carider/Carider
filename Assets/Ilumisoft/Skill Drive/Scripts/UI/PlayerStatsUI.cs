@@ -1,3 +1,6 @@
+// 11/24/2025 AI-Tag
+// This was created with the help of Assistant, a Unity Artificial Intelligence product.
+
 using UnityEngine;
 using TMPro;
 using Photon.Pun;
@@ -18,11 +21,6 @@ public class PlayerStatsUI : MonoBehaviourPunCallbacks
         }
     }
 
-     void Start()
-    {
-        UpdatePlayerNamesDisplay();
-    }
-
     // 룸 입장 시 닉네임 자동 할당
     public override void OnJoinedRoom()
     {
@@ -30,7 +28,6 @@ public class PlayerStatsUI : MonoBehaviourPunCallbacks
         {
             int actorNum = PhotonNetwork.LocalPlayer.ActorNumber;
             PhotonNetwork.NickName = $"P{actorNum}";
-            Debug.Log($"[PlayerStatsUI] ActorNumber: {actorNum}, NickName: {PhotonNetwork.NickName}");
             UpdatePlayerNamesDisplay(); // 닉네임 할당 후 즉시 UI 갱신
         }
     }
@@ -52,11 +49,6 @@ public class PlayerStatsUI : MonoBehaviourPunCallbacks
         {
             statsText.text = "No player info";
             return;
-        }
-
-        if (string.IsNullOrEmpty(PhotonNetwork.LocalPlayer.NickName))
-        {
-            Debug.LogWarning("[PlayerStatsUI] NickName is empty!");
         }
 
         statsText.text = $"You: {PhotonNetwork.LocalPlayer.NickName}";
