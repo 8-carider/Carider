@@ -12,6 +12,11 @@ namespace Ilumisoft.SkillDrive.Input
     /// </summary>
     public class VehiclePlayerInput : VehicleInputSource
     {
+        // WASD UI 오브젝트 연결용 변수
+        public UnityEngine.UI.Image WKey, AKey, SKey, DKey;
+        public Color pressedColor = Color.gray;
+        public Color defaultColor = Color.white;
+
         private InputAction moveAction;
         private Network.VehicleSeatManager seatManager;
         private Vector2 currentInput = Vector2.zero;
@@ -73,6 +78,12 @@ namespace Ilumisoft.SkillDrive.Input
 
         private void Update()
         {
+            // WASD UI 색상 변경
+            if (WKey != null) WKey.color = UnityEngine.Input.GetKey(KeyCode.W) ? pressedColor : defaultColor;
+            if (AKey != null) AKey.color = UnityEngine.Input.GetKey(KeyCode.A) ? pressedColor : defaultColor;
+            if (SKey != null) SKey.color = UnityEngine.Input.GetKey(KeyCode.S) ? pressedColor : defaultColor;
+            if (DKey != null) DKey.color = UnityEngine.Input.GetKey(KeyCode.D) ? pressedColor : defaultColor;
+
             // 멀티플레이어: 로컬 플레이어만 입력 읽기
             if (!PhotonNetwork.IsConnected)
             {
@@ -83,18 +94,18 @@ namespace Ilumisoft.SkillDrive.Input
                 }
                 return;
             }
-            
+
             // 멀티플레이어: 내가 이 차량에 배정되었는지 확인
             if (seatManager == null || !seatManager.IsPlayerAssigned(PhotonNetwork.LocalPlayer.ActorNumber))
             {
                 return; // 내 차량이 아니면 입력 무시
             }
-            
+
             // 키보드에서 입력 읽기
             if (moveAction != null)
             {
                 Vector2 localInput = moveAction.ReadValue<Vector2>();
-                
+
                 // 입력이 있을 때만 RPC 전송 (대역폭 절약)
                 if (localInput.sqrMagnitude > 0.01f || currentInput.sqrMagnitude > 0.01f)
                 {
@@ -102,7 +113,7 @@ namespace Ilumisoft.SkillDrive.Input
                     {
                         currentInput = localInput;
                         int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
-                        
+
                         // VehicleSeatManager의 PhotonView를 통해 RPC 전송
                         if (seatManager.photonView != null)
                         {
