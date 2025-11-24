@@ -63,7 +63,16 @@ namespace Ilumisoft.SkillDrive.LevelSelection
         {
             returnInputAction.started += (arg) =>
             {
-                LoadMenu();
+                // Enter 키 입력 시 현재 선택된 맵으로 들어가기
+                if (Keyboard.current != null && Keyboard.current.enterKey.isPressed)
+                {
+                    LoadLevel(currentIndex + 1);
+                }
+                else
+                {
+                    // 기존 메뉴 복귀 기능(다른 키 입력 시)
+                    LoadMenu();
+                }
             };
         }
 
@@ -73,51 +82,11 @@ namespace Ilumisoft.SkillDrive.LevelSelection
 
             // Optional debug (disabled by default via SkillDriveDebug flags)
             Ilumisoft.SkillDrive.SkillDriveDebug.LogUI($"[LevelSelectionManager] LastLevel = {LastLevel}");
-            for (int i = 1; i <= levelPreviews.Count; i++)
-            {
-                Ilumisoft.SkillDrive.SkillDriveDebug.LogUI($"[LevelSelectionManager] Level {i} locked? {LevelLockManager.IsLocked(i)}");
-            }
-
             SetupLevelPreviewsAndButtons();
-
-            if (LastLevel != -1)
-            {
-                currentIndex = LastLevel;
-
-                levelPreviews[currentIndex].Select();
-
-                buttonContainer.transform.GetChild(currentIndex).GetComponent<Selectable>().Select();
-
-                yield return new WaitForSecondsRealtime(1.0f);
-
-                int currentLevelNumber = currentIndex + 1;
-                int nextLevelNumber = currentLevelNumber + 1;
-
-                if (LevelLockManager.IsLocked(nextLevelNumber) == false)
-                {
-                    SelectNextLevel();
-                }
-            }
-            else
-            {
-                currentIndex = 0;
-
-                for (int i = 0; i < levelPreviews.Count; i++)
-                {
-                    int levelNumber = i + 1;
-
-                    if (IsLevelComplete(levelNumber) == false)
-                    {
-                        currentIndex = i;
-
-                        break;
-                    }
-                }
-
-                levelPreviews[currentIndex].Select();
-            }
-
+            currentIndex = 0;
+            levelPreviews[currentIndex].Select();
             buttonContainer.transform.GetChild(currentIndex).GetComponent<Selectable>().Select();
+            yield break;
         }
 
         void SetupLevelPreviewsAndButtons()
@@ -126,11 +95,6 @@ namespace Ilumisoft.SkillDrive.LevelSelection
             for (int i = 0; i < levelPreviews.Count; i++)
             {
                 int levelNumber = i + 1;
-
-                bool isLocked = IsLevelLocked(levelNumber);
-
-                levelPreviews[i].ShowLock(isLocked);
-                levelPreviews[i].ShowCompletedText(IsLevelComplete(levelNumber));
 
                 var buttonInstance = Instantiate(levelSelectButtonPrefab, buttonContainer.transform);
                 buttonInstance.Initialize(this, levelNumber);
@@ -145,13 +109,17 @@ namespace Ilumisoft.SkillDrive.LevelSelection
         }
 
         bool IsLevelLocked(int levelNumber) => LevelLockManager.IsLocked(levelNumber);
-
-        bool IsLevelComplete(int levelNumber) => !LevelLockManager.IsLocked(levelNumber + 1);
-
-        bool IsCurrentLevelLocked => LevelLockManager.IsLocked(currentIndex + 1);
-
-        public void LoadMenu()
+    public void LoadMenu()
         {
+            // 포톤 방에서 나가기 및 서버 연결 끊기
+            if (Photon.Pun.PhotonNetwork.InRoom)
+            {
+                Photon.Pun.PhotonNetwork.LeaveRoom();
+            }
+            if (Photon.Pun.PhotonNetwork.IsConnected)
+            {
+                Photon.Pun.PhotonNetwork.Disconnect();
+            }
             sceneLoader.LoadScene(0);
         }
 
@@ -199,15 +167,8 @@ namespace Ilumisoft.SkillDrive.LevelSelection
 
         public void LoadLevel(int levelNumber)
         {
-            if (IsCurrentLevelLocked == false)
-            {
-                StopAllCoroutines();
-                StartCoroutine(LoadLevelCoroutine(levelNumber));
-            }
-            else
-            {
-                deniedSFX.Play();
-            }
+            StopAllCoroutines();
+            StartCoroutine(LoadLevelCoroutine(levelNumber));
         }
 
         IEnumerator LoadLevelCoroutine(int levelNumber)

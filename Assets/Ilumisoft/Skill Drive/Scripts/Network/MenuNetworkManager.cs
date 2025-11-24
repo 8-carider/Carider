@@ -37,20 +37,19 @@ namespace Ilumisoft.SkillDrive.Network
                 return;
             }
 
-            if (PhotonNetwork.IsConnected)
+            // PhotonNetwork가 연결되어 있지 않거나, Disconnected 상태면 항상 재접속 시도
+            if (!PhotonNetwork.IsConnected || PhotonNetwork.NetworkClientState == Photon.Realtime.ClientState.Disconnected)
             {
-                Debug.Log("[MenuNetworkManager] Already connected, showing lobby");
-                ShowLobby();
+                isConnecting = true;
+                PhotonNetwork.GameVersion = gameVersion;
+                PhotonNetwork.AutomaticallySyncScene = true;
+                PhotonNetwork.ConnectUsingSettings();
+                Debug.Log("[MenuNetworkManager] Connecting to Photon...");
                 return;
             }
 
-            // Photon 네트워크 접속 시작
-            isConnecting = true;
-            PhotonNetwork.GameVersion = gameVersion;
-            PhotonNetwork.AutomaticallySyncScene = true;
-            PhotonNetwork.ConnectUsingSettings();
-
-            Debug.Log("[MenuNetworkManager] Connecting to Photon...");
+            Debug.Log("[MenuNetworkManager] Already connected, showing lobby");
+            ShowLobby();
         }
 
         public override void OnConnectedToMaster()
