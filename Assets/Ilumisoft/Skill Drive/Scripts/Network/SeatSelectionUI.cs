@@ -86,25 +86,25 @@ namespace Ilumisoft.SkillDrive.Network
             if (vehicle1ThrottleButton != null)
             {
                 vehicle1ThrottleButton.onClick.AddListener(() => OnSeatButtonClicked(0, true));
-                UpdateButtonText(vehicle1ThrottleButton, "Vehicle 1\nThrottle");
+                UpdateButtonText(vehicle1ThrottleButton, "Vehicle 1 : Forward Backward");
             }
 
             if (vehicle1SteeringButton != null)
             {
                 vehicle1SteeringButton.onClick.AddListener(() => OnSeatButtonClicked(0, false));
-                UpdateButtonText(vehicle1SteeringButton, "Vehicle 1\nSteering");
+                UpdateButtonText(vehicle1SteeringButton, "Vehicle 1 : Left Right");
             }
 
             if (vehicle2ThrottleButton != null)
             {
                 vehicle2ThrottleButton.onClick.AddListener(() => OnSeatButtonClicked(1, true));
-                UpdateButtonText(vehicle2ThrottleButton, "Vehicle 2\nThrottle");
+                UpdateButtonText(vehicle2ThrottleButton, "Vehicle 2 : Forward Backward");
             }
 
             if (vehicle2SteeringButton != null)
             {
                 vehicle2SteeringButton.onClick.AddListener(() => OnSeatButtonClicked(1, false));
-                UpdateButtonText(vehicle2SteeringButton, "Vehicle 2\nSteering");
+                UpdateButtonText(vehicle2SteeringButton, "Vehicle 2 : Left Right");
             }
 
             // Confirm 버튼은 제거됨
@@ -161,7 +161,7 @@ namespace Ilumisoft.SkillDrive.Network
             }
             if (!iOwnThisSeat && iOwnOtherVehicle)
             {
-                UpdateStatusText("같은 차량 내 좌석만 선택할 수 있습니다.");
+                UpdateStatusText("Select seats in the same vehicle");
                 return;
             }
 
@@ -384,7 +384,7 @@ namespace Ilumisoft.SkillDrive.Network
                 
                 if (allSeatsReady)
                 {
-                    UpdateStatusText("All seats ready - Master can start");
+                    UpdateStatusText("All seats ready\nMaster can start");
                 }
                 else
                 {
@@ -461,10 +461,10 @@ namespace Ilumisoft.SkillDrive.Network
                 string roleText = "";
                 
                 // 버튼 식별
-                if (btn == vehicle1ThrottleButton) { vehicleText = "Vehicle 1"; roleText = "Throttle"; }
-                else if (btn == vehicle1SteeringButton) { vehicleText = "Vehicle 1"; roleText = "Steering"; }
-                else if (btn == vehicle2ThrottleButton) { vehicleText = "Vehicle 2"; roleText = "Throttle"; }
-                else if (btn == vehicle2SteeringButton) { vehicleText = "Vehicle 2"; roleText = "Steering"; }
+                if (btn == vehicle1ThrottleButton) { vehicleText = "Vehicle 1"; roleText = "F B"; }
+                else if (btn == vehicle1SteeringButton) { vehicleText = "Vehicle 1"; roleText = "L R"; }
+                else if (btn == vehicle2ThrottleButton) { vehicleText = "Vehicle 2"; roleText = "F B"; }
+                else if (btn == vehicle2SteeringButton) { vehicleText = "Vehicle 2"; roleText = "L R"; }
                 
                 if (string.IsNullOrEmpty(playerLabel))
                 {

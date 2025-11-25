@@ -42,7 +42,7 @@ namespace Ilumisoft.SkillDrive.Network
                 playerNameInput.text = "Player" + Random.Range(1000, 9999);
             }
 
-            UpdateStatusText("연결 대기 중...");
+            UpdateStatusText("Wait to join...");
         }
 
         private void Update()
@@ -57,19 +57,19 @@ namespace Ilumisoft.SkillDrive.Network
             // 연결 상태 업데이트
             if (PhotonNetwork.IsConnected && PhotonNetwork.InLobby)
             {
-                UpdateStatusText("준비 완료! Enter 또는 Join 버튼 클릭");
+                UpdateStatusText("Ready! Enter or Join button click");
                 if (joinButton != null)
                     joinButton.interactable = true;
             }
             else if (PhotonNetwork.IsConnected)
             {
-                UpdateStatusText("로비 참가 중...");
+                UpdateStatusText("Joining lobby...");
                 if (joinButton != null)
                     joinButton.interactable = false;
             }
             else
             {
-                UpdateStatusText("서버 연결 중...");
+                UpdateStatusText("Connecting to server...");
                 if (joinButton != null)
                     joinButton.interactable = false;
             }
@@ -91,7 +91,7 @@ namespace Ilumisoft.SkillDrive.Network
                 Debug.Log($"[LobbyUI] 플레이어 이름 설정: {playerNameInput.text}");
             }
 
-            UpdateStatusText("게임 참가 중...");
+            UpdateStatusText("Joining game...");
             
             if (networkManager != null)
             {
