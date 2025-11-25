@@ -3800,6 +3800,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 743190943094514869, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: m_fontSize
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 743190943094514869, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1742685605526584416, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -49
@@ -3912,6 +3920,10 @@ PrefabInstance:
       propertyPath: pressedColor.r
       value: 0.4
       objectReference: {fileID: 0}
+    - target: {fileID: 4206778040290378683, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c1971f143cb87524f81f49bb099fb8b2, type: 2}
     - target: {fileID: 4706629741627289360, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
       propertyPath: m_StreamingVersion
       value: 20241001
@@ -5895,6 +5907,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 743190943094514869, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: m_fontSize
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 743190943094514869, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1742685605526584416, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -77
@@ -5967,6 +5987,10 @@ PrefabInstance:
       propertyPath: pressedColor.r
       value: 0.4
       objectReference: {fileID: 0}
+    - target: {fileID: 4206778040290378683, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2397d7d06567606428426325a2250ea4, type: 2}
     - target: {fileID: 5393329625112742096, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
       propertyPath: sceneViewId
       value: 2

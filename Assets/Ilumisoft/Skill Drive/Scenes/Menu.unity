@@ -34371,6 +34371,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8590004837392644835, guid: a143135be3953454fb2e8716b4dc1b0e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c1971f143cb87524f81f49bb099fb8b2, type: 2}
     - target: {fileID: 919132149155446097, guid: a143135be3953454fb2e8716b4dc1b0e, type: 3}
       propertyPath: m_Name
       value: Vehicle
@@ -43117,6 +43121,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8590004837392644835, guid: a143135be3953454fb2e8716b4dc1b0e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2397d7d06567606428426325a2250ea4, type: 2}
     - target: {fileID: 919132149155446097, guid: a143135be3953454fb2e8716b4dc1b0e, type: 3}
       propertyPath: m_Name
       value: Vehicle
