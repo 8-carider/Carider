@@ -27,6 +27,7 @@ public class PlayerStatsUI : MonoBehaviourPunCallbacks
         {
             int actorNum = PhotonNetwork.LocalPlayer.ActorNumber;
             PhotonNetwork.NickName = $"P{actorNum}";
+            Debug.Log($"[PlayerStatsUI] NickName set in OnJoinedRoom: {PhotonNetwork.NickName}");
             UpdatePlayerNamesDisplay(); // 닉네임 할당 후 즉시 UI 갱신
         }
     }
