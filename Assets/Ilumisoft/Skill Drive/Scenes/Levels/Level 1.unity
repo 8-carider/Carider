@@ -4525,7 +4525,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "WASD: car control\nF: respawn (master only)\nESC: back to title\n\nCollect
-    more objects to win! \n"
+    more objects to win! \n\nPress H key to close\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d757eda8b5241624db64e8805a4940d3, type: 2}
   m_sharedMaterial: {fileID: -751087735306096826, guid: d757eda8b5241624db64e8805a4940d3, type: 2}
