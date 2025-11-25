@@ -61,6 +61,7 @@ MonoBehaviour:
   - DeactivateCollectableRPC
   - RPC_SwitchPreviewVCam
   - RPC_SyncCamera
+  - RPC_StartRace
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
