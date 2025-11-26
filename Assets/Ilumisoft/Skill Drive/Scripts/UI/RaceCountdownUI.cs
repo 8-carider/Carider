@@ -9,12 +9,13 @@ namespace Ilumisoft.SkillDrive.UI
         [SerializeField] private TMP_Text countdownText;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private float countdownDuration = 1.0f;
-        [SerializeField] private string[] countdownSequence = { "3", "2", "1", "START" };
+        [SerializeField] private string[] countdownSequence = { "3..", "2..", "1..", "Go!" };
 
         public System.Action OnCountdownFinished;
 
         public void StartCountdown()
         {
+            gameObject.SetActive(true);
             StartCoroutine(CountdownRoutine());
         }
 
