@@ -111,6 +111,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39dee8d330a413f479d766f622b29fc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WKey: {fileID: 0}
+  AKey: {fileID: 0}
+  SKey: {fileID: 0}
+  DKey: {fileID: 0}
+  pressedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!65 &7755348753579058470
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -217,6 +223,7 @@ GameObject:
   - component: {fileID: 2612464816402476608}
   - component: {fileID: 4706629741627289360}
   - component: {fileID: 9933201586386523}
+  - component: {fileID: 3681459751262929689}
   m_Layer: 0
   m_Name: VehicleVCam
   m_TagString: Untagged
@@ -256,7 +263,7 @@ MonoBehaviour:
     m_Value: 10
   OutputChannel: 1
   StandbyUpdate: 0
-  m_StreamingVersion: 20230301
+  m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 1742685605526584416}
@@ -313,6 +320,22 @@ MonoBehaviour:
     Time: 0
     Smoothing: 0
     IgnoreY: 0
+--- !u!114 &3681459751262929689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3582945637003889750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cdba0e5deb60d04ea5fad287923b999, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.UI.RaceCameraDistanceSequence
+  targetVCam: {fileID: 4706629741627289360}
+  startDistance: 200
+  endDistance: 60
+  moveDuration: 2
 --- !u!1 &5265549887123279869
 GameObject:
   m_ObjectHideFlags: 0

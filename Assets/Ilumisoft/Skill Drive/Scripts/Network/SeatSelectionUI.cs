@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Ilumisoft.SkillDrive.Game;
+using Ilumisoft.SkillDrive.UI;
 
 namespace Ilumisoft.SkillDrive.Network
 {
@@ -183,19 +184,15 @@ namespace Ilumisoft.SkillDrive.Network
         private void OnStartGameClicked()
         {
             Debug.Log("[SeatSelectionUI] Start button clicked!");
-            
             if (!PhotonNetwork.IsMasterClient)
             {
                 Debug.LogWarning("[SeatSelectionUI] Not master client!");
                 return;
             }
-            
             Debug.Log("[SeatSelectionUI] Checking if all seats filled...");
             if (!AllFourUniqueSeatsFilled())
             {
                 Debug.LogWarning("[SeatSelectionUI] Not all seats filled!");
-                
-                // 디버그: 현재 좌석 상태 출력
                 var managers = FindObjectsOfType<VehicleSeatManager>();
                 Debug.Log($"[SeatSelectionUI] Found {managers.Length} VehicleSeatManagers");
                 foreach (var m in managers)
@@ -203,35 +200,65 @@ namespace Ilumisoft.SkillDrive.Network
                     var (t, s) = m.GetAssignedActors();
                     Debug.Log($"[SeatSelectionUI] {m.name}: Throttle={t}, Steering={s}");
                 }
-                
                 UpdateStatusText("Not all seats filled");
                 return;
             }
-            
-            Debug.Log("[SeatSelectionUI] All seats filled. Finding MapVehicleSpawner...");
-            var spawner = FindObjectOfType<MapVehicleSpawner>();
-            if (spawner != null)
+
+            // 모든 클라이언트에서 카메라 연출 → 카운트다운 순서로 동작하도록 RPC 호출
+            photonView.RPC("RPC_PlayCameraSequenceAndStartCountdown", RpcTarget.All);
+
+            // Start 버튼 즉시 숨김
+            if (startGameButton != null)
             {
-                Debug.Log($"[SeatSelectionUI] MapVehicleSpawner found: {spawner.name}");
-                var pv = spawner.GetComponent<PhotonView>();
-                if (pv != null)
+                startGameButton.gameObject.SetActive(false);
+            }
+        }
+
+        [PunRPC]
+        private void RPC_PlayCameraSequenceAndStartCountdown()
+        {
+            // 모든 차량의 카메라 연출 실행
+            var cameraSequences = FindObjectsByType<RaceCameraDistanceSequence>(FindObjectsSortMode.None);
+            if (cameraSequences != null && cameraSequences.Length > 0)
+            {
+                foreach (var seq in cameraSequences)
                 {
-                    Debug.Log($"[SeatSelectionUI] PhotonView found. ViewID: {pv.ViewID}, IsMine: {pv.IsMine}, Owner: {pv.Owner}");
-                    pv.RPC("RPC_StartGame", RpcTarget.All);
-                    UpdateStatusText("Game Starting!");
-                    Debug.Log("[SeatSelectionUI] RPC_StartGame called!");
+                    seq.PlayCameraDistanceSequence();
                 }
-                else
-                {
-                    Debug.LogError("[SeatSelectionUI] PhotonView not found on MapVehicleSpawner!");
-                }
+                UpdateStatusText("Camera sequence starting...");
+                // 연출이 끝난 후 카운트다운 시작 (2.5초 후)
+                Invoke(nameof(StartRaceCountdown), 2.5f);
             }
             else
             {
-                Debug.LogError("[SeatSelectionUI] MapVehicleSpawner not found!");
+                // 연출이 없으면 바로 카운트다운 시작
+                StartRaceCountdown();
             }
+            // 패널 숨김
+            if (selectionPanel != null)
+                selectionPanel.SetActive(false);
+        }
 
-            // GameManager의 Countdown을 네트워크로 시작 (기존 시스템 프리팹 재사용)
+        private void StartRaceCountdown()
+        {
+            // 카운트다운 UI 실행
+            var countdownUI = FindAnyObjectByType<RaceCountdownUI>();
+            if (countdownUI != null)
+            {
+                countdownUI.OnCountdownFinished -= OnCountdownFinished;
+                countdownUI.OnCountdownFinished += OnCountdownFinished;
+                countdownUI.StartCountdown();
+            }
+            else
+            {
+                // 카운트다운 UI가 없으면 바로 다음 단계로
+                OnCountdownFinished();
+            }
+        }
+
+        private void OnCountdownFinished()
+        {
+            // 기존 카운트다운 로직 실행 (타이머 시작 등)
             float timeLimit = 120f;
             if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("TimeLimit"))
             {
@@ -240,14 +267,13 @@ namespace Ilumisoft.SkillDrive.Network
                 else if (v is int i) timeLimit = i;
                 else if (float.TryParse(v.ToString(), out var parsed)) timeLimit = parsed;
             }
-
-            // 이 UI의 PhotonView를 사용해 모든 클라이언트에서 카운트다운 시작
             photonView.RPC("RPC_BeginCountdown", RpcTarget.AllBuffered, timeLimit);
 
-            // Start 버튼 즉시 숨김 (마스터 포함 모든 클라이언트에서는 RPC_StartGame에서 패널 닫힘 처리)
-            if (startGameButton != null)
+            // 차량 조작 활성화
+            var vehicles = FindObjectsByType<Ilumisoft.SkillDrive.Vehicle>(FindObjectsSortMode.None);
+            foreach (var v in vehicles)
             {
-                startGameButton.gameObject.SetActive(false);
+                v.CanMove = true;
             }
         }
 

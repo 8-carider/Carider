@@ -6,7 +6,7 @@ namespace Ilumisoft.SkillDrive.UI
 {
     public class RaceCameraDistanceSequence : MonoBehaviour
     {
-        [SerializeField] private Unity.Cinemachine.CinemachineCamera targetVCam;
+        [SerializeField] private CinemachineCamera targetVCam;
         [SerializeField] private float startDistance = 120f;
         [SerializeField] private float endDistance = 60f;
         [SerializeField] private float moveDuration = 2.0f;
@@ -20,28 +20,24 @@ namespace Ilumisoft.SkillDrive.UI
 
         private IEnumerator CameraDistanceRoutine()
         {
-            var transposer = targetVCam.GetComponent<Unity.Cinemachine.CinemachineTransposer>();
-            if (transposer == null)
+            var composer = targetVCam.GetComponent<CinemachinePositionComposer>();
+            if (composer == null)
             {
-                Debug.LogError("RaceCameraDistanceSequence: CinemachineTransposer not found!");
+                Debug.LogError("RaceCameraDistanceSequence: CinemachinePositionComposer not found!");
                 yield break;
             }
             float elapsed = 0f;
             float initialDistance = startDistance;
             float finalDistance = endDistance;
-            Vector3 offset = transposer.m_FollowOffset;
-            offset.z = initialDistance;
-            transposer.m_FollowOffset = offset;
+            composer.CameraDistance = initialDistance;
             while (elapsed < moveDuration)
             {
                 float t = elapsed / moveDuration;
-                offset.z = Mathf.Lerp(initialDistance, finalDistance, t);
-                transposer.m_FollowOffset = offset;
+                composer.CameraDistance = Mathf.Lerp(initialDistance, finalDistance, t);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
-            offset.z = finalDistance;
-            transposer.m_FollowOffset = offset;
+            composer.CameraDistance = finalDistance;
             OnCameraSequenceFinished?.Invoke();
         }
     }

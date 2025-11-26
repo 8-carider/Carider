@@ -27,6 +27,8 @@ namespace Ilumisoft.SkillDrive.UI
                 yield return new WaitForSeconds(countdownDuration);
             }
             canvasGroup.alpha = 0f;
+            countdownText.text = "";
+            gameObject.SetActive(false);
             OnCountdownFinished?.Invoke();
         }
     }
