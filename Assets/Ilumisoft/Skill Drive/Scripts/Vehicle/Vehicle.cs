@@ -7,6 +7,11 @@
     {
     public class Vehicle : MonoBehaviour
     {
+        // 스피드업 효과 관련 필드
+        private float speedUpTimer = 0f;
+        private float speedUpMultiplier = 1f;
+        private float originalAcceleration;
+        private float originalMaxSpeed;
     [SerializeField]
     private VehicleStats stats = new VehicleStats();
 
@@ -69,12 +74,39 @@
     /// </summary>
     protected virtual void FixedUpdate()
     {
+        // 스피드업 효과 타이머 처리
+        if (speedUpTimer > 0f)
+        {
+            speedUpTimer -= Time.fixedDeltaTime;
+            if (speedUpTimer <= 0f)
+            {
+                // 원래 값 복구
+                FinalStats.Acceleration = originalAcceleration;
+                FinalStats.MaxSpeed = originalMaxSpeed;
+                speedUpMultiplier = 1f;
+            }
+        }
+
         CollectInput();
         PerformGroundCheck();
         ApplyGravity();
         ApplyLateralFriction();
         ApplySteering();
         ApplyAcceleration();
+    }
+    /// <summary>
+    /// 일정 시간 동안 차량의 가속도/최대속도 배율을 올려주는 스피드업 효과
+    /// </summary>
+    public void ApplySpeedUp(float duration, float multiplier)
+    {
+        // 기존 값 저장
+        originalAcceleration = FinalStats.Acceleration;
+        originalMaxSpeed = FinalStats.MaxSpeed;
+        // 배율 적용
+        FinalStats.Acceleration = originalAcceleration * multiplier;
+        FinalStats.MaxSpeed = originalMaxSpeed * multiplier;
+        speedUpMultiplier = multiplier;
+        speedUpTimer = duration;
     }
 
     /// <summary>

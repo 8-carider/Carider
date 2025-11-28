@@ -21,9 +21,6 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("Layer mask used to detect ground when spawning collectables")]
         private LayerMask groundLayer = ~0;
 
-        [SerializeField, Tooltip("Layer mask used to detect obstacles when spawning collectables")]
-        private LayerMask obstacleLayer = 0; // Inspector에서 장애물 레이어 지정
-
         [SerializeField, Tooltip("Maximum number of attempts to find a non-overlapping spawn position")]
         private int maxSpawnAttempts = 10;
 
@@ -117,52 +114,39 @@ namespace Ilumisoft.SkillDrive.Game
 
             while (spawned < collectableCount && attempts < maxSpawnAttempts * collectableCount)
             {
-                Vector3 randomPos = transform.position + new Vector3(
+                Vector3 spawnPosition = transform.position + new Vector3(
                     Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f),
-                    5f, // 위에서 아래로 Raycast
+                    0.5f,
                     Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
                 );
-                RaycastHit hit;
-                // 바닥 체크: 위에서 아래로 Raycast, groundLayer에 닿는 위치만 생성
-                if (Physics.Raycast(randomPos, Vector3.down, out hit, 10f, groundLayer))
+
+                // 겹침 체크
+                if (!Physics.CheckSphere(spawnPosition, spawnCheckRadius, groundLayer))
                 {
-                    Vector3 spawnPosition = hit.point + Vector3.up * 0.5f;
-                    // 장애물 체크: obstacleLayer와 겹치지 않는 위치만 생성
-                    if (!Physics.CheckSphere(spawnPosition, spawnCheckRadius, obstacleLayer))
-                    {
 #if PHOTON_UNITY_NETWORKING
-                        Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
+                    Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
 #else
-                        Instantiate(collectablePrefab, spawnPosition, Quaternion.identity);
+                    Instantiate(collectablePrefab, spawnPosition, Quaternion.identity);
 #endif
-                        spawned++;
-                    }
+                    spawned++;
                 }
                 attempts++;
             }
 
-            // 부족하면 fallback으로 채우기(바닥+장애물 체크 동일하게 적용)
+            // 부족하면 fallback으로 채우기
             while (spawned < collectableCount)
             {
-                Vector3 randomPos = transform.position + new Vector3(
+                Vector3 fallbackPos = transform.position + new Vector3(
                     Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f),
-                    5f,
+                    0.5f,
                     Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
                 );
-                RaycastHit hit;
-                if (Physics.Raycast(randomPos, Vector3.down, out hit, 10f, groundLayer))
-                {
-                    Vector3 spawnPosition = hit.point + Vector3.up * 0.5f;
-                    if (!Physics.CheckSphere(spawnPosition, spawnCheckRadius, obstacleLayer))
-                    {
 #if PHOTON_UNITY_NETWORKING
-                        Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
+                Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
 #else
-                        Instantiate(collectablePrefab, spawnPosition, Quaternion.identity);
+                Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
 #endif
-                        spawned++;
-                    }
-                }
+                spawned++;
             }
 
             AttachCollectEventsToAll();
