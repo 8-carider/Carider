@@ -915,7 +915,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3497860065554390917, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
       propertyPath: m_LocalScale.x
@@ -3918,8 +3918,8 @@ MonoBehaviour:
   checkRadius: 5
   maxTries: 30
   speedUpCollectablePrefab: {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
-  spawnAreaMin: {x: 0, y: 0}
-  spawnAreaMax: {x: 10, y: 10}
+  spawnAreaMin: {x: -20, y: -20}
+  spawnAreaMax: {x: 20, y: 20}
 --- !u!4 &1897611793
 Transform:
   m_ObjectHideFlags: 0
