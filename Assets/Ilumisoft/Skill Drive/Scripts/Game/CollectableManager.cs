@@ -30,6 +30,9 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("한 번에 맵에 존재할 콜렉터블 개수")]
         private int collectableCount = 10;
 
+        [SerializeField, Tooltip("피할 레이어(예: 장애물)")]
+        private LayerMask obstacleLayer = 0;
+
         private int collected = 0;
         private int spawned = 0;
 
@@ -120,8 +123,10 @@ namespace Ilumisoft.SkillDrive.Game
                     Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
                 );
 
-                // 겹침 체크
-                if (!Physics.CheckSphere(spawnPosition, spawnCheckRadius, groundLayer))
+                // 겹침 체크: groundLayer와 obstacleLayer 모두 피함
+                bool overlapGround = Physics.CheckSphere(spawnPosition, spawnCheckRadius, groundLayer);
+                bool overlapObstacle = obstacleLayer.value != 0 && Physics.CheckSphere(spawnPosition, spawnCheckRadius, obstacleLayer);
+                if (!overlapGround && !overlapObstacle)
                 {
 #if PHOTON_UNITY_NETWORKING
                     Photon.Pun.PhotonNetwork.Instantiate(prefabName, spawnPosition, Quaternion.identity);
@@ -133,7 +138,7 @@ namespace Ilumisoft.SkillDrive.Game
                 attempts++;
             }
 
-            // 부족하면 fallback으로 채우기
+            // 부족하면 fallback으로 채우기 (장애물 피하기 적용)
             while (spawned < collectableCount)
             {
                 Vector3 fallbackPos = transform.position + new Vector3(
@@ -141,12 +146,17 @@ namespace Ilumisoft.SkillDrive.Game
                     0.5f,
                     Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
                 );
+                bool overlapGround = Physics.CheckSphere(fallbackPos, spawnCheckRadius, groundLayer);
+                bool overlapObstacle = obstacleLayer.value != 0 && Physics.CheckSphere(fallbackPos, spawnCheckRadius, obstacleLayer);
+                if (!overlapGround && !overlapObstacle)
+                {
 #if PHOTON_UNITY_NETWORKING
-                Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
+                    Photon.Pun.PhotonNetwork.Instantiate(prefabName, fallbackPos, Quaternion.identity);
 #else
-                Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
+                    Instantiate(collectablePrefab, fallbackPos, Quaternion.identity);
 #endif
-                spawned++;
+                    spawned++;
+                }
             }
 
             AttachCollectEventsToAll();
