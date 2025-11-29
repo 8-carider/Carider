@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Ilumisoft.SkillDrive.Game
@@ -11,6 +12,9 @@ namespace Ilumisoft.SkillDrive.Game
         public FlagSpawner flagSpawner;
         public AutoCameraAdjust cameraAdjuster;
 
+        // 불꽃놀이
+        public GameObject[] fireworksPrefabs;
+
         private void Start()
         {
             List<PlayerRankData> ranking = GameSessionManager.Instance.GetFinalRanking();
@@ -20,9 +24,12 @@ namespace Ilumisoft.SkillDrive.Game
             if (flagSpawner != null)
                 flagSpawner.SpawnFlags(ranking);
 
-            // 🔥 카메라 이동 함수 호출 (이제 이름 일치함)
+            // 카메라 이동
             if (cameraAdjuster != null && flagSpawner != null)
                 cameraAdjuster.AdjustCameraToHeight(flagSpawner.HighestFlagHeight * 1f);
+
+            // 카메라가 멈추면 우승자 텍스트 & 불꽃놀이 실행
+            cameraAdjuster.OnCameraStop += () => OnCameraStopped(ranking);
         }
 
         private void SpawnTexts(List<PlayerRankData> ranking)
@@ -36,11 +43,95 @@ namespace Ilumisoft.SkillDrive.Game
 
                 tmp.text = $"P{i + 1}\n{ranking[i].TotalCollected}";
                 tmp.fontSize = 10;
+                tmp.color = Color.white;
+                tmp.outlineWidth = 0.2f;
+                tmp.outlineColor = Color.black;
+
                 tmp.alignment = TextAlignmentOptions.Center;
 
                 obj.transform.LookAt(Camera.main.transform);
                 obj.transform.Rotate(0, 180, 0);
             }
         }
+
+        // 카메라가 멈추면 우승 텍스트 함수 & 불꽃놀이 함수 실행
+        private void OnCameraStopped(List<PlayerRankData> ranking)
+        {
+            ShowWinnerText(ranking);
+            StartCoroutine(SpawnFireworksLoop());
+        }
+
+        // 우승자 텍스트 출력
+        // 우승자 텍스트 출력 (동점자 지원)
+        private void ShowWinnerText(List<PlayerRankData> ranking)
+        {
+            int topScore = ranking[0].TotalCollected;
+            List<int> winners = new List<int>();//동점자 고려
+
+            foreach (var p in ranking)
+            {
+                if (p.TotalCollected == topScore)
+                    winners.Add(p.ActorNumber);
+            }
+            string winnerText = "";
+
+            if (winners.Count == 1)
+            {
+                winnerText = $"Winner is Player {winners[0]} !!!";
+            }
+            else
+            {
+                string listText = string.Join(", ", winners);
+                winnerText = $"Winners are Players {listText} !!!";
+            }
+            GameObject winnerObj = new GameObject("WinnerText");
+            TextMeshPro tmp = winnerObj.AddComponent<TextMeshPro>();
+
+            tmp.text = winnerText;
+            tmp.fontSize = 10;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.outlineWidth = 0.2f;
+            tmp.outlineColor = Color.black;
+
+            // 카메라 앞에 배치
+            Camera cam = Camera.main;
+            winnerObj.transform.position =
+                cam.transform.position +
+                cam.transform.forward * 10f +
+                cam.transform.up * 1.5f;
+
+            winnerObj.transform.LookAt(cam.transform);
+            winnerObj.transform.Rotate(0, 180f, 0);
+        }
+
+
+
+        // 불꽃놀이(무한 반복) 
+        private IEnumerator SpawnFireworksLoop()
+        {
+            Camera cam = Camera.main;
+
+            while (true)
+            {
+                if (fireworksPrefabs.Length > 0)
+                {
+                    // 랜덤 위치 (카메라가 보고있는 화면 내부)
+                    float x = Random.Range(-8f, 8f);
+                    float y = Random.Range(2f, 6f);
+
+                    Vector3 spawnPos = cam.transform.position
+                                     + cam.transform.forward * 10f
+                                     + cam.transform.right * x
+                                     + cam.transform.up * y;
+
+                    GameObject prefab = fireworksPrefabs[Random.Range(0, fireworksPrefabs.Length)];
+                    Instantiate(prefab, spawnPos, Quaternion.identity);
+                }
+
+                yield return new WaitForSeconds(0.1f); // 반복 속도
+            }
+        }
     }
 }
+

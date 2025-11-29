@@ -3699,6 +3699,18 @@ MonoBehaviour:
   resultTextPrefab: {fileID: 1960524440}
   flagSpawner: {fileID: 310689300}
   cameraAdjuster: {fileID: 216386431}
+  fireworksPrefabs:
+  - {fileID: 2808162098065262329, guid: 3ffa853ee6c0ca14dbd1c9d6030f2bb1, type: 3}
+  - {fileID: 7063594922231315700, guid: 3cc0a5e83e8d3904ca2763d1f0f7735d, type: 3}
+  - {fileID: 1971032574568611451, guid: 9818b049f5d927d4fb2879c29b139ec3, type: 3}
+  - {fileID: 7711949702769651735, guid: 0a9192254fc7d32438b6c4ef5ac41b71, type: 3}
+  - {fileID: 118094709120759156, guid: 3f5de61719eb28d49bc89ee7b626ddf5, type: 3}
+  - {fileID: 8202410161701405397, guid: 25f8a06e8555a5041904acded44bc97c, type: 3}
+  - {fileID: 6555377131790855691, guid: 08816012032abb14993fa0ec2ad3016a, type: 3}
+  - {fileID: 6974458438175869487, guid: ecf4dd9e709cc3b4187ff35f7fa97825, type: 3}
+  - {fileID: 7830405810077843025, guid: fc94b69fd85e8244cbd4bd102eac954e, type: 3}
+  - {fileID: 4026928156342996194, guid: e7c75804935927a4da12aa9e11166a0a, type: 3}
+  - {fileID: 5629879620833252019, guid: b41e2949fea37f74282b75a98656d019, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

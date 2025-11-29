@@ -29,9 +29,12 @@ public class FlagSpawner : MonoBehaviour
     {
         HighestFlagHeight = 1f;
 
-        for (int i = 0; i < ranking.Count && i < spawnPositions.Length; i++)
+        foreach (var playerData in ranking)
         {
-            float visualHeight = SpawnSingleFlag(ranking[i], spawnPositions[i], i);
+            int playerIndex = Mathf.Clamp(playerData.ActorNumber - 1, 0, spawnPositions.Length - 1);
+
+            // 해당 플레이어 자리에 깃발 생성
+            float visualHeight = SpawnSingleFlag(playerData, spawnPositions[playerIndex], playerIndex);
 
             if (visualHeight > HighestFlagHeight)
                 HighestFlagHeight = visualHeight;
@@ -49,6 +52,7 @@ public class FlagSpawner : MonoBehaviour
 
         float height = Mathf.Max(1, playerData.TotalCollected * heightMultiplier);
 
+        // 폴대 높이 조절
         if (pole != null)
         {
             Vector3 scale = pole.localScale;
@@ -60,9 +64,14 @@ public class FlagSpawner : MonoBehaviour
 
         float visualHeight = height * 2f;
 
+        // 깃발 위치 조절 + 색상 설정
         if (cloth != null)
         {
-            cloth.localPosition = new Vector3(cloth.localPosition.x + 0.25f, visualHeight + 0.1f, cloth.localPosition.z);
+            cloth.localPosition = new Vector3(
+                cloth.localPosition.x - 0.1f,
+                visualHeight + 0.1f,
+                cloth.localPosition.z
+            );
 
             Renderer r = cloth.GetComponent<Renderer>();
             if (r != null)
@@ -71,15 +80,24 @@ public class FlagSpawner : MonoBehaviour
             cloth.gameObject.AddComponent<FlagWaver>();
         }
 
+        // 점수 텍스트 생성
         GameObject textObj = new GameObject("ScoreText");
         textObj.transform.SetParent(flag.transform);
 
         TextMeshPro scoreText = textObj.AddComponent<TextMeshPro>();
         scoreText.text = $"{playerData.TotalCollected}";
         scoreText.fontSize = 10;
+        scoreText.color = Color.white;
+        scoreText.outlineWidth = 0.2f;
+        scoreText.outlineColor = Color.black;
         scoreText.alignment = TextAlignmentOptions.Center;
 
-        textObj.transform.localPosition = new Vector3(0.3f, visualHeight + 1.2f, 0);
+        textObj.transform.localPosition = new Vector3(
+            0.3f,
+            visualHeight + 1.2f,
+            0
+        );
+
         textObj.transform.LookAt(Camera.main.transform);
         textObj.transform.Rotate(0, 180, 0);
 

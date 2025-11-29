@@ -1,12 +1,15 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class AutoCameraAdjust : MonoBehaviour
 {
     [Header("카메라 이동 속도")]
-    public float moveSpeed = 0.05f;
+    public float moveSpeed = 0.001f;
 
     private Coroutine moveRoutine;
+
+    public event Action OnCameraStop;
 
     public void AdjustCameraToHeight(float targetHeight)
     {
@@ -39,8 +42,11 @@ public class AutoCameraAdjust : MonoBehaviour
             yield return null;
         }
 
-        // 목표 위치에 정확히 고정
+        // 목표 지점에 카메라 멈춤
         transform.position = targetPos;
         moveRoutine = null;
+
+        // 카메라 멈춤 이벤트 호출->GameResultUI에서 우승자 텍스트 출력 및 불꽃놀이 시작됨
+        OnCameraStop?.Invoke();
     }
 }

@@ -15,6 +15,10 @@ public class FlagWaver : MonoBehaviour
     private void Update()
     {
         float offset = Mathf.Sin(Time.time * waveSpeed) * waveStrength;
-        transform.localPosition = new Vector3(basePos.x - 0.3f * offset, basePos.y + 0.3f * offset, basePos.z + 0.1f * offset);
+        transform.localPosition = new Vector3(
+            basePos.x - 0.2f * offset,
+            basePos.y + 0.25f * offset,
+            basePos.z - 0.1f * offset
+        );
     }
 }
