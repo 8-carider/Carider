@@ -87,7 +87,7 @@ public class FlagSpawner : MonoBehaviour
         TextMeshPro scoreText = textObj.AddComponent<TextMeshPro>();
         scoreText.text = $"{playerData.TotalCollected}";
         scoreText.fontSize = 10;
-        scoreText.color = Color.white;
+        scoreText.color = Color.black;
         scoreText.outlineWidth = 0.2f;
         scoreText.outlineColor = Color.black;
         scoreText.alignment = TextAlignmentOptions.Center;

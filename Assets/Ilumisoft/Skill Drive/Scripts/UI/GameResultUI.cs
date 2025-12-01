@@ -43,7 +43,7 @@ namespace Ilumisoft.SkillDrive.Game
 
                 tmp.text = $"P{i + 1}\n{ranking[i].TotalCollected}";
                 tmp.fontSize = 10;
-                tmp.color = Color.white;
+                tmp.color = Color.black;
                 tmp.outlineWidth = 0.2f;
                 tmp.outlineColor = Color.black;
 
@@ -89,7 +89,7 @@ namespace Ilumisoft.SkillDrive.Game
 
             tmp.text = winnerText;
             tmp.fontSize = 10;
-            tmp.color = Color.white;
+            tmp.color = Color.black;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.outlineWidth = 0.2f;
             tmp.outlineColor = Color.black;

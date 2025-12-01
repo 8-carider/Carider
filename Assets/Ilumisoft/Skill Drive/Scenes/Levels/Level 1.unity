@@ -1956,7 +1956,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -27.5
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1964,7 +1964,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 27.5
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2000,7 +2000,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamLength
-      value: 55
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamCollides
@@ -2590,7 +2590,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -27.5
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2598,7 +2598,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -27.5
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2634,7 +2634,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamLength
-      value: 55
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamCollides
@@ -5034,7 +5034,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -27.5
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5042,7 +5042,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -27.5
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5078,7 +5078,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamLength
-      value: 55
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamCollides
@@ -6451,7 +6451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Outline
   outlineMode: 1
-  outlineColor: {r: 0.9509299, g: 1, b: 0, a: 1}
+  outlineColor: {r: 0.7294118, g: 0.3333333, b: 0.8274511, a: 1}
   outlineWidth: 4.23
   precomputeOutline: 0
   bakeKeys: []
@@ -6471,7 +6471,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 27.5
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6479,7 +6479,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -27.5
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6515,7 +6515,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamLength
-      value: 55
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 3279759220021890839, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
       propertyPath: beamCollides
@@ -9293,7 +9293,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7878435878925382938, guid: 247e01720d70346ee8796ee030cc5018, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -105
+      value: -104.5
       objectReference: {fileID: 0}
     - target: {fileID: 7878435878925382938, guid: 247e01720d70346ee8796ee030cc5018, type: 3}
       propertyPath: m_LocalPosition.z
