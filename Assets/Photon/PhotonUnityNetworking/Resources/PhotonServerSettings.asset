@@ -64,6 +64,8 @@ MonoBehaviour:
   - RPC_StartRace
   - RPC_PlayCameraSequenceAndStartCountdown
   - RPC_RequestRespawn
+  - RPC_StartRespawnSequence
+  - RPC_ShowExplosionAndHide
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
