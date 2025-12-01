@@ -121,5 +121,12 @@ namespace Ilumisoft.SkillDrive.Game
 #endif
             }
         }
+#if PHOTON_UNITY_NETWORKING
+[PunRPC]
+private void RPC_RequestRespawn(float delay)
+{
+    FindObjectOfType<ItemSpawner>()?.RespawnAfterDelay(delay);
+}
+#endif
     }
 }
