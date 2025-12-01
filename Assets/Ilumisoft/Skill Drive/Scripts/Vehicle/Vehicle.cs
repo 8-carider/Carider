@@ -12,6 +12,10 @@
         private float speedUpMultiplier = 1f;
         private float originalAcceleration;
         private float originalMaxSpeed;
+
+        // 스피드업 활성화 여부 (제트엔진 파티클용)
+        public bool IsSpeedUpActive => speedUpTimer > 0f;
+        public float SpeedUpMultiplier => speedUpMultiplier;
     [SerializeField]
     private VehicleStats stats = new VehicleStats();
 
