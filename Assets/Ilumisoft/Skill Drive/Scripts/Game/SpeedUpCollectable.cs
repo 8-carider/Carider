@@ -17,6 +17,9 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("스피드업 배율")]
         private float speedUpMultiplier = 1.5f;
 
+        [SerializeField, Tooltip("해당 아이템을 먹은 후 재생성까지 대기 시간(초). 0 이하이면 재생성 안 함")]
+        private float respawnDelay = 8.0f;
+
         public UnityAction OnCollect = null;
 
         private void OnTriggerEnter(Collider other)
@@ -70,14 +73,18 @@ namespace Ilumisoft.SkillDrive.Game
                     }
                     else
                     {
+                        // 마스터 클라이언트에서만 재생성 예약
+                        TryScheduleRespawn();
                         PhotonNetwork.Destroy(gameObject);
                     }
                 }
                 else
                 {
+                    TryScheduleRespawn();
                     Destroy(gameObject);
                 }
 #else
+                TryScheduleRespawn();
                 Destroy(gameObject);
 #endif
             }
@@ -89,9 +96,24 @@ namespace Ilumisoft.SkillDrive.Game
         {
             if (PhotonNetwork.IsMasterClient)
             {
+                TryScheduleRespawn();
                 PhotonNetwork.Destroy(gameObject);
             }
         }
 #endif
+
+        /// <summary>
+        /// 씬 내 ItemSpawner를 찾아 재생성을 예약한다.
+        /// </summary>
+        private void TryScheduleRespawn()
+        {
+            if (respawnDelay <= 0f) return;
+            var spawner = FindObjectOfType<ItemSpawner>();
+            if (spawner != null)
+            {
+                // 개별 아이템 교체: 전체 batch 대신 하나만 리스폰
+                spawner.RespawnOneAfterDelay(respawnDelay);
+            }
+        }
     }
 }

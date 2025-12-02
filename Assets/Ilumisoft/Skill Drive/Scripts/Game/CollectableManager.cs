@@ -27,6 +27,9 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("Radius used to check for overlapping collectables when spawning")]
         private float spawnCheckRadius = 0.6f;
 
+        [SerializeField, Tooltip("장애물 겹침 체크 반경 (트리거 포함)")]
+        private float obstacleCheckRadius = 1.2f;
+
         [SerializeField, Tooltip("한 번에 맵에 존재할 콜렉터블 개수")]
         private int collectableCount = 10;
 
@@ -125,7 +128,7 @@ namespace Ilumisoft.SkillDrive.Game
 
                 // 겹침 체크: groundLayer와 obstacleLayer 모두 피함
                 bool overlapGround = Physics.CheckSphere(spawnPosition, spawnCheckRadius, groundLayer);
-                bool overlapObstacle = obstacleLayer.value != 0 && Physics.CheckSphere(spawnPosition, spawnCheckRadius, obstacleLayer);
+                bool overlapObstacle = obstacleLayer.value != 0 && Physics.OverlapSphere(spawnPosition, obstacleCheckRadius, obstacleLayer, QueryTriggerInteraction.Collide).Length > 0;
                 if (!overlapGround && !overlapObstacle)
                 {
 #if PHOTON_UNITY_NETWORKING
@@ -147,7 +150,7 @@ namespace Ilumisoft.SkillDrive.Game
                     Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
                 );
                 bool overlapGround = Physics.CheckSphere(fallbackPos, spawnCheckRadius, groundLayer);
-                bool overlapObstacle = obstacleLayer.value != 0 && Physics.CheckSphere(fallbackPos, spawnCheckRadius, obstacleLayer);
+                bool overlapObstacle = obstacleLayer.value != 0 && Physics.OverlapSphere(fallbackPos, obstacleCheckRadius, obstacleLayer, QueryTriggerInteraction.Collide).Length > 0;
                 if (!overlapGround && !overlapObstacle)
                 {
 #if PHOTON_UNITY_NETWORKING
