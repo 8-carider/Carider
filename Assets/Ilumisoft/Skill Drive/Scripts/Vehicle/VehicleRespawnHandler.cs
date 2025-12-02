@@ -127,18 +127,28 @@ namespace Ilumisoft.SkillDrive
             }
 
             // UI 카운트다운은 로컬에서만 실행 (이 차량을 조종하는 플레이어만)
-            respawnUI.ShowRespawnSequence(() =>
+            bool showLocalUI = true;
+            if (PhotonNetwork.IsConnected)
             {
-                if (PhotonNetwork.IsConnected && photonView != null)
+                var seatManager = GetComponent<Ilumisoft.SkillDrive.Network.VehicleSeatManager>();
+                int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
+                showLocalUI = seatManager != null && seatManager.IsPlayerAssigned(localActor);
+            }
+            if (showLocalUI)
+            {
+                respawnUI.ShowRespawnSequence(() =>
                 {
-                    photonView.RPC("RPC_Respawn", RpcTarget.All);
-                }
-                else
-                {
-                    PerformRespawn();
-                }
-                isRespawning = false;
-            });
+                    if (PhotonNetwork.IsConnected && photonView != null)
+                    {
+                        photonView.RPC("RPC_Respawn", RpcTarget.All);
+                    }
+                    else
+                    {
+                        PerformRespawn();
+                    }
+                    isRespawning = false;
+                });
+            }
         }
 
         [PunRPC]
