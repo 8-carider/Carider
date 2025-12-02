@@ -29560,6 +29560,8 @@ GameObject:
   - component: {fileID: 2588224576490255756}
   - component: {fileID: 7172305805550126045}
   - component: {fileID: 5346363918512652168}
+  - component: {fileID: 6841706595459673612}
+  - component: {fileID: 426185121224952452}
   m_Layer: 0
   m_Name: FireCenter
   m_TagString: Untagged
@@ -34653,6 +34655,39 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &6841706595459673612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2890024094253188089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2ae7b9914874dcaa78d531c16deec2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.LaserKillZone
+--- !u!65 &426185121224952452
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2890024094253188089}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 10, z: 700}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7352723259943148806
 GameObject:
   m_ObjectHideFlags: 0
@@ -34664,7 +34699,6 @@ GameObject:
   - component: {fileID: 2420186187820511151}
   - component: {fileID: 7619463665453318582}
   - component: {fileID: 1633656863759576785}
-  - component: {fileID: 9159073806585595875}
   m_Layer: 0
   m_Name: OrbitalBeamYellow
   m_TagString: Untagged
@@ -39568,27 +39602,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!65 &9159073806585595875
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7352723259943148806}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 10, y: 10, z: 700}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8094438869851913799
 GameObject:
   m_ObjectHideFlags: 0

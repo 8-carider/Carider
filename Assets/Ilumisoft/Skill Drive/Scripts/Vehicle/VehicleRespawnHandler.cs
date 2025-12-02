@@ -97,7 +97,7 @@ namespace Ilumisoft.SkillDrive
             return true;
         }
 
-        private void RequestRespawn()
+        public void RequestRespawn()
         {
             // UI가 없으면 바로 리스폰
             if (respawnUI == null)

@@ -14846,6 +14846,7 @@ GameObject:
   - component: {fileID: 548164617128781776}
   - component: {fileID: 3323734975945563013}
   - component: {fileID: 277770187127654426}
+  - component: {fileID: 6428462804656794235}
   m_Layer: 0
   m_Name: FireCenter
   m_TagString: Untagged
@@ -19960,6 +19961,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 10, z: 700}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6428462804656794235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5478966958884366324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2ae7b9914874dcaa78d531c16deec2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.LaserKillZone
 --- !u!1 &6964089953379142821
 GameObject:
   m_ObjectHideFlags: 0

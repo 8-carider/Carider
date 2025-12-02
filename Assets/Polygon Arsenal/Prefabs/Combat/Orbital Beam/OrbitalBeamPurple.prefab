@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1860789403583625513}
   - component: {fileID: 6462881732625633144}
   - component: {fileID: 8073822978152067885}
+  - component: {fileID: 4698749100187477244}
+  - component: {fileID: 6653494634012238774}
   m_Layer: 0
   m_Name: FireCenter
   m_TagString: Untagged
@@ -5104,6 +5106,39 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!65 &4698749100187477244
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306764117427785564}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 10, z: 700}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6653494634012238774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306764117427785564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2ae7b9914874dcaa78d531c16deec2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.LaserKillZone
 --- !u!1 &1836819106009847370
 GameObject:
   m_ObjectHideFlags: 0
@@ -39579,7 +39614,6 @@ GameObject:
   - component: {fileID: 1995050737231700746}
   - component: {fileID: 6017978179860155667}
   - component: {fileID: 3211639188806836852}
-  - component: {fileID: 8495686530295220025}
   m_Layer: 0
   m_Name: OrbitalBeamPurple
   m_TagString: Untagged
@@ -44483,24 +44517,3 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!65 &8495686530295220025
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6643931268488843683}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 10, y: 10, z: 700}
-  m_Center: {x: 0, y: 0, z: 0}
