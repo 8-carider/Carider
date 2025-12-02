@@ -64,13 +64,13 @@ namespace Ilumisoft.SkillDrive.Game
             {
                 if (TryGetValidSpawnPosition(out Vector3 pos))
                 {
-                    PhotonNetwork.Instantiate("PowerIconSpeedv3", pos, Quaternion.identity);
+                    SpawnRandomItem(pos);
                 }
             }
 #else
             if (TryGetValidSpawnPosition(out Vector3 pos))
             {
-                Instantiate(speedUpCollectablePrefab, pos, Quaternion.identity);
+                SpawnRandomItem(pos);
             }
 #endif
         }
@@ -98,14 +98,16 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("디버그: 스폰 위치 실패 사유 로깅")] private bool logSpawnAttempts = false;
 
         [Header("아이템 프리팹")]
-        [SerializeField]
-        private GameObject speedUpCollectablePrefab;
+        [SerializeField, Tooltip("랜덤 생성할 아이템 프리팹 배열 (하나만 넣으면 그것만 생성)")]
+        private GameObject[] collectablePrefabs;
 
-        [Header("랜덤 생성 영역 (XZ)")]
-        [SerializeField, Tooltip("맵의 최소 XZ 좌표")]
-        private Vector2 spawnAreaMin = new Vector2(-20, -20);
-        [SerializeField, Tooltip("맵의 최대 XZ 좌표")]
-        private Vector2 spawnAreaMax = new Vector2(20, 20);
+        [Header("Photon Resources 이름")]
+        [SerializeField, Tooltip("Photon으로 생성할 프리팹 이름들 (프리팹 배열과 순서 일치 필요)")]
+        private string[] photonPrefabNames;
+
+        [Header("랜덤 생성 영역 (상대 좌표)")]
+        [SerializeField, Tooltip("이 오브젝트 위치를 중심으로 한 스폰 영역 크기 (XZ)")]
+        private Vector2 spawnAreaSize = new Vector2(60, 190);
 
         // [Header("하늘 높이")]
         // [SerializeField]
@@ -113,17 +115,22 @@ namespace Ilumisoft.SkillDrive.Game
 
         private void Start()
         {
-            if (!spawnOnStart) return;
+            Debug.Log($"[ItemSpawner] Start 호출됨. spawnOnStart={spawnOnStart}");
+            Debug.Log($"[ItemSpawner] 이 오브젝트 위치: {transform.position}");
+            
 #if PHOTON_UNITY_NETWORKING
-            // 아직 룸에 없는 경우 IsMasterClient=false → 실제 스폰은 OnJoinedRoom에서 처리
-            if (PhotonNetwork.InRoom)
+            // CollectableManager 방식: 마스터 클라이언트면 바로 스폰
+            if (Photon.Pun.PhotonNetwork.IsMasterClient)
             {
-                if (PhotonNetwork.IsMasterClient)
-                {
-                    SpawnRandomItems();
-                }
+                Debug.Log("[ItemSpawner] 마스터 클라이언트 - Start에서 SpawnRandomItems 호출");
+                SpawnRandomItems();
+            }
+            else
+            {
+                Debug.Log("[ItemSpawner] 마스터가 아님 - Start에서 스폰 안 함");
             }
 #else
+            Debug.Log("[ItemSpawner] 싱글플레이 모드 - 즉시 스폰");
             SpawnRandomItems();
 #endif
         }
@@ -131,9 +138,11 @@ namespace Ilumisoft.SkillDrive.Game
 #if PHOTON_UNITY_NETWORKING
         public override void OnJoinedRoom()
         {
+            Debug.Log($"[ItemSpawner] OnJoinedRoom 호출됨. spawnOnJoinRoom={spawnOnJoinRoom}, IsMaster={PhotonNetwork.IsMasterClient}");
             if (!spawnOnJoinRoom) return;
             if (PhotonNetwork.IsMasterClient)
             {
+                Debug.Log("[ItemSpawner] OnJoinedRoom에서 SpawnRandomItems 호출");
                 SpawnRandomItems();
             }
         }
@@ -150,7 +159,7 @@ namespace Ilumisoft.SkillDrive.Game
                 {
                     if (TryGetValidSpawnPosition(out Vector3 pos))
                     {
-                        PhotonNetwork.Instantiate("PowerIconSpeedv3", pos, Quaternion.identity);
+                        SpawnRandomItem(pos);
                     }
                 }
             }
@@ -162,9 +171,10 @@ namespace Ilumisoft.SkillDrive.Game
         {
             for (int i = 0; i < maxTries; i++)
             {
-                float x = Random.Range(spawnAreaMin.x, spawnAreaMax.x);
-                float z = Random.Range(spawnAreaMin.y, spawnAreaMax.y);
-                Vector3 rayStart = new Vector3(x, 100f, z); // 높은 곳에서 아래로
+                // 이 오브젝트 위치를 중심으로 상대 좌표 계산
+                float x = transform.position.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+                float z = transform.position.z + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+                Vector3 rayStart = new Vector3(x, transform.position.y + 100f, z); // 이 오브젝트 높이 기준으로 위에서 아래로
 
                 // Ground 탐지
                 if (!Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, 200f, groundLayer, QueryTriggerInteraction.Collide))
@@ -204,7 +214,7 @@ namespace Ilumisoft.SkillDrive.Game
             // 실패 처리
             if (useCenterFallback)
             {
-                position = new Vector3(0f, spawnHeightOffset, 0f);
+                position = transform.position + Vector3.up * spawnHeightOffset; // 이 오브젝트 중심 위치 사용
                 // 최후 수단 위치라도 장애물 내부이면 무시
                 var overlapsCenter = Physics.OverlapSphere(position, checkRadius, obstacleLayer, QueryTriggerInteraction.Collide);
                 if (overlapsCenter != null && overlapsCenter.Length > 0)
@@ -224,17 +234,54 @@ namespace Ilumisoft.SkillDrive.Game
         // 지정된 개수만큼 아이템을 생성
         private void SpawnRandomItems()
         {
+            Debug.Log($"[ItemSpawner] SpawnRandomItems 시작. spawnCount={spawnCount}");
+            int successCount = 0;
             for (int i = 0; i < spawnCount; i++)
             {
                 if (TryGetValidSpawnPosition(out Vector3 spawnPos))
                 {
-#if PHOTON_UNITY_NETWORKING
-                    PhotonNetwork.Instantiate("PowerIconSpeedv3", spawnPos, Quaternion.identity);
-#else
-                    Instantiate(speedUpCollectablePrefab, spawnPos, Quaternion.identity);
-#endif
+                    Debug.Log($"[ItemSpawner] 유효한 위치 찾음: {spawnPos}");
+                    SpawnRandomItem(spawnPos);
+                    successCount++;
+                }
+                else
+                {
+                    Debug.LogWarning($"[ItemSpawner] {i+1}번째 아이템 스폰 실패 - 유효한 위치를 찾지 못함");
                 }
             }
+            Debug.Log($"[ItemSpawner] SpawnRandomItems 완료. 성공: {successCount}/{spawnCount}");
+        }
+
+        // 랜덤 아이템 하나를 생성
+        private void SpawnRandomItem(Vector3 position)
+        {
+            if (collectablePrefabs == null || collectablePrefabs.Length == 0)
+            {
+                Debug.LogError("[ItemSpawner] collectablePrefabs 배열이 비어있습니다!");
+                return;
+            }
+
+            // 배열에서 랜덤 선택
+            int randomIndex = Random.Range(0, collectablePrefabs.Length);
+
+#if PHOTON_UNITY_NETWORKING
+            // Photon 이름 배열이 있고 유효한 인덱스면 사용
+            if (photonPrefabNames != null && randomIndex < photonPrefabNames.Length && !string.IsNullOrEmpty(photonPrefabNames[randomIndex]))
+            {
+                var obj = PhotonNetwork.Instantiate(photonPrefabNames[randomIndex], position, Quaternion.identity);
+                Debug.Log($"[ItemSpawner] Photon Instantiate 성공: {obj.name} (인덱스 {randomIndex})");
+            }
+            else
+            {
+                Debug.LogWarning($"[ItemSpawner] Photon 프리팹 이름이 없습니다. 인덱스: {randomIndex}");
+            }
+#else
+            if (collectablePrefabs[randomIndex] != null)
+            {
+                Instantiate(collectablePrefabs[randomIndex], position, Quaternion.identity);
+                Debug.Log($"[ItemSpawner] Instantiate 성공: {collectablePrefabs[randomIndex].name} (인덱스 {randomIndex})");
+            }
+#endif
         }
 #if PHOTON_UNITY_NETWORKING
 [PunRPC]
