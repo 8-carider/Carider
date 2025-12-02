@@ -22,6 +22,29 @@ namespace Ilumisoft.SkillDrive.Game
 
         public UnityAction OnCollect = null;
 
+        private void Start()
+        {
+            // Ground 레이어 위에 자동으로 위치 조정 (Collectable과 동일 방식)
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            if (groundLayer >= 0)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
+                {
+                    var pos = transform.position;
+                    // 콜라이더가 중앙 피벗이면 반높이만큼 올려서 파묻힘 방지 + 추가 여유 높이
+                    float lift = 0.05f; // 기본 여유
+                    var col = GetComponent<Collider>();
+                    if (col != null)
+                    {
+                        lift += col.bounds.extents.y; // 반높이
+                    }
+                    pos.y = hit.point.y + lift;
+                    transform.position = pos;
+                }
+            }
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Player"))

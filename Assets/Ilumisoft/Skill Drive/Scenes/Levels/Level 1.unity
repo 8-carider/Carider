@@ -2175,37 +2175,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2072093351684827179, guid: 3039c2ebcd61c884ab9c9d97efbdf8d8, type: 3}
   m_PrefabInstance: {fileID: 597556647}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &601467329
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 601467330}
-  m_Layer: 0
-  m_Name: SpeedUpSpawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &601467330
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 601467329}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.3, y: 0.64, z: -14}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1897611793}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &633354763 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
@@ -4214,11 +4183,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2072093351684827179, guid: 3039c2ebcd61c884ab9c9d97efbdf8d8, type: 3}
   m_PrefabInstance: {fileID: 1388518309}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1133811304 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-  m_PrefabInstance: {fileID: 5986869634733880310}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1134337128
 PrefabInstance:
@@ -7777,69 +7741,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2072093351684827179, guid: 3039c2ebcd61c884ab9c9d97efbdf8d8, type: 3}
   m_PrefabInstance: {fileID: 287507666}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1897611791
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1897611793}
-  - component: {fileID: 1897611792}
-  m_Layer: 0
-  m_Name: ItemManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1897611792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1897611791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d53a9a51063bcc4d867a72c11e422c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.SpeedUpCollectableSpawner
-  spawnCount: 2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  checkRadius: 1.5
-  maxTries: 30
-  spawnHeightOffset: 0.5
-  verticalClearance: 1
-  useCenterFallback: 0
-  spawnOnStart: 1
-  spawnOnJoinRoom: 1
-  spawnOnMasterSwitch: 1
-  logSpawnAttempts: 0
-  speedUpCollectablePrefab: {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
-  spawnAreaSize: {x: 100, y: 100}
---- !u!4 &1897611793
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1897611791}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.49, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 601467330}
-  m_Father: {fileID: 1133811304}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1904814986 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2072093351684827179, guid: 3039c2ebcd61c884ab9c9d97efbdf8d8, type: 3}
@@ -8366,6 +8267,45 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3039c2ebcd61c884ab9c9d97efbdf8d8, type: 3}
+--- !u!1 &2092055227 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+  m_PrefabInstance: {fileID: 5986869634733880310}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2092055231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092055227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d53a9a51063bcc4d867a72c11e422c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.SpeedUpCollectableSpawner
+  spawnCount: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  spawnCheckRadius: 2
+  obstacleCheckRadius: 1.7
+  maxTries: 30
+  spawnHeightOffset: 2
+  verticalClearance: 1
+  useCenterFallback: 0
+  spawnOnStart: 1
+  spawnOnJoinRoom: 1
+  spawnOnMasterSwitch: 1
+  logSpawnAttempts: 0
+  collectablePrefabs:
+  - {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
+  photonPrefabNames:
+  - PowerIconSpeedv3
+  spawnAreaSize: {x: 70, y: 70}
 --- !u!4 &2094025895 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
@@ -9103,7 +9043,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.61
+      value: 2.98
       objectReference: {fileID: 0}
     - target: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9115,11 +9055,11 @@ PrefabInstance:
       objectReference: {fileID: 5709810654877547134}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1897611793}
-    m_AddedComponents: []
+      addedObject: {fileID: 2092055231}
   m_SourcePrefab: {fileID: 100100000, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
 --- !u!1001 &9164194655572542518
 PrefabInstance:

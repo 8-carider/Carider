@@ -80,9 +80,11 @@ namespace Ilumisoft.SkillDrive.Game
             [SerializeField, Tooltip("Obstacle 레이어")]
             private LayerMask obstacleLayer;
 
-            [Header("랜덤 위치 샘플링")]
-            [SerializeField, Tooltip("장애물 피하기 체크 반경 (겹침이 보이면 1.5~2.0 권장)")]
-            private float checkRadius = 1.5f;
+            [Header("랜덤 위치 샘플링 (CollectableManager와 동일 방식)")]
+            [SerializeField, Tooltip("Collectable 겹침 체크 반경")]
+            private float spawnCheckRadius = 0.6f;
+            [SerializeField, Tooltip("장애물 겹침 체크 반경 (트리거 포함)")]
+            private float obstacleCheckRadius = 1.2f;
             [SerializeField, Tooltip("랜덤 위치 최대 시도 횟수")]
             private int maxTries = 30;
 
@@ -166,67 +168,45 @@ namespace Ilumisoft.SkillDrive.Game
         }
 #endif
 
-        // 맵의 랜덤 위치에 아이템을 생성 (장애물 내부 회피 강화)
+        // CollectableManager와 동일한 방식: 중심 기준 랜덤 좌표 선택 후 겹침 검사로 유효 위치 결정
         private bool TryGetValidSpawnPosition(out Vector3 position)
         {
             for (int i = 0; i < maxTries; i++)
             {
-                // 이 오브젝트 위치를 중심으로 상대 좌표 계산
-                float x = transform.position.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-                float z = transform.position.z + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-                Vector3 rayStart = new Vector3(x, transform.position.y + 100f, z); // 이 오브젝트 높이 기준으로 위에서 아래로
+                Vector3 candidate = transform.position + new Vector3(
+                    Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f),
+                    spawnHeightOffset,
+                    Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
+                );
 
-                // Ground 탐지
-                if (!Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, 200f, groundLayer, QueryTriggerInteraction.Collide))
+                // 겹침 체크: groundLayer와 obstacleLayer 모두 피함 (CollectableManager와 동일 로직)
+                bool overlapGround = Physics.CheckSphere(candidate, spawnCheckRadius, groundLayer);
+                bool overlapObstacle = obstacleLayer.value != 0 && Physics.OverlapSphere(candidate, obstacleCheckRadius, obstacleLayer, QueryTriggerInteraction.Collide).Length > 0;
+                if (!overlapGround && !overlapObstacle)
                 {
-                    if (logSpawnAttempts) Debug.Log($"[ItemSpawner] 지면 없음 pass (x:{x:F1} z:{z:F1})");
-                    continue; // 지면 없음
+                    position = SnapToGround(candidate);
+                    return true;
                 }
 
-                Vector3 candidate = hit.point + Vector3.up * spawnHeightOffset;
-
-                // 장애물/트리거 겹침 검사 (트리거 포함 강제)
-                var overlaps = Physics.OverlapSphere(candidate, checkRadius, obstacleLayer, QueryTriggerInteraction.Collide);
-                if (overlaps != null && overlaps.Length > 0)
+                if (logSpawnAttempts)
                 {
-                    if (logSpawnAttempts) Debug.Log($"[ItemSpawner] 수평 겹침 {overlaps.Length}개 pass");
-                    continue; // 수평 겹침
+                    Debug.Log($"[ItemSpawner] 겹침으로 스킵: ground={overlapGround}, obstacle={overlapObstacle}");
                 }
-
-                // 위쪽 공간 확보 (천장/오버행 내부 방지)
-                if (Physics.Raycast(candidate, Vector3.up, verticalClearance, obstacleLayer, QueryTriggerInteraction.Collide))
-                {
-                    if (logSpawnAttempts) Debug.Log("[ItemSpawner] 위쪽 막힘 pass");
-                    continue; // 위로 막힘
-                }
-
-                // 아래쪽이 실제 지면인지 추가 짧은 확인 (미세한 공중 스폰 방지)
-                if (!Physics.Raycast(candidate + Vector3.up * 0.1f, Vector3.down, out RaycastHit groundCheck, 0.5f, groundLayer, QueryTriggerInteraction.Collide))
-                {
-                    if (logSpawnAttempts) Debug.Log("[ItemSpawner] 미세 지면 재확인 실패 pass");
-                    continue;
-                }
-
-                position = candidate;
-                return true;
             }
 
-            // 실패 처리
+            // 부족하면 fallback (CollectableManager도 부족 시 채움) — 중앙 시도
             if (useCenterFallback)
             {
-                position = transform.position + Vector3.up * spawnHeightOffset; // 이 오브젝트 중심 위치 사용
-                // 최후 수단 위치라도 장애물 내부이면 무시
-                var overlapsCenter = Physics.OverlapSphere(position, checkRadius, obstacleLayer, QueryTriggerInteraction.Collide);
-                if (overlapsCenter != null && overlapsCenter.Length > 0)
+                Vector3 center = transform.position + new Vector3(0f, spawnHeightOffset, 0f);
+                bool overlapGround = Physics.CheckSphere(center, spawnCheckRadius, groundLayer);
+                bool overlapObstacle = obstacleLayer.value != 0 && Physics.OverlapSphere(center, obstacleCheckRadius, obstacleLayer, QueryTriggerInteraction.Collide).Length > 0;
+                if (!overlapGround && !overlapObstacle)
                 {
-                    Debug.LogWarning("ItemSpawner: 중앙 fallback 위치도 장애물과 겹침. 스폰 취소.");
-                    position = Vector3.zero;
-                    return false;
+                    position = SnapToGround(center);
+                    return true;
                 }
-                return true;
             }
 
-            Debug.LogWarning("ItemSpawner: 유효한 스폰 위치를 찾지 못했습니다. 이번 재생성 건너뜀.");
             position = Vector3.zero;
             return false;
         }
@@ -241,7 +221,9 @@ namespace Ilumisoft.SkillDrive.Game
                 if (TryGetValidSpawnPosition(out Vector3 spawnPos))
                 {
                     Debug.Log($"[ItemSpawner] 유효한 위치 찾음: {spawnPos}");
-                    SpawnRandomItem(spawnPos);
+                    // 최종적으로 지면 윗면에 스냅
+                    var snappedPos = SnapToGround(spawnPos);
+                    SpawnRandomItem(snappedPos);
                     successCount++;
                 }
                 else
@@ -282,6 +264,17 @@ namespace Ilumisoft.SkillDrive.Game
                 Debug.Log($"[ItemSpawner] Instantiate 성공: {collectablePrefabs[randomIndex].name} (인덱스 {randomIndex})");
             }
 #endif
+        }
+
+        // 주어진 위치를 기준으로 바로 위에서 아래로 레이캐스트하여 지면 윗면으로 Y를 스냅
+        private Vector3 SnapToGround(Vector3 pos)
+        {
+            var origin = pos + Vector3.up * 2f; // 살짝 위에서 시작
+            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 10f, groundLayer, QueryTriggerInteraction.Collide))
+            {
+                pos.y = hit.point.y + spawnHeightOffset;
+            }
+            return pos;
         }
 #if PHOTON_UNITY_NETWORKING
 [PunRPC]
