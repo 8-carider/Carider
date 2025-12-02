@@ -39579,6 +39579,7 @@ GameObject:
   - component: {fileID: 4246611934620473151}
   - component: {fileID: 8270016669983881510}
   - component: {fileID: 996192507943540289}
+  - component: {fileID: 8517851976091265164}
   m_Layer: 0
   m_Name: OrbitalBeamRed
   m_TagString: Untagged
@@ -44482,3 +44483,24 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!65 &8517851976091265164
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9039528559970624918}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 10, z: 700}
+  m_Center: {x: 0, y: 0, z: 0}

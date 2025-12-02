@@ -34664,6 +34664,7 @@ GameObject:
   - component: {fileID: 3377668703550461226}
   - component: {fileID: 7418585942880566067}
   - component: {fileID: 1865109316043396180}
+  - component: {fileID: 7533959316024172169}
   m_Layer: 0
   m_Name: OrbitalBeamScarlet
   m_TagString: Untagged
@@ -39567,6 +39568,27 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!65 &7533959316024172169
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7585125621595154307}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 10, z: 700}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9159442090867705026
 GameObject:
   m_ObjectHideFlags: 0

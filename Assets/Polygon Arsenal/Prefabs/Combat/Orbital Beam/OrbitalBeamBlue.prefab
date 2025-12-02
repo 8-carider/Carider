@@ -14845,6 +14845,7 @@ GameObject:
   - component: {fileID: 5186289126551097729}
   - component: {fileID: 548164617128781776}
   - component: {fileID: 3323734975945563013}
+  - component: {fileID: 277770187127654426}
   m_Layer: 0
   m_Name: FireCenter
   m_TagString: Untagged
@@ -19938,6 +19939,27 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!65 &277770187127654426
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5478966958884366324}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10, y: 10, z: 700}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6964089953379142821
 GameObject:
   m_ObjectHideFlags: 0

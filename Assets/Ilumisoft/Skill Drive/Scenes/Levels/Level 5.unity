@@ -295,6 +295,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1575135991}
     m_Modifications:
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: loopTimeLength
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -938,6 +942,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1713123950}
     m_Modifications:
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: loopTimeLength
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -1358,6 +1366,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1575135991}
     m_Modifications:
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: loopTimeLength
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -4805,6 +4817,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1713123950}
     m_Modifications:
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: loopTimeLength
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -5193,6 +5209,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1575135991}
     m_Modifications:
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: loopTimeLength
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
