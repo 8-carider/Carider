@@ -37,11 +37,18 @@ namespace Ilumisoft.SkillDrive
         private ParticleSystem[] particleSystems;
         private TrailRenderer[] trailRenderers;
         private Collider[] colliders;
+        // 스폰포인트가 설정되지 않은 경우를 대비해 초기 위치/회전 저장
+        private Vector3 initialPosition;
+        private Quaternion initialRotation;
 
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
             vehicle = GetComponent<Vehicle>();
+
+            // 초기 위치/회전 기록 (스폰포인트 누락 시 사용)
+            initialPosition = transform.position;
+            initialRotation = transform.rotation;
 
             // RespawnUI가 설정되지 않았다면 자동으로 찾기
             if (respawnUI == null)
@@ -90,7 +97,8 @@ namespace Ilumisoft.SkillDrive
                     // We'll add a public method to check assignment
                     return seatManager.IsPlayerAssigned(localActor);
                 }
-                return false;
+                // 좌석 매니저가 없으면 소유자에게는 허용, 아니면 거부
+                return photonView != null ? photonView.IsMine : true;
             }
             
             // In single player, always allow
@@ -180,13 +188,17 @@ namespace Ilumisoft.SkillDrive
         {
             if (spawnPoint == null)
             {
-                Debug.LogWarning("[VehicleRespawnHandler] No spawn point assigned!");
-                return;
+                // 스폰포인트가 누락된 경우 초기 위치로 리스폰
+                Debug.LogWarning("[VehicleRespawnHandler] No spawn point assigned! Falling back to initial transform.");
+                transform.position = initialPosition;
+                transform.rotation = initialRotation;
             }
-
-            // Teleport to spawn point
-            transform.position = spawnPoint.position;
-            transform.rotation = spawnPoint.rotation;
+            else
+            {
+                // Teleport to spawn point
+                transform.position = spawnPoint.position;
+                transform.rotation = spawnPoint.rotation;
+            }
 
             // 차량 다시 활성화
             EnableVehicle();
