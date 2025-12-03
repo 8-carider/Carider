@@ -8305,7 +8305,7 @@ MonoBehaviour:
   - {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
   photonPrefabNames:
   - PowerIconSpeedv3
-  spawnAreaSize: {x: 70, y: 70}
+  spawnAreaSize: {x: 100, y: 100}
 --- !u!4 &2094025895 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3279759220021890836, guid: 87640d3d3e6f706418d35a078285047e, type: 3}
@@ -9023,11 +9023,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: spawnAreaSize.x
-      value: 70
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: spawnAreaSize.y
-      value: 70
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: obstacleCheckRadius

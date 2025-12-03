@@ -1,11 +1,21 @@
-﻿    using UnityEngine;
-    using Photon.Pun;
+﻿using UnityEngine;
+using UnityEngine.Events;
+#if PHOTON_UNITY_NETWORKING
+using Photon.Pun;
+#endif
 
-    public class Collectable2 : MonoBehaviourPun 
+namespace Ilumisoft.SkillDrive.Game
+{
+    public class Collectable2 : MonoBehaviour
     {
+        [SerializeField]
+        GameObject particlesPrefab = null;
+
+        public UnityAction OnCollect = null;
+
         private void Start()
         {
-            // Ground 레이어 위에 자동으로 위치 조정
+            // Ground 레이어 위로 자동 위치 조정
             int groundLayer = LayerMask.NameToLayer("Ground");
             if (groundLayer >= 0)
             {
@@ -17,60 +27,74 @@
                     transform.position = pos;
                 }
             }
+
+            // RadarSystem 자동 등록
+            StartCoroutine(RegisterToRadarDelayed());
         }
-    [Header("Settings")]
-    [SerializeField] public int scoreAmount = 5; // 점수 설정
 
-    [Header("Effects")]
-    [SerializeField]
-    GameObject particlesPrefab = null; // 파티클 프리팹 변수 (인스펙터 연결용)
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!gameObject.activeSelf) return;
-
-        if (other.CompareTag("Player"))
+        private System.Collections.IEnumerator RegisterToRadarDelayed()
         {
+            yield return new WaitForSeconds(0.1f);
+
+            var locatableManagerType = System.Type.GetType("Ilumisoft.RadarSystem.LocatableManager, Ilumisoft.RadarSystem");
+            if (locatableManagerType != null)
+            {
+                var registerMethod = locatableManagerType.GetMethod("Register", new[] { typeof(GameObject) });
+                if (registerMethod != null)
+                {
+                    var managerInstance = GameObject.FindObjectOfType(locatableManagerType);
+                    if (managerInstance != null)
+                    {
+                        registerMethod.Invoke(managerInstance, new object[] { this.gameObject });
+                    }
+                }
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!other.CompareTag("Player"))
+                return;
+
+            // 파티클
 #if PHOTON_UNITY_NETWORKING
             if (particlesPrefab != null)
             {
                 if (PhotonNetwork.InRoom)
-                {
-                    PhotonNetwork.Instantiate("Collect Particles 2", transform.position, transform.rotation);
-                }
+                    PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
                 else
-                {
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
-                }
             }
 #else
             if (particlesPrefab != null)
-            {
                 Instantiate(particlesPrefab, transform.position, transform.rotation);
-            }
 #endif
 
-            var vehicle = other.GetComponentInParent<Ilumisoft.SkillDrive.Game.VehicleCollectables>();
-            if (vehicle != null)
+            // ✔ 점수 +5 (여기만 다름)
+            var vehicleCollectables = other.GetComponent<VehicleCollectables>();
+            if (vehicleCollectables != null)
             {
-                vehicle.AddCollectable(this.scoreAmount);
+                vehicleCollectables.AddCollectable(5);
             }
 
+            OnCollect?.Invoke();
+
+            // Photon 파괴 처리
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
-                if (photonView != null && !photonView.IsMine)
+                PhotonView pv = PhotonView.Get(this);
+
+                if (pv != null && !pv.IsMine)
                 {
-                    photonView.RequestOwnership();
+                    pv.RequestOwnership();
                     return;
                 }
-                // 소유자(또는 마스터)가 파괴를 시도
+
                 if (!PhotonNetwork.IsMasterClient)
                 {
-                    if (photonView != null)
-                    {
-                        photonView.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
-                    }
+                    if (pv != null)
+                        pv.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
                 }
                 else
                 {
@@ -79,23 +103,22 @@
             }
             else
             {
-                gameObject.SetActive(false);
+                Destroy(gameObject);
             }
 #else
-            gameObject.SetActive(false);
+            Destroy(gameObject);
 #endif
         }
-    }
-
 
 #if PHOTON_UNITY_NETWORKING
-    [PunRPC]
-    private void RPC_RequestDestroy()
-    {
-        if (PhotonNetwork.IsMasterClient)
+        [PunRPC]
+        private void RPC_RequestDestroy()
         {
-            PhotonNetwork.Destroy(gameObject);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(gameObject);
+            }
         }
-    }
 #endif
+    }
 }

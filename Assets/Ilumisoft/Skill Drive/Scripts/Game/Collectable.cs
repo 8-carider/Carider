@@ -93,7 +93,7 @@ namespace Ilumisoft.SkillDrive.Game
 
                 OnCollect?.Invoke();
 
-            #if PHOTON_UNITY_NETWORKING
+#if PHOTON_UNITY_NETWORKING
                 if (PhotonNetwork.InRoom)
                 {
                     PhotonView photonView = PhotonView.Get(this);
