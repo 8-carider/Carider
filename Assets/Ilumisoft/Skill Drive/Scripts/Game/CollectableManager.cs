@@ -9,7 +9,6 @@ namespace Ilumisoft.SkillDrive.Game
 {
     public class CollectableManager : MonoBehaviour
     {
-        // 🔥 원래 있던 이벤트 복구
         public UnityAction OnAllCollected;
         public UnityAction OnCollectableCollected;
         public UnityAction OnCollectablesSpawned;
@@ -25,7 +24,6 @@ namespace Ilumisoft.SkillDrive.Game
         [Header("Layers")]
         [SerializeField] private LayerMask groundLayer;
 
-        // ⭐ 맵3,4 지면(surface)도 포함할 수 있게 추가
         [SerializeField] private LayerMask extraGroundLayers;
 
         [SerializeField] private LayerMask obstacleLayer;
@@ -111,16 +109,11 @@ namespace Ilumisoft.SkillDrive.Game
             AttachCollectEventsToAll();
             OnCollectablesSpawned?.Invoke();
         }
-
-
-        // ===========================================
-        //     🔥 허공 생성 금지 / 장애물 위 생성 금지 구현
-        // ===========================================
+        //허공 생성 불가능하게
         private bool TrySpawnOne()
         {
             int attempts = 0;
 
-            // ⭐ 지면으로 인정할 모든 레이어 (Ground)
             int combinedGroundMask = groundLayer;
 
             while (attempts < maxSpawnAttempts)
@@ -129,16 +122,14 @@ namespace Ilumisoft.SkillDrive.Game
 
                 Vector3 posXZ = new Vector3(
                     Random.Range(-spawnAreaSize.x / 2, spawnAreaSize.x / 2),
-                    50f, // 높게 쏴서 레이캐스트로 땅 찾음
+                    50f, // 레이캐스트로 ground 찾음
                     Random.Range(-spawnAreaSize.y / 2, spawnAreaSize.y / 2)
                 );
 
-                // ⬇ Raycast로 땅 찾기 — 허공 생성 방지 핵심
                 if (Physics.Raycast(posXZ, Vector3.down, out RaycastHit hit, 100f, combinedGroundMask))
                 {
                     Vector3 finalPos = hit.point;
 
-                    // 장애물 위 여부
                     bool obstacleOverlap =
                         Physics.CheckSphere(finalPos, obstacleCheckRadius, obstacleLayer);
 
