@@ -168,6 +168,21 @@ namespace Ilumisoft.SkillDrive.LevelSelection
         public void LoadLevel(int levelNumber)
         {
             StopAllCoroutines();
+            
+            // 마스터만 레벨 로드 RPC 호출
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonView photonView = GetComponent<PhotonView>();
+                if (photonView != null)
+                {
+                    photonView.RPC("RPC_LoadLevel", RpcTarget.All, levelNumber);
+                }
+            }
+        }
+
+        [PunRPC]
+        void RPC_LoadLevel(int levelNumber)
+        {
             StartCoroutine(LoadLevelCoroutine(levelNumber));
         }
 
