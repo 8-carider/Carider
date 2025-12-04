@@ -20,10 +20,28 @@ namespace Ilumisoft.SkillDrive.Input
         private InputAction moveAction;
         private Network.VehicleSeatManager seatManager;
         private Vector2 currentInput = Vector2.zero;
+        
+        // WASD Canvas 참조
+        private Canvas wasdCanvas;
+        
+        // 다른 플레이어의 입력 상태 저장
+        private Vector2 otherPlayerInput = Vector2.zero;
 
         private void Awake()
         {
             seatManager = GetComponent<Network.VehicleSeatManager>();
+            
+            // WASD Canvas 찾기 (자신의 차량 아래)
+            wasdCanvas = GetComponentInChildren<Canvas>(true);
+            if (wasdCanvas != null)
+            {
+                // 기본적으로 비활성화 (배정될 때만 활성화)
+                wasdCanvas.gameObject.SetActive(false);
+                Debug.Log($"[VehiclePlayerInput] Canvas found on {gameObject.name}");
+            }
+            
+            // 디버그: seatManager 찾음 확인
+            Debug.Log($"[VehiclePlayerInput] Vehicle {gameObject.name}: seatManager found = {seatManager != null}");
             
             // Input Action 설정 - PlayerInput 컴포넌트에서 가져오기
             var playerInput = GetComponent<PlayerInput>();
@@ -78,12 +96,6 @@ namespace Ilumisoft.SkillDrive.Input
 
         private void Update()
         {
-            // WASD UI 색상 변경
-            if (WKey != null) WKey.color = UnityEngine.Input.GetKey(KeyCode.W) ? pressedColor : defaultColor;
-            if (AKey != null) AKey.color = UnityEngine.Input.GetKey(KeyCode.A) ? pressedColor : defaultColor;
-            if (SKey != null) SKey.color = UnityEngine.Input.GetKey(KeyCode.S) ? pressedColor : defaultColor;
-            if (DKey != null) DKey.color = UnityEngine.Input.GetKey(KeyCode.D) ? pressedColor : defaultColor;
-
             // 멀티플레이어: 로컬 플레이어만 입력 읽기
             if (!PhotonNetwork.IsConnected)
             {
@@ -92,16 +104,48 @@ namespace Ilumisoft.SkillDrive.Input
                 {
                     currentInput = moveAction.ReadValue<Vector2>();
                 }
+                
+                // UI 업데이트 (싱글 플레이어)
+                if (WKey != null) WKey.color = UnityEngine.Input.GetKey(KeyCode.W) ? pressedColor : defaultColor;
+                if (AKey != null) AKey.color = UnityEngine.Input.GetKey(KeyCode.A) ? pressedColor : defaultColor;
+                if (SKey != null) SKey.color = UnityEngine.Input.GetKey(KeyCode.S) ? pressedColor : defaultColor;
+                if (DKey != null) DKey.color = UnityEngine.Input.GetKey(KeyCode.D) ? pressedColor : defaultColor;
                 return;
             }
 
             // 멀티플레이어: 내가 이 차량에 배정되었는지 확인
-            if (seatManager == null || !seatManager.IsPlayerAssigned(PhotonNetwork.LocalPlayer.ActorNumber))
+            if (seatManager == null)
             {
-                return; // 내 차량이 아니면 입력 무시
+                Debug.LogWarning($"[VehiclePlayerInput] {gameObject.name}: seatManager is null!");
+                if (WKey != null) WKey.color = defaultColor;
+                if (AKey != null) AKey.color = defaultColor;
+                if (SKey != null) SKey.color = defaultColor;
+                if (DKey != null) DKey.color = defaultColor;
+                return;
             }
 
-            // 키보드에서 입력 읽기
+            int myActor = PhotonNetwork.LocalPlayer?.ActorNumber ?? -1;
+            bool isAssigned = seatManager.IsPlayerAssigned(myActor);
+            
+            // 디버그 로그 (첫 프레임만)
+            if (Time.frameCount % 60 == 0)
+            {
+                Debug.Log($"[VehiclePlayerInput] {gameObject.name}: MyActor={myActor}, Assigned={isAssigned}");
+            }
+
+            // Canvas 활성화/비활성화 - 자신의 차량일 때만 보여주기
+            if (wasdCanvas != null)
+            {
+                wasdCanvas.gameObject.SetActive(isAssigned);
+            }
+
+            if (!isAssigned)
+            {
+                // 내 차량이 아니면 입력 처리 안 함
+                return; 
+            }
+
+            // 내 차량이면 내 입력만 표시
             if (moveAction != null)
             {
                 Vector2 localInput = moveAction.ReadValue<Vector2>();
@@ -112,7 +156,6 @@ namespace Ilumisoft.SkillDrive.Input
                     if (Vector2.Distance(localInput, currentInput) > 0.01f)
                     {
                         currentInput = localInput;
-                        int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
 
                         // VehicleSeatManager의 PhotonView를 통해 RPC 전송
                         if (seatManager.photonView != null)
@@ -122,6 +165,12 @@ namespace Ilumisoft.SkillDrive.Input
                         }
                     }
                 }
+                
+                // UI 업데이트 (내 입력만 표시)
+                if (WKey != null) WKey.color = currentInput.y > 0.1f ? pressedColor : defaultColor;
+                if (AKey != null) AKey.color = currentInput.x < -0.1f ? pressedColor : defaultColor;
+                if (SKey != null) SKey.color = currentInput.y < -0.1f ? pressedColor : defaultColor;
+                if (DKey != null) DKey.color = currentInput.x > 0.1f ? pressedColor : defaultColor;
             }
         }
 
