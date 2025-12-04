@@ -23,13 +23,20 @@ namespace Ilumisoft.SkillDrive.Network
         private Vector3 networkAngularVelocity;
         
         // 부드러운 동기화를 위한 추가 변수
-        private float lerpSpeed = 15f; // 기본 보간 속도
+        private float lerpSpeed = 20f; // 보간 속도 (20이 최적)
         private float positionThreshold = 2f; // 텔레포트 임계값
+        
+        // 버벅임 개선을 위한 추가 변수
+        private Vector3 lastReceivedPosition;
+        private Vector3 lastReceivedVelocity;
+        private float receivedTime;
         
         private void Awake()
         {
             seatManager = GetComponent<VehicleSeatManager>();
             rb = GetComponent<Rigidbody>();
+            
+            lastReceivedPosition = rb != null ? rb.position : Vector3.zero;
             
             if (rb != null)
             {
@@ -37,6 +44,8 @@ namespace Ilumisoft.SkillDrive.Network
                 if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
                 {
                     rb.isKinematic = true; // 비 마스터는 transform만 업데이트
+                    // 리지드바디 물리 업데이트를 최소화
+                    rb.constraints = RigidbodyConstraints.FreezeRotation;
                 }
             }
         }
@@ -47,6 +56,7 @@ namespace Ilumisoft.SkillDrive.Network
             if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient && rb != null)
             {
                 float distance = Vector3.Distance(rb.position, networkPosition);
+                float timeSinceUpdate = Time.time - receivedTime;
                 
                 // 너무 멀리 떨어져 있으면 텔레포트 (워프)
                 if (distance > positionThreshold)
@@ -57,18 +67,22 @@ namespace Ilumisoft.SkillDrive.Network
                 }
                 else
                 {
-                    // 거리에 따라 동적으로 보간 속도 조정
-                    float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 2f, distance / positionThreshold);
+                    // 거리와 시간을 고려한 동적 보간 속도
+                    float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 1.5f, distance / positionThreshold);
                     
-                    // 외삽: 속도를 고려한 위치 예측 (더 공격적으로)
-                    Vector3 extrapolatedPosition = networkPosition + networkVelocity * Time.fixedDeltaTime * 2f;
+                    // 더 정확한 외삽: 시간 경과까지 고려
+                    Vector3 extrapolatedPosition = networkPosition + networkVelocity * (timeSinceUpdate + Time.fixedDeltaTime);
                     
-                    // 부드러운 보간
-                    rb.MovePosition(Vector3.Lerp(rb.position, extrapolatedPosition, Time.fixedDeltaTime * dynamicLerpSpeed));
-                    rb.MoveRotation(Quaternion.Slerp(rb.rotation, networkRotation, Time.fixedDeltaTime * dynamicLerpSpeed));
+                    // 부드러운 보간 (MovePosition 대신 직접 position 수정으로 더 정확함)
+                    Vector3 newPosition = Vector3.Lerp(rb.position, extrapolatedPosition, Time.fixedDeltaTime * dynamicLerpSpeed);
+                    rb.position = newPosition;
                     
-                    // 속도 동기화
-                    rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, networkVelocity, Time.fixedDeltaTime * 10f);
+                    // 회전 보간
+                    Quaternion newRotation = Quaternion.Slerp(rb.rotation, networkRotation, Time.fixedDeltaTime * dynamicLerpSpeed);
+                    rb.rotation = newRotation;
+                    
+                    // 속도 직접 설정 (Lerp 없이)
+                    rb.linearVelocity = networkVelocity;
                 }
             }
         }
@@ -91,9 +105,10 @@ namespace Ilumisoft.SkillDrive.Network
                 networkVelocity = (Vector3)stream.ReceiveNext();
                 networkAngularVelocity = (Vector3)stream.ReceiveNext();
                 
-                // 지연 보정 (lag compensation)
-                float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
-                networkPosition += networkVelocity * lag;
+                // 수신 시간 기록
+                receivedTime = Time.time;
+                lastReceivedPosition = networkPosition;
+                lastReceivedVelocity = networkVelocity;
             }
         }
     }
