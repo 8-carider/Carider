@@ -70,8 +70,8 @@ namespace Ilumisoft.SkillDrive.Network
                     // 거리와 시간을 고려한 동적 보간 속도
                     float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 1.5f, distance / positionThreshold);
                     
-                    // 외삽 계수를 낮춰서 순간이동 방지 (timeSinceUpdate만 사용, fixedDeltaTime 제거)
-                    float extrapolationFactor = Mathf.Min(timeSinceUpdate, 0.2f); // 최대 0.2초까지만 예측
+                    // 외삽 계수를 더 낮춰서 움찔거림 방지 (최대 0.1초까지만 예측)
+                    float extrapolationFactor = Mathf.Min(timeSinceUpdate, 0.1f);
                     Vector3 extrapolatedPosition = networkPosition + networkVelocity * extrapolationFactor;
                     
                     // 부드러운 보간

@@ -104,14 +104,20 @@
     /// </summary>
     public void ApplySpeedUp(float duration, float multiplier)
     {
-        // 기존 값 저장
-        originalAcceleration = FinalStats.Acceleration;
-        originalMaxSpeed = FinalStats.MaxSpeed;
-        // 배율 적용
+        // 첫 번째 스피드업이면 원래 값 저장
+        if (speedUpTimer <= 0f)
+        {
+            originalAcceleration = FinalStats.Acceleration;
+            originalMaxSpeed = FinalStats.MaxSpeed;
+        }
+        
+        // 타이머 추가 (누적)
+        speedUpTimer += duration;
+        
+        // 배율 적용 (매번 새로 적용)
+        speedUpMultiplier = multiplier;
         FinalStats.Acceleration = originalAcceleration * multiplier;
         FinalStats.MaxSpeed = originalMaxSpeed * multiplier;
-        speedUpMultiplier = multiplier;
-        speedUpTimer = duration;
     }
 
     /// <summary>
