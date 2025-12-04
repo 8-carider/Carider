@@ -8,6 +8,17 @@ namespace Ilumisoft.SkillDrive.Game
 {
     public class Collectable : MonoBehaviour
     {
+        [SerializeField]
+        GameObject particlesPrefab = null;
+
+        [SerializeField, Tooltip("콜렉터블 생성 시 나타날 파티클 (프리팹 자식으로 배치)")]
+        private ParticleSystem spawnParticle = null;
+
+        [SerializeField, Tooltip("생성 파티클이 재생될 시간(초)")]
+        private float spawnParticleShowDuration = 2.0f;
+
+        public UnityAction OnCollect = null;
+
         private void Start()
         {
             // Ground 레이어 위에 자동으로 위치 조정
@@ -24,6 +35,52 @@ namespace Ilumisoft.SkillDrive.Game
                 }
             }
 
+            // 메시와 콜라이더 찾기
+            var renderer = GetComponentInChildren<MeshRenderer>();
+            var collider = GetComponentInChildren<Collider>();
+            
+            // 메시 비활성화
+            if (renderer != null)
+            {
+                renderer.gameObject.SetActive(false);
+                Debug.Log($"[Collectable] 메시 비활성화: {renderer.gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"[Collectable] MeshRenderer를 찾을 수 없음: {gameObject.name}");
+            }
+            
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+
+            // 파티클 컴포넌트 찾기 (자식이 없으면 경고)
+            if (spawnParticle == null)
+            {
+                spawnParticle = GetComponentInChildren<ParticleSystem>();
+            }
+
+            // 생성 전조 파티클 활성화
+            if (spawnParticle != null)
+            {
+                spawnParticle.gameObject.SetActive(true);
+                
+                // 파티클이 시간 동안 계속 재생되도록 루핑 활성화
+                var main = spawnParticle.main;
+                main.loop = true;
+                
+                spawnParticle.Play();
+                Debug.Log($"[Collectable] 생성 파티클 재생 (루핑): {gameObject.name}, 파티클 오브젝트: {spawnParticle.gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"[Collectable] spawnParticle이 null입니다: {gameObject.name}");
+            }
+
+            // 일정 시간 후 파티클 비활성화하고 메시/콜라이더 표시
+            StartCoroutine(ShowMeshAfterDelay(renderer, collider, spawnParticle, spawnParticleShowDuration));
+
             // RadarSystem에 자동 등록 (딜레이 후)
             StartCoroutine(RegisterToRadarDelayed());
 
@@ -32,6 +89,58 @@ namespace Ilumisoft.SkillDrive.Game
             foreach (var loc in Ilumisoft.RadarSystem.LocatableManager.Locatables)
             {
                 Debug.Log($"[LocatableManager] 등록된 오브젝트: {loc.gameObject.name}");
+            }
+        }
+
+        private System.Collections.IEnumerator ShowMeshAfterDelay(MeshRenderer renderer, Collider collider, ParticleSystem particle, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            
+            Debug.Log($"[Collectable] ShowMeshAfterDelay 코루틴 시작, delay={delay}");
+            
+            // 파티클 비활성화
+            if (particle != null)
+            {
+                particle.Stop();
+                particle.gameObject.SetActive(false);
+                Debug.Log($"[Collectable] 파티클 비활성화 완료: {particle.gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"[Collectable] particle이 null입니다!");
+            }
+            
+            // 메시 활성화 - 직접 자식들을 순회해서 찾기
+            Transform meshChild = null;
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                if (child.name == "Cube")
+                {
+                    meshChild = child;
+                    break;
+                }
+            }
+            
+            if (meshChild != null)
+            {
+                meshChild.gameObject.SetActive(true);
+                Debug.Log($"[Collectable] Cube 활성화 완료: {meshChild.gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"[Collectable] Cube를 찾을 수 없습니다!");
+                // 다른 이름의 메시 자식 찾기
+                if (renderer != null)
+                {
+                    renderer.gameObject.SetActive(true);
+                    Debug.Log($"[Collectable] renderer의 게임오브젝트 활성화: {renderer.gameObject.name}");
+                }
+            }
+            
+            if (collider != null)
+            {
+                collider.enabled = true;
             }
         }
 
@@ -53,11 +162,6 @@ namespace Ilumisoft.SkillDrive.Game
                 }
             }
         }
-
-        [SerializeField]
-        GameObject particlesPrefab = null;
-
-        public UnityAction OnCollect = null;
 
         private void OnTriggerEnter(Collider other)
         {
