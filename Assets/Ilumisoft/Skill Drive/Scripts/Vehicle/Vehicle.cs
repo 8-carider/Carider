@@ -115,6 +115,21 @@
     }
 
     /// <summary>
+    /// 스피드업 효과를 즉시 초기화 (리스폰 시 사용)
+    /// </summary>
+    public void ResetSpeedUp()
+    {
+        if (speedUpTimer > 0f)
+        {
+            // 원래 값으로 복구
+            FinalStats.Acceleration = originalAcceleration;
+            FinalStats.MaxSpeed = originalMaxSpeed;
+            speedUpMultiplier = 1f;
+            speedUpTimer = 0f;
+        }
+    }
+
+    /// <summary>
     /// Collect the input from all input sources
     /// </summary>
     protected virtual void CollectInput()

@@ -322,9 +322,10 @@ namespace Ilumisoft.SkillDrive
                 rb.angularVelocity = Vector3.zero;
             }
 
-            // 차량 입력/움직임 활성화
+            // 스피드업 효과 초기화 (리스폰 시 효과 제거)
             if (vehicle != null)
             {
+                vehicle.ResetSpeedUp();
                 vehicle.CanMove = true;
             }
 
