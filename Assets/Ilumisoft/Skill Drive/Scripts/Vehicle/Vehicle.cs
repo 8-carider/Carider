@@ -68,6 +68,7 @@
             if (!PhotonNetwork.IsMasterClient && Rigidbody != null)
             {
                 Rigidbody.useGravity = false;
+                // 부드러운 보간을 위해 Interpolate 사용
                 Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             }
         }

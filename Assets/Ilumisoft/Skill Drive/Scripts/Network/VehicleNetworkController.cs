@@ -22,6 +22,10 @@ namespace Ilumisoft.SkillDrive.Network
         private Vector3 networkVelocity;
         private Vector3 networkAngularVelocity;
         
+        // 부드러운 동기화를 위한 추가 변수
+        private float lerpSpeed = 15f; // 기본 보간 속도
+        private float positionThreshold = 2f; // 텔레포트 임계값
+        
         private void Awake()
         {
             seatManager = GetComponent<VehicleSeatManager>();
@@ -39,11 +43,33 @@ namespace Ilumisoft.SkillDrive.Network
         
         private void FixedUpdate()
         {
-            // 비 마스터 클라이언트: 네트워크 위치로 보간
+            // 비 마스터 클라이언트: 네트워크 위치로 보간 + 외삽
             if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient && rb != null)
             {
-                rb.MovePosition(Vector3.Lerp(rb.position, networkPosition, Time.fixedDeltaTime * 10f));
-                rb.MoveRotation(Quaternion.Lerp(rb.rotation, networkRotation, Time.fixedDeltaTime * 10f));
+                float distance = Vector3.Distance(rb.position, networkPosition);
+                
+                // 너무 멀리 떨어져 있으면 텔레포트 (워프)
+                if (distance > positionThreshold)
+                {
+                    rb.position = networkPosition;
+                    rb.rotation = networkRotation;
+                    rb.linearVelocity = networkVelocity;
+                }
+                else
+                {
+                    // 거리에 따라 동적으로 보간 속도 조정
+                    float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 2f, distance / positionThreshold);
+                    
+                    // 외삽: 속도를 고려한 위치 예측 (더 공격적으로)
+                    Vector3 extrapolatedPosition = networkPosition + networkVelocity * Time.fixedDeltaTime * 2f;
+                    
+                    // 부드러운 보간
+                    rb.MovePosition(Vector3.Lerp(rb.position, extrapolatedPosition, Time.fixedDeltaTime * dynamicLerpSpeed));
+                    rb.MoveRotation(Quaternion.Slerp(rb.rotation, networkRotation, Time.fixedDeltaTime * dynamicLerpSpeed));
+                    
+                    // 속도 동기화
+                    rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, networkVelocity, Time.fixedDeltaTime * 10f);
+                }
             }
         }
         

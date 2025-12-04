@@ -558,11 +558,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: spawnAreaSize.x
-      value: 107
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: spawnAreaSize.y
-      value: 107
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: m_LocalPosition.x

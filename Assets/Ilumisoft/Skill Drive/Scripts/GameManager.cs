@@ -65,6 +65,16 @@ namespace Ilumisoft.SkillDrive.Game
             collectableManager.OnAllCollected += OnAllCollected;
             // 시간 초과 시에만 결과 패널을 띄움
             countdown.OnTimeOut += OnTimeOut;
+            
+            // Photon 네트워크 전송 빈도 증가 (차량 동기화 개선)
+#if PHOTON_UNITY_NETWORKING
+            if (Photon.Pun.PhotonNetwork.IsConnected)
+            {
+                Photon.Pun.PhotonNetwork.SendRate = 30; // 기본 20 → 30
+                Photon.Pun.PhotonNetwork.SerializationRate = 20; // 기본 10 → 20
+                Debug.Log("[GameManager] Photon SendRate=30, SerializationRate=20 설정 완료");
+            }
+#endif
         }
 
         private IEnumerator Start()
