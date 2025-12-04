@@ -186,6 +186,10 @@ namespace Ilumisoft.SkillDrive
 
         private void PerformRespawn()
         {
+            // 텔레포트 전에 차량이 완전히 비활성화되어 있는지 확인
+            // (충돌체가 꺼져있어야 콜렉터블과 충돌 안 함)
+            DisableVehicle();
+            
             if (spawnPoint == null)
             {
                 // 스폰포인트가 누락된 경우 초기 위치로 리스폰
@@ -195,12 +199,12 @@ namespace Ilumisoft.SkillDrive
             }
             else
             {
-                // Teleport to spawn point
+                // Teleport to spawn point (비활성화 상태로 이동)
                 transform.position = spawnPoint.position;
                 transform.rotation = spawnPoint.rotation;
             }
 
-            // 차량 다시 활성화
+            // 텔레포트 후 차량 다시 활성화
             EnableVehicle();
 
             // 리스폰 후 카메라가 다시 따라오도록 재활성화
@@ -228,7 +232,7 @@ namespace Ilumisoft.SkillDrive
                 }
             }
 
-            Debug.Log($"[VehicleRespawnHandler] Vehicle respawned at {spawnPoint.position}");
+            Debug.Log($"[VehicleRespawnHandler] Vehicle respawned at spawn point");
         }
 
         /// <summary>
