@@ -24,7 +24,7 @@ namespace Ilumisoft.SkillDrive.Network
         
         // 부드러운 동기화를 위한 추가 변수
         private float lerpSpeed = 20f; // 보간 속도 (20이 최적)
-        private float positionThreshold = 2f; // 텔레포트 임계값
+        private float positionThreshold = 5f; // 텔레포트 임계값 (2→5로 증가)
         
         // 버벅임 개선을 위한 추가 변수
         private Vector3 lastReceivedPosition;
@@ -70,10 +70,11 @@ namespace Ilumisoft.SkillDrive.Network
                     // 거리와 시간을 고려한 동적 보간 속도
                     float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 1.5f, distance / positionThreshold);
                     
-                    // 더 정확한 외삽: 시간 경과까지 고려
-                    Vector3 extrapolatedPosition = networkPosition + networkVelocity * (timeSinceUpdate + Time.fixedDeltaTime);
+                    // 외삽 계수를 낮춰서 순간이동 방지 (timeSinceUpdate만 사용, fixedDeltaTime 제거)
+                    float extrapolationFactor = Mathf.Min(timeSinceUpdate, 0.2f); // 최대 0.2초까지만 예측
+                    Vector3 extrapolatedPosition = networkPosition + networkVelocity * extrapolationFactor;
                     
-                    // 부드러운 보간 (MovePosition 대신 직접 position 수정으로 더 정확함)
+                    // 부드러운 보간
                     Vector3 newPosition = Vector3.Lerp(rb.position, extrapolatedPosition, Time.fixedDeltaTime * dynamicLerpSpeed);
                     rb.position = newPosition;
                     

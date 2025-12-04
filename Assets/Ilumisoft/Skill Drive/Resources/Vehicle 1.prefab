@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    MaxSpeed: 50
+    MaxSpeed: 40
     Acceleration: 20
     SteeringPower: 1.5
     Grip: 0.04
