@@ -4938,6 +4938,7 @@ MonoBehaviour:
   particlesPrefab: {fileID: 0}
   speedUpDuration: 3
   speedUpMultiplier: 1.5
+  respawnDelay: 8
 --- !u!1 &8895338483242430715
 GameObject:
   m_ObjectHideFlags: 0

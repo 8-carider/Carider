@@ -13,7 +13,7 @@ public class GroundManager : MonoBehaviour
     public float interval = 5.0f; // 쿨타임
 
     [Header("모드 설정")]
-    public bool isRandomMode = true; // ★ 체크하면 랜덤, 끄면 순서대로
+    public bool isRandomMode = true; //체크하면 랜덤, 끄면 순서대로
 
     void Start()
     {
@@ -36,12 +36,7 @@ public class GroundManager : MonoBehaviour
 
             if (isRandomMode)
             {
-                // ============================
-                // 🎲 랜덤 모드 (동전 던지기)
-                // ============================
                 
-                // 각각 50% 확률로 열릴지 말지 결정
-                // (Random.value는 0.0 ~ 1.0 사이의 랜덤한 숫자입니다)
                 bool rndTL = Random.value > 0.5f;
                 bool rndTR = Random.value > 0.5f;
                 bool rndBL = Random.value > 0.5f;
@@ -73,9 +68,13 @@ public class GroundManager : MonoBehaviour
 
                 // [패턴 3] 대각선
                 OpenDoors(true, false, false, true);
+                yield return new WaitForSeconds(interval);  
+
+                // [패턴 4] 대각선
+                OpenDoors(false, true, true, false);
                 yield return new WaitForSeconds(interval);
 
-                // [패턴 4] 전체
+                // [패턴 5] 전체
                 OpenDoors(true, true, true, true);
                 
             }

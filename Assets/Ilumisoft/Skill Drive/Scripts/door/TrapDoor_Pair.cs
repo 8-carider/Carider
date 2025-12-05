@@ -10,12 +10,6 @@ public class TrapDoorPair : MonoBehaviour
     [Header("연결 2: 색깔 바꿀 문짝들 (Cube)")]
     public MeshRenderer[] doorMeshes; 
 
-    [Header("연결 3: 덜컹거림 방지용 장판 (Ghost Cover)")]
-    public GameObject ghostCover; 
-
-    // ★ 수정됨: 직접 드래그해서 넣을 수 있게 public으로 변경
-    [Header("연결 4: 문짝에 붙은 콜라이더 (직접 넣으세요!)")]
-    public Collider[] doorColliders; 
 
     [Header("설정 1: 경고(Warning)")]
     public float warningTime = 1.0f;     
@@ -51,12 +45,6 @@ public class TrapDoorPair : MonoBehaviour
         // 원래 문 색깔 기억하기
         if (doorMeshes.Length > 0 && doorMeshes[0] != null)
             originalMat = doorMeshes[0].material;
-        
-        // ★ 시작 상태 설정:
-        // 1. 장판(GhostCover)은 켜고 (매끄러운 바닥)
-        // 2. 문짝 콜라이더(DoorColliders)는 끄기 (충돌 방지)
-        if (ghostCover != null) ghostCover.SetActive(true);
-        SetDoorColliders(false); 
     }
 
     public void Open()
@@ -70,12 +58,7 @@ public class TrapDoorPair : MonoBehaviour
 
     IEnumerator DoorSequence()
     {
-        // ============================
-        // 0단계: 경고 (장판 ON, 문 콜라이더 OFF)
-        // ============================
-        if (ghostCover != null) ghostCover.SetActive(true);
-        SetDoorColliders(false);
-
+        
         float timer = 0f;
         while (timer < warningTime)
         {
@@ -91,15 +74,7 @@ public class TrapDoorPair : MonoBehaviour
         ChangeMaterial(originalMat);
 
 
-        // ============================
-        // ★ 1단계 직전: 문 열림! 
-        // 장판 치우고, 문짝 콜라이더 켜기 (차 떨어지게)
-        // ============================
-        if (ghostCover != null) ghostCover.SetActive(false);
-        SetDoorColliders(true); 
-
-
-        // 1단계: 문 열기 애니메이션
+        
         float currentAngle = 0f;
         while (Mathf.Abs(currentAngle - targetAngle) > 0.1f)
         {
@@ -122,26 +97,8 @@ public class TrapDoorPair : MonoBehaviour
         ApplyRotation(0f); 
 
 
-        // ============================
-        // ★ 4단계: 문 닫힘 완료!
-        // 장판 다시 깔고, 문짝 콜라이더 끄기
-        // ============================
-        if (ghostCover != null) ghostCover.SetActive(true);
-        SetDoorColliders(false); 
 
         isRunning = false; 
-    }
-
-    // 콜라이더 켜고 끄는 함수
-    void SetDoorColliders(bool isActive)
-    {
-        if (doorColliders != null)
-        {
-            foreach (Collider col in doorColliders)
-            {
-                if (col != null) col.enabled = isActive;
-            }
-        }
     }
 
     void ChangeMaterial(Material mat)
