@@ -74,19 +74,19 @@ namespace Ilumisoft.SkillDrive.Game
             }
 #endif
         }
-            [Header("레이어 설정")]
-            [SerializeField, Tooltip("Ground 레이어")]
-            private LayerMask groundLayer;
-            [SerializeField, Tooltip("Obstacle 레이어")]
-            private LayerMask obstacleLayer;
+        [Header("레이어 설정")]
+        [SerializeField, Tooltip("Ground 레이어")]
+        private LayerMask groundLayer;
+        [SerializeField, Tooltip("Obstacle 레이어")]
+        private LayerMask obstacleLayer;
 
-            [Header("랜덤 위치 샘플링 (CollectableManager와 동일 방식)")]
-            [SerializeField, Tooltip("Collectable 겹침 체크 반경")]
-            private float spawnCheckRadius = 0.6f;
-            [SerializeField, Tooltip("장애물 겹침 체크 반경 (트리거 포함)")]
-            private float obstacleCheckRadius = 1.2f;
-            [SerializeField, Tooltip("랜덤 위치 최대 시도 횟수")]
-            private int maxTries = 30;
+        [Header("랜덤 위치 샘플링 (CollectableManager와 동일 방식)")]
+        [SerializeField, Tooltip("Collectable 겹침 체크 반경")]
+        private float spawnCheckRadius = 0.6f;
+        [SerializeField, Tooltip("장애물 겹침 체크 반경 (트리거 포함)")]
+        private float obstacleCheckRadius = 1.2f;
+        [SerializeField, Tooltip("랜덤 위치 최대 시도 횟수")]
+        private int maxTries = 30;
 
         [Header("고급 스폰 검사")]
         [SerializeField, Tooltip("스폰 위치를 지면 위로 얼마나 올릴지 (아이템 떠있게)")] private float spawnHeightOffset = 0.5f;
@@ -119,7 +119,7 @@ namespace Ilumisoft.SkillDrive.Game
         {
             Debug.Log($"[ItemSpawner] Start 호출됨. spawnOnStart={spawnOnStart}");
             Debug.Log($"[ItemSpawner] 이 오브젝트 위치: {transform.position}");
-            
+
 #if PHOTON_UNITY_NETWORKING
             // CollectableManager 방식: 마스터 클라이언트면 바로 스폰
             if (Photon.Pun.PhotonNetwork.IsMasterClient)
@@ -168,45 +168,40 @@ namespace Ilumisoft.SkillDrive.Game
         }
 #endif
 
-        // CollectableManager와 동일한 방식: 중심 기준 랜덤 좌표 선택 후 겹침 검사로 유효 위치 결정
+        // CollectableManager와 동일한 방식//
         private bool TryGetValidSpawnPosition(out Vector3 position)
         {
             for (int i = 0; i < maxTries; i++)
             {
-                Vector3 candidate = transform.position + new Vector3(
+                // 1) 랜덤 XZ 선택
+                Vector3 posXZ = transform.position + new Vector3(
                     Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f),
-                    spawnHeightOffset,
+                    50f,
                     Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f)
                 );
 
-                // 겹침 체크: groundLayer와 obstacleLayer 모두 피함 (CollectableManager와 동일 로직)
-                bool overlapGround = Physics.CheckSphere(candidate, spawnCheckRadius, groundLayer);
-                bool overlapObstacle = obstacleLayer.value != 0 && Physics.OverlapSphere(candidate, obstacleCheckRadius, obstacleLayer, QueryTriggerInteraction.Collide).Length > 0;
-                if (!overlapGround && !overlapObstacle)
+                // 2)Ground 위인지 검사
+                if (Physics.Raycast(posXZ, Vector3.down, out RaycastHit hit, 200f, groundLayer))
                 {
-                    position = SnapToGround(candidate);
-                    return true;
-                }
+                    Vector3 finalPos = hit.point + Vector3.up * spawnHeightOffset;
 
-                if (logSpawnAttempts)
-                {
-                    Debug.Log($"[ItemSpawner] 겹침으로 스킵: ground={overlapGround}, obstacle={overlapObstacle}");
-                }
-            }
+                    // 3) 장애물과 겹치는지 확인
+                    bool obstacleOverlap = Physics.CheckSphere(finalPos, obstacleCheckRadius, obstacleLayer);
 
-            // 부족하면 fallback (CollectableManager도 부족 시 채움) — 중앙 시도
-            if (useCenterFallback)
-            {
-                Vector3 center = transform.position + new Vector3(0f, spawnHeightOffset, 0f);
-                bool overlapGround = Physics.CheckSphere(center, spawnCheckRadius, groundLayer);
-                bool overlapObstacle = obstacleLayer.value != 0 && Physics.OverlapSphere(center, obstacleCheckRadius, obstacleLayer, QueryTriggerInteraction.Collide).Length > 0;
-                if (!overlapGround && !overlapObstacle)
-                {
-                    position = SnapToGround(center);
+                    if (obstacleOverlap)
+                        continue;
+
+                    // 4) 스폰 반경 안에 다른 아이템 있는지 검사
+                    bool groundOverlap = Physics.CheckSphere(finalPos, spawnCheckRadius, groundLayer);
+                    if (groundOverlap)
+                        continue;
+
+                    position = finalPos;
                     return true;
                 }
             }
 
+            // 유효 위치 실패
             position = Vector3.zero;
             return false;
         }
@@ -228,7 +223,7 @@ namespace Ilumisoft.SkillDrive.Game
                 }
                 else
                 {
-                    Debug.LogWarning($"[ItemSpawner] {i+1}번째 아이템 스폰 실패 - 유효한 위치를 찾지 못함");
+                    Debug.LogWarning($"[ItemSpawner] {i + 1}번째 아이템 스폰 실패 - 유효한 위치를 찾지 못함");
                 }
             }
             Debug.Log($"[ItemSpawner] SpawnRandomItems 완료. 성공: {successCount}/{spawnCount}");
@@ -269,19 +264,23 @@ namespace Ilumisoft.SkillDrive.Game
         // 주어진 위치를 기준으로 바로 위에서 아래로 레이캐스트하여 지면 윗면으로 Y를 스냅
         private Vector3 SnapToGround(Vector3 pos)
         {
-            var origin = pos + Vector3.up * 2f; // 살짝 위에서 시작
-            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 10f, groundLayer, QueryTriggerInteraction.Collide))
+            Vector3 origin = pos + Vector3.up * 5f;
+
+            // Raycast로 Ground 찾기
+            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 50f, groundLayer))
             {
                 pos.y = hit.point.y + spawnHeightOffset;
             }
+
             return pos;
         }
+
 #if PHOTON_UNITY_NETWORKING
-[PunRPC]
-private void RPC_RequestRespawn(float delay)
-{
-    FindObjectOfType<ItemSpawner>()?.RespawnAfterDelay(delay);
-}
+        [PunRPC]
+        private void RPC_RequestRespawn(float delay)
+        {
+            FindObjectOfType<ItemSpawner>()?.RespawnAfterDelay(delay);
+        }
 #endif
     }
 }
