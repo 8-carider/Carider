@@ -55,7 +55,7 @@ namespace PolygonArsenal
             ActivateFireCenterCollider(effectRoot, false);
             yield return new WaitForSeconds(2f);
             ActivateFireCenterCollider(effectRoot, true);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
             ActivateFireCenterCollider(effectRoot, false);
         }
 
