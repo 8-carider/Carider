@@ -38,7 +38,7 @@ namespace Ilumisoft.SkillDrive.Game
         public void ShowMapSelectionUI()
         {
             Debug.Log("[MapSelectionUI] ShowMapSelectionUI called");
-            
+
             if (selectionPanel == null)
             {
                 Debug.LogError("[MapSelectionUI] Selection Panel is not assigned!");
@@ -54,12 +54,12 @@ namespace Ilumisoft.SkillDrive.Game
             {
                 // 마스터: 드롭다운 설정
                 SetupMapCountDropdown();
-                
+
                 if (instructionText != null)
                 {
                     instructionText.text = "Select total number of maps to play";
                 }
-                
+
                 if (mapCountDropdown != null) mapCountDropdown.gameObject.SetActive(true);
                 if (confirmButton != null) confirmButton.gameObject.SetActive(true);
             }
@@ -70,7 +70,7 @@ namespace Ilumisoft.SkillDrive.Game
                 {
                     instructionText.text = "Waiting for master to select...";
                 }
-                
+
                 if (mapCountDropdown != null) mapCountDropdown.gameObject.SetActive(false);
                 if (confirmButton != null) confirmButton.gameObject.SetActive(false);
             }
@@ -113,15 +113,15 @@ namespace Ilumisoft.SkillDrive.Game
             if (!PhotonNetwork.IsMasterClient) return;
 
             int selectedMapCount = mapCountDropdown.value + 1; // dropdown index 0 = 1 map
-            
-            // 각 맵마다 기본 제한시간 2분 설정
-            float timeLimit = 120f;
-            
+
+            // 각 맵마다 기본 제한시간 3분 설정
+            float timeLimit = 180f;
+
             Debug.Log($"[MapSelectionUI] Master selected {selectedMapCount} maps with {timeLimit}s time limit per map");
-            
+
             // 게임 세션 시작
             GameSessionManager.Instance.StartGameSession(selectedMapCount);
-            
+
             // 제한시간 저장 (CustomProperties)
             ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
             {
