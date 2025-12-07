@@ -87,18 +87,17 @@ namespace PolygonArsenal
                 if (fireCenterPS != null)
                 {
                     var main = fireCenterPS.main;
-                    float startDelay = main.startDelay.constant; // FireCenter의 startDelay
-                    float duration = main.duration; // FireCenter의 실제 재생 시간
+                    float startDelay = main.startDelay.constant; // FireCenter의 startDelay (2초)
 
                     // startDelay 동안 대기 (충전 중 - 안전)
                     ActivateFireCenterCollider(effectRoot, false);
                     yield return new WaitForSeconds(startDelay);
 
-                    // 레이저 발사 시작 - Collider 활성화
+                    // 레이저 발사 시작 - Collider 활성화 (2~3.5초 구간만)
                     ActivateFireCenterCollider(effectRoot, true);
-                    yield return new WaitForSeconds(duration);
+                    yield return new WaitForSeconds(1.5f); // 1.5초간만 위험
 
-                    // 레이저 발사 끝 - Collider 비활성화
+                    // 레이저 발사 끝 - Collider 비활성화 (파티클은 계속 재생됨)
                     ActivateFireCenterCollider(effectRoot, false);
                 }
             }
