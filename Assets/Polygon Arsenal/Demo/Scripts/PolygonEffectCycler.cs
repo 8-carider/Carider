@@ -17,6 +17,7 @@ namespace PolygonArsenal
 
         GameObject instantiatedEffect;
         BoxCollider fireCenterCollider;
+        Coroutine activeColliderRoutine; // 현재 실행 중인 코루틴 추적
 
         int effectIndex = 0;
 
@@ -25,7 +26,9 @@ namespace PolygonArsenal
         void Start()
         {
             instantiatedEffect = Instantiate(listOfEffects[effectIndex], transform.position, transform.rotation) as GameObject;
-            StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
+            // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
+            ActivateFireCenterCollider(instantiatedEffect, false);
+            activeColliderRoutine = StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
             effectIndex++;
             timeOfLastInstantiate = Time.time;
         }
@@ -34,14 +37,25 @@ namespace PolygonArsenal
         {
             if (Time.time >= timeOfLastInstantiate + loopTimeLength)
             {
+                // 이전 코루틴 중단 (확실한 정리)
+                if (activeColliderRoutine != null)
+                {
+                    StopCoroutine(activeColliderRoutine);
+                    activeColliderRoutine = null;
+                }
+
                 // Destroy 직전에 Collider 비활성화 (안전)
                 if (instantiatedEffect != null)
                 {
                     ActivateFireCenterCollider(instantiatedEffect, false);
                 }
                 Destroy(instantiatedEffect);
+
+                // 새 파티클 생성 및 새 코루틴 시작
                 instantiatedEffect = Instantiate(listOfEffects[effectIndex], transform.position, transform.rotation) as GameObject;
-                StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
+                // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
+                ActivateFireCenterCollider(instantiatedEffect, false);
+                activeColliderRoutine = StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
                 timeOfLastInstantiate = Time.time;
                 if (effectIndex < listOfEffects.Count - 1)
                     effectIndex++;
@@ -49,26 +63,35 @@ namespace PolygonArsenal
                     effectIndex = 0;
             }
         }
-        // FireCenter Collider를 파티클이 살아있는 동안만 활성화
+        // FireCenter의 startDelay를 고려하여 정확한 타이밍에 Collider 활성화
         IEnumerator FireCenterColliderRoutine(GameObject effectRoot)
         {
             if (effectRoot == null) yield break;
 
-            // 파티클 시스템의 실제 지속 시간 가져오기
+            // FireCenter 파티클 정보 가져오기
             var fireCenter = effectRoot.transform.Find("FireCenter");
             if (fireCenter != null)
             {
-                var particleSystem = fireCenter.GetComponent<ParticleSystem>();
-                if (particleSystem != null)
+                var fireCenterPS = fireCenter.GetComponent<ParticleSystem>();
+                if (fireCenterPS != null)
                 {
-                    // 파티클이 시작되는 순간부터 활성화
-                    ActivateFireCenterCollider(effectRoot, true);
+                    var main = fireCenterPS.main;
+                    float startDelay = main.startDelay.constant; // FireCenter의 startDelay
+                    float duration = main.duration; // FireCenter의 실제 재생 시간
 
-                    // 파티클 지속 시간만큼 대기
-                    yield return new WaitForSeconds(particleSystem.main.duration);
-
-                    // 파티클이 끝나면 즉시 비활성화
+                    // startDelay 동안 대기 (충전 중 - 안전)
                     ActivateFireCenterCollider(effectRoot, false);
+                    Debug.Log($"[{Time.time:F2}] Collider OFF - ChargeUp 시작");
+                    yield return new WaitForSeconds(startDelay);
+
+                    // 레이저 발사 시작 - Collider 활성화
+                    ActivateFireCenterCollider(effectRoot, true);
+                    Debug.Log($"[{Time.time:F2}] Collider ON - FireCenter 발사");
+                    yield return new WaitForSeconds(duration);
+
+                    // 레이저 발사 끝 - Collider 비활성화
+                    ActivateFireCenterCollider(effectRoot, false);
+                    Debug.Log($"[{Time.time:F2}] Collider OFF - FireCenter 종료");
                 }
             }
         }
