@@ -49,14 +49,28 @@ namespace PolygonArsenal
                     effectIndex = 0;
             }
         }
-        // FireCenter Collider를 2초~3초 구간(1초간)만 활성화
+        // FireCenter Collider를 파티클이 살아있는 동안만 활성화
         IEnumerator FireCenterColliderRoutine(GameObject effectRoot)
         {
-            ActivateFireCenterCollider(effectRoot, false);
-            yield return new WaitForSeconds(2f);
-            ActivateFireCenterCollider(effectRoot, true);
-            yield return new WaitForSeconds(0.5f);
-            ActivateFireCenterCollider(effectRoot, false);
+            if (effectRoot == null) yield break;
+
+            // 파티클 시스템의 실제 지속 시간 가져오기
+            var fireCenter = effectRoot.transform.Find("FireCenter");
+            if (fireCenter != null)
+            {
+                var particleSystem = fireCenter.GetComponent<ParticleSystem>();
+                if (particleSystem != null)
+                {
+                    // 파티클이 시작되는 순간부터 활성화
+                    ActivateFireCenterCollider(effectRoot, true);
+
+                    // 파티클 지속 시간만큼 대기
+                    yield return new WaitForSeconds(particleSystem.main.duration);
+
+                    // 파티클이 끝나면 즉시 비활성화
+                    ActivateFireCenterCollider(effectRoot, false);
+                }
+            }
         }
 
         // FireCenter라는 이름의 자식 오브젝트에서 BoxCollider를 찾아 활성/비활성
