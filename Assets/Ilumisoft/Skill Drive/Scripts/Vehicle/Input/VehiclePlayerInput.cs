@@ -166,11 +166,13 @@ namespace Ilumisoft.SkillDrive.Input
                     }
                 }
                 
-                // UI 업데이트 (내 입력만 표시)
-                if (WKey != null) WKey.color = currentInput.y > 0.1f ? pressedColor : defaultColor;
-                if (AKey != null) AKey.color = currentInput.x < -0.1f ? pressedColor : defaultColor;
-                if (SKey != null) SKey.color = currentInput.y < -0.1f ? pressedColor : defaultColor;
-                if (DKey != null) DKey.color = currentInput.x > 0.1f ? pressedColor : defaultColor;
+                // UI 업데이트: 자신의 입력 + 파트너의 입력 혼합
+                Vector2 displayInput = seatManager.GetMixedInputForUI(myActor);
+                
+                if (WKey != null) WKey.color = displayInput.y > 0.1f ? pressedColor : defaultColor;
+                if (AKey != null) AKey.color = displayInput.x < -0.1f ? pressedColor : defaultColor;
+                if (SKey != null) SKey.color = displayInput.y < -0.1f ? pressedColor : defaultColor;
+                if (DKey != null) DKey.color = displayInput.x > 0.1f ? pressedColor : defaultColor;
             }
         }
 

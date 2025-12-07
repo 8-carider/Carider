@@ -19,6 +19,10 @@ namespace Ilumisoft.SkillDrive.Network
 
         private float throttleInput = 0f;  // Y축 (앞/뒤)
         private float steeringInput = 0f;  // X축 (좌/우)
+        
+        // 각 플레이어의 개별 입력 저장
+        private Vector2 throttlePlayerInput = Vector2.zero;  // Throttle 담당 플레이어의 입력
+        private Vector2 steeringPlayerInput = Vector2.zero;  // Steering 담당 플레이어의 입력
 
         /// <summary>
         /// 플레이어가 이 차량에 배정되었는지 확인
@@ -45,6 +49,38 @@ namespace Ilumisoft.SkillDrive.Network
         }
 
         /// <summary>
+        /// 로컬 플레이어의 입력과 파트너의 입력을 분리해서 반환
+        /// localActor가 throttle이면: 자신의 throttle input + 파트너의 steering input
+        /// localActor가 steering이면: 자신의 steering input + 파트너의 throttle input
+        /// 같은 플레이어가 둘 다 담당하면: 자신의 전체 입력 반환
+        /// </summary>
+        public Vector2 GetMixedInputForUI(int localActor)
+        {
+            Vector2 result = Vector2.zero;
+
+            // 같은 플레이어가 throttle과 steering을 모두 담당하는 경우
+            if (throttleSeatActorNumber == steeringSeatActorNumber && throttleSeatActorNumber == localActor)
+            {
+                // 자신의 전체 입력 사용
+                result = throttlePlayerInput;  // throttle과 steering이 같으므로 둘 다 포함
+            }
+            else if (localActor == throttleSeatActorNumber)
+            {
+                // 나는 throttle (앞뒤), 파트너는 steering (좌우)
+                result.y = throttlePlayerInput.y;  // 내 Y축 (W/S)
+                result.x = steeringPlayerInput.x;  // 파트너의 X축 (A/D)
+            }
+            else if (localActor == steeringSeatActorNumber)
+            {
+                // 나는 steering (좌우), 파트너는 throttle (앞뒤)
+                result.x = steeringPlayerInput.x;  // 내 X축 (A/D)
+                result.y = throttlePlayerInput.y;  // 파트너의 Y축 (W/S)
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// VehiclePlayerInput이 RPC로 받은 입력을 전달
         /// </summary>
         public void ReceivePlayerInput(float x, float y, int actor)
@@ -53,6 +89,7 @@ namespace Ilumisoft.SkillDrive.Network
             if (actor == throttleSeatActorNumber)
             {
                 throttleInput = Mathf.Clamp(y, -1f, 1f);
+                throttlePlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
                 Debug.Log($"[VehicleSeatManager] Throttle input from actor {actor}: {throttleInput:F2}");
             }
             
@@ -60,6 +97,7 @@ namespace Ilumisoft.SkillDrive.Network
             if (actor == steeringSeatActorNumber)
             {
                 steeringInput = Mathf.Clamp(x, -1f, 1f);
+                steeringPlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
                 Debug.Log($"[VehicleSeatManager] Steering input from actor {actor}: {steeringInput:F2}");
             }
         }
