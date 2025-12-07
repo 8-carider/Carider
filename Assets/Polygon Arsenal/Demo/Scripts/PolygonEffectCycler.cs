@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace PolygonArsenal
 {
@@ -24,6 +25,12 @@ namespace PolygonArsenal
 
         void Start()
         {
+            // 멀티플레이: 마스터 클라이언트만 레이저 생성 (타이밍 동기화)
+            if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
             instantiatedEffect = Instantiate(listOfEffects[effectIndex], transform.position, transform.rotation) as GameObject;
             // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
             ActivateFireCenterCollider(instantiatedEffect, false);
@@ -34,6 +41,12 @@ namespace PolygonArsenal
 
         void Update()
         {
+            // 멀티플레이: 마스터 클라이언트만 레이저 생성 (타이밍 동기화)
+            if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
+            {
+                return;
+            }
+
             if (Time.time >= timeOfLastInstantiate + loopTimeLength)
             {
                 // 이전 코루틴 중단 (확실한 정리)
