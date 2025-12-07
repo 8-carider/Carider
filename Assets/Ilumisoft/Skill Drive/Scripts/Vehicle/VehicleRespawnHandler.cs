@@ -80,7 +80,15 @@ namespace Ilumisoft.SkillDrive
 
             if (UnityEngine.Input.GetKeyDown(respawnKey))
             {
-                RequestRespawn();
+                // RPC로 리스폰 요청 - 모든 클라이언트에서 동기화
+                if (PhotonNetwork.IsConnected && photonView != null)
+                {
+                    photonView.RPC("RPC_RequestRespawn", RpcTarget.All);
+                }
+                else
+                {
+                    RequestRespawn();
+                }
             }
         }
 
@@ -107,6 +115,13 @@ namespace Ilumisoft.SkillDrive
 
         public void RequestRespawn()
         {
+            // 이미 리스폰 중이면 무시 (중복 방지)
+            if (isRespawning)
+            {
+                Debug.Log("[VehicleRespawnHandler] Already respawning! Ignoring duplicate request.");
+                return;
+            }
+
             // UI가 없으면 바로 리스폰
             if (respawnUI == null)
             {
@@ -121,7 +136,7 @@ namespace Ilumisoft.SkillDrive
                 return;
             }
 
-            // 리스폰 시퀀스 시작
+            // 리스폰 시퀀스 시작 - 플래그 설정
             isRespawning = true;
 
             // 폭발 파티클과 차량 숨김은 모든 클라이언트에 동기화
@@ -134,15 +149,42 @@ namespace Ilumisoft.SkillDrive
                 ShowExplosionAndHide();
             }
 
-            // UI 카운트다운은 로컬에서만 실행 (이 차량을 조종하는 플레이어만)
-            bool showLocalUI = true;
+            // 카운트다운 UI는 모든 클라이언트에서 보여줌 (RPC 동기화)
+            if (PhotonNetwork.IsConnected && photonView != null)
+            {
+                photonView.RPC("RPC_ShowCountdown", RpcTarget.All);
+            }
+            else
+            {
+                StartCountdown();
+            }
+        }
+
+        [PunRPC]
+        private void RPC_RequestRespawn()
+        {
+            RequestRespawn();
+        }
+
+        [PunRPC]
+        private void RPC_ShowCountdown()
+        {
+            StartCountdown();
+        }
+
+        private void StartCountdown()
+        {
+            // 로컬 플레이어가 이 차량에 배정되었는지 확인
+            bool isLocalPlayer = true;
             if (PhotonNetwork.IsConnected)
             {
                 var seatManager = GetComponent<Ilumisoft.SkillDrive.Network.VehicleSeatManager>();
                 int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
-                showLocalUI = seatManager != null && seatManager.IsPlayerAssigned(localActor);
+                isLocalPlayer = seatManager != null && seatManager.IsPlayerAssigned(localActor);
             }
-            if (showLocalUI)
+
+            // 이 차량을 조종하는 플레이어에게만 UI 표시
+            if (isLocalPlayer && respawnUI != null)
             {
                 respawnUI.ShowRespawnSequence(() =>
                 {
@@ -156,6 +198,11 @@ namespace Ilumisoft.SkillDrive
                     }
                     isRespawning = false;
                 });
+            }
+            else
+            {
+                // 다른 차량을 조종하는 플레이어는 카운트다운 안 보이고 바로 완료
+                isRespawning = false;
             }
         }
 
