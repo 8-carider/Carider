@@ -14,40 +14,39 @@ namespace PolygonArsenal
         [SerializeField]
         float loopTimeLength = 5f;
 
-        float timeOfLastInstantiate;
+        double timeOfLastInstantiate;
 
         GameObject instantiatedEffect;
         Coroutine activeColliderRoutine; // 현재 실행 중인 코루틴 추적
 
         int effectIndex = 0;
+        bool usePhotonTime = false; // Photon 시간 사용 여부
 
         // Use this for initialization
 
         void Start()
         {
-            // 멀티플레이: 마스터 클라이언트만 레이저 생성 (타이밍 동기화)
-            if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
-            {
-                return;
-            }
+            // 멀티플레이 시 Photon 시간 사용
+            usePhotonTime = PhotonNetwork.IsConnected;
 
+            // 모든 클라이언트에서 레이저 생성
             instantiatedEffect = Instantiate(listOfEffects[effectIndex], transform.position, transform.rotation) as GameObject;
             // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
             ActivateFireCenterCollider(instantiatedEffect, false);
             activeColliderRoutine = StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
             effectIndex++;
-            timeOfLastInstantiate = Time.time;
+            timeOfLastInstantiate = GetCurrentTime();
+        }
+
+        double GetCurrentTime()
+        {
+            return usePhotonTime ? PhotonNetwork.Time : Time.time;
         }
 
         void Update()
         {
-            // 멀티플레이: 마스터 클라이언트만 레이저 생성 (타이밍 동기화)
-            if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
-            {
-                return;
-            }
-
-            if (Time.time >= timeOfLastInstantiate + loopTimeLength)
+            // 모든 클라이언트에서 Photon 시간 기준으로 레이저 생성
+            if (GetCurrentTime() >= timeOfLastInstantiate + loopTimeLength)
             {
                 // 이전 코루틴 중단 (확실한 정리)
                 if (activeColliderRoutine != null)
@@ -68,7 +67,7 @@ namespace PolygonArsenal
                 // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
                 ActivateFireCenterCollider(instantiatedEffect, false);
                 activeColliderRoutine = StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
-                timeOfLastInstantiate = Time.time;
+                timeOfLastInstantiate = GetCurrentTime();
                 if (effectIndex < listOfEffects.Count - 1)
                     effectIndex++;
                 else
