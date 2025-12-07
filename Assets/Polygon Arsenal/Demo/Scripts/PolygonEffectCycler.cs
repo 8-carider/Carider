@@ -16,7 +16,6 @@ namespace PolygonArsenal
         float timeOfLastInstantiate;
 
         GameObject instantiatedEffect;
-        BoxCollider fireCenterCollider;
         Coroutine activeColliderRoutine; // 현재 실행 중인 코루틴 추적
 
         int effectIndex = 0;
@@ -81,32 +80,56 @@ namespace PolygonArsenal
 
                     // startDelay 동안 대기 (충전 중 - 안전)
                     ActivateFireCenterCollider(effectRoot, false);
-                    Debug.Log($"[{Time.time:F2}] Collider OFF - ChargeUp 시작");
                     yield return new WaitForSeconds(startDelay);
 
                     // 레이저 발사 시작 - Collider 활성화
                     ActivateFireCenterCollider(effectRoot, true);
-                    Debug.Log($"[{Time.time:F2}] Collider ON - FireCenter 발사");
                     yield return new WaitForSeconds(duration);
 
                     // 레이저 발사 끝 - Collider 비활성화
                     ActivateFireCenterCollider(effectRoot, false);
-                    Debug.Log($"[{Time.time:F2}] Collider OFF - FireCenter 종료");
                 }
             }
         }
 
-        // FireCenter라는 이름의 자식 오브젝트에서 BoxCollider를 찾아 활성/비활성
+        // FireCenter라는 이름의 자식 오브젝트에서 BoxCollider를 제거하거나 추가
         void ActivateFireCenterCollider(GameObject effectRoot, bool enable)
         {
             if (effectRoot == null) return;
+
             var fireCenter = effectRoot.transform.Find("FireCenter");
-            if (fireCenter != null)
+            if (fireCenter == null) return;
+
+            var existingCollider = fireCenter.GetComponent<BoxCollider>();
+
+            if (enable)
             {
-                var collider = fireCenter.GetComponent<BoxCollider>();
-                if (collider != null)
+                // Collider가 없으면 새로 생성
+                if (existingCollider == null)
                 {
-                    collider.enabled = enable;
+                    var newCollider = fireCenter.gameObject.AddComponent<BoxCollider>();
+                    newCollider.isTrigger = true;
+                    newCollider.size = new Vector3(10, 10, 700);
+                    newCollider.center = Vector3.zero;
+
+                    // LaserKillZone 스크립트도 추가
+                    if (fireCenter.GetComponent<Ilumisoft.SkillDrive.Game.LaserKillZone>() == null)
+                    {
+                        fireCenter.gameObject.AddComponent<Ilumisoft.SkillDrive.Game.LaserKillZone>();
+                    }
+                }
+                else
+                {
+                    // 이미 있으면 활성화
+                    existingCollider.enabled = true;
+                }
+            }
+            else
+            {
+                // Collider 완전히 제거
+                if (existingCollider != null)
+                {
+                    Destroy(existingCollider);
                 }
             }
         }
