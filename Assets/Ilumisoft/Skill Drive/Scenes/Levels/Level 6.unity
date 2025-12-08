@@ -2513,6 +2513,15 @@ PrefabInstance:
       propertyPath: m_fontColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4611442867809138983, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_text
+      value: "WASD: car control\nF: respawn\nESC: back to title\n\nCollect more objects
+        to win! \n\nPress H key to close\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915352591022748815, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: spawnAreaSize.x
       value: 150

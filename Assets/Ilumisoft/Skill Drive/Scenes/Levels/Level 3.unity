@@ -8091,23 +8091,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 207
+      value: 67
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
-      propertyPath: m_LocalRotation.y
       value: 0.8660254
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3477196594550433434, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_IsActive
@@ -16221,6 +16221,15 @@ PrefabInstance:
     - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: m_fontColor.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4611442867809138983, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_text
+      value: "WASD: car control\nF: respawn\nESC: back to title\n\nCollect more objects
+        to win! \n\nPress H key to close\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915352591022748815, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: spawnAreaSize.x
