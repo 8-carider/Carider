@@ -34,6 +34,7 @@ namespace Ilumisoft.SkillDrive
         private float fadeSpeed = 2f;
 
         private Canvas canvas;
+        private Coroutine sequenceCoroutine;
 
         private void Awake()
         {
@@ -95,7 +96,15 @@ namespace Ilumisoft.SkillDrive
         /// </summary>
         public void ShowRespawnSequence(System.Action onComplete)
         {
-            StartCoroutine(RespawnSequence(onComplete));
+            if (sequenceCoroutine != null)
+            {
+                StopCoroutine(sequenceCoroutine); // 중복 재생 방지
+            }
+            sequenceCoroutine = StartCoroutine(RespawnSequence(() =>
+            {
+                sequenceCoroutine = null;
+                onComplete?.Invoke();
+            }));
         }
 
         private IEnumerator RespawnSequence(System.Action onComplete)
@@ -115,18 +124,68 @@ namespace Ilumisoft.SkillDrive
                 if (countdownText != null)
                 {
                     countdownText.text = i.ToString();
-                    // 숫자가 바뀔 때마다 약간 크기 변화 효과
-                    countdownText.transform.localScale = Vector3.one * 1.2f;
+                    // 처음에는 0 → 1.05까지 부드럽게 등장시키고, 이어서 수축
+                    countdownText.transform.localScale = Vector3.zero;
+                    var c = countdownText.color;
+                    c.a = 0f;
+                    countdownText.color = c;
+                    // 이전 프레임 잔상 방지를 위해 텍스트 즉시 적용 후 한 프레임 대기
+                    yield return null;
                 }
-                
-                yield return new WaitForSeconds(0.2f);
-                
+
+                // 1) 팝인: 0 -> 1.05, 0 -> 1 (부드럽게 등장)
+                const float popDuration = 0.1f;
+                float t = 0f;
+                while (t < popDuration)
+                {
+                    t += Time.deltaTime;
+                    float lerp = Mathf.Clamp01(t / popDuration);
+                    float smooth = Mathf.SmoothStep(0f, 1f, lerp);
+                    float scale = Mathf.Lerp(0f, 1.05f, smooth);
+                    float alpha = Mathf.Lerp(0f, 1f, smooth);
+
+                    if (countdownText != null)
+                    {
+                        countdownText.transform.localScale = Vector3.one * scale;
+                        var c = countdownText.color;
+                        c.a = alpha;
+                        countdownText.color = c;
+                    }
+                    yield return null;
+                }
+
+                // 2) 수축: 1.05 -> 0, 1 -> 0 (부드러운 연결)
+                const float shrinkDuration = 0.6f;
+                t = 0f;
+                while (t < shrinkDuration)
+                {
+                    t += Time.deltaTime;
+                    float lerp = Mathf.Clamp01(t / shrinkDuration);
+                    float smooth = Mathf.SmoothStep(0f, 1f, lerp);
+                    float scale = Mathf.Lerp(1.05f, 0f, smooth);
+                    float alpha = Mathf.Lerp(1f, 0f, smooth);
+
+                    if (countdownText != null)
+                    {
+                        countdownText.transform.localScale = Vector3.one * scale;
+                        var c = countdownText.color;
+                        c.a = alpha;
+                        countdownText.color = c;
+                    }
+                    yield return null;
+                }
+
                 if (countdownText != null)
                 {
-                    countdownText.transform.localScale = Vector3.one;
+                    countdownText.transform.localScale = Vector3.zero;
+                    var c = countdownText.color;
+                    c.a = 0f;
+                    countdownText.color = c;
                 }
-                
-                yield return new WaitForSeconds(0.8f);
+
+                // 총 1초 템포 유지 (pop + shrink 소요 후 남은 시간 대기)
+                float remain = Mathf.Max(0f, 1.0f - popDuration - shrinkDuration);
+                if (remain > 0f) yield return new WaitForSeconds(remain);
             }
 
             // 4. 리스폰 실행
