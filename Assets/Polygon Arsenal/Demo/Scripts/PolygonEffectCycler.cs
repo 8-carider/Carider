@@ -14,6 +14,11 @@ namespace PolygonArsenal
         [SerializeField]
         float loopTimeLength = 5f;
 
+        [Header("Start offset (초기 지연)")]
+        [SerializeField]
+        [Tooltip("레이저 시작 지연 시간 (Row/Col 타이밍 엇갈리게)")]
+        float startOffset = 0f;
+
         double timeOfLastInstantiate;
 
         GameObject instantiatedEffect;
@@ -29,13 +34,8 @@ namespace PolygonArsenal
             // 멀티플레이 시 Photon 시간 사용
             usePhotonTime = PhotonNetwork.IsConnected;
 
-            // 모든 클라이언트에서 레이저 생성
-            instantiatedEffect = Instantiate(listOfEffects[effectIndex], transform.position, transform.rotation) as GameObject;
-            // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
-            ActivateFireCenterCollider(instantiatedEffect, false);
-            activeColliderRoutine = StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
-            effectIndex++;
-            timeOfLastInstantiate = GetCurrentTime();
+            // 초기 지연 설정 (startOffset만큼 시간을 뒤로 당김)
+            timeOfLastInstantiate = GetCurrentTime() - loopTimeLength + startOffset;
         }
 
         double GetCurrentTime()
@@ -48,26 +48,25 @@ namespace PolygonArsenal
             // 모든 클라이언트에서 Photon 시간 기준으로 레이저 생성
             if (GetCurrentTime() >= timeOfLastInstantiate + loopTimeLength)
             {
-                // 이전 코루틴 중단 (확실한 정리)
+                // 이전 효과 정리
                 if (activeColliderRoutine != null)
                 {
                     StopCoroutine(activeColliderRoutine);
                     activeColliderRoutine = null;
                 }
 
-                // Destroy 직전에 Collider 비활성화 (안전)
                 if (instantiatedEffect != null)
                 {
                     ActivateFireCenterCollider(instantiatedEffect, false);
+                    Destroy(instantiatedEffect);
                 }
-                Destroy(instantiatedEffect);
 
                 // 새 파티클 생성 및 새 코루틴 시작
                 instantiatedEffect = Instantiate(listOfEffects[effectIndex], transform.position, transform.rotation) as GameObject;
-                // 즉시 Collider 비활성화 (프리팹의 기본값이 enabled=true일 수 있음)
                 ActivateFireCenterCollider(instantiatedEffect, false);
                 activeColliderRoutine = StartCoroutine(FireCenterColliderRoutine(instantiatedEffect));
                 timeOfLastInstantiate = GetCurrentTime();
+
                 if (effectIndex < listOfEffects.Count - 1)
                     effectIndex++;
                 else

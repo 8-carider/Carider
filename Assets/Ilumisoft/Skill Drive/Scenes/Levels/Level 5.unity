@@ -943,6 +943,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1713123950}
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: startOffset
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
       value: 7
       objectReference: {fileID: 0}
@@ -14479,6 +14483,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1713123950}
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: startOffset
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
       value: 7
       objectReference: {fileID: 0}
@@ -15058,7 +15066,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 87.827774
+      value: 7.827774
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.y
