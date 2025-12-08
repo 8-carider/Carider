@@ -87,11 +87,9 @@ public class FlagSpawner : MonoBehaviour
         TextMeshPro main = textObj.AddComponent<TextMeshPro>();
         main.text = $"{playerData.TotalCollected}";
         main.fontSize = 10;
-        main.color = Color.black;
+        main.color = playerColors[playerIndex];
         main.alignment = TextAlignmentOptions.Center;
         main.outlineWidth = 0f;
-
-        AddOutlineToTMP(main, 0.05f);
 
         textObj.transform.localPosition = new Vector3(
             0.3f,
@@ -103,42 +101,5 @@ public class FlagSpawner : MonoBehaviour
         textObj.transform.Rotate(0, 180, 0);
 
         return visualHeight;
-    }
-
-    private void AddOutlineToTMP(TextMeshPro main, float offset)
-    {
-        if (main == null) return;
-
-        Transform parent = main.transform;
-        string text = main.text;
-        float size = main.fontSize;
-        var alignment = main.alignment;
-        var font = main.font;
-
-        Vector3[] offsets = new Vector3[]
-        {
-            new Vector3( offset, 0, 0),
-            new Vector3(-offset, 0, 0),
-            new Vector3(0,  offset, 0),
-            new Vector3(0, -offset, 0),
-            new Vector3( offset,  offset, 0),
-            new Vector3(-offset,  offset, 0),
-            new Vector3( offset, -offset, 0),
-            new Vector3(-offset, -offset, 0),
-        };
-
-        foreach (var off in offsets)
-        {
-            GameObject go = new GameObject("Outline");
-            go.transform.SetParent(parent, false);
-            go.transform.localPosition = off;
-
-            var t = go.AddComponent<TextMeshPro>();
-            t.text = text;
-            t.fontSize = size;
-            t.alignment = alignment;
-            t.color = Color.white;
-            t.font = font;
-        }
     }
 }

@@ -89,7 +89,7 @@ namespace Ilumisoft.SkillDrive.Game
         private int maxTries = 30;
 
         [Header("고급 스폰 검사")]
-        [SerializeField, Tooltip("스폰 위치를 지면 위로 얼마나 올릴지 (아이템 떠있게)")] private float spawnHeightOffset = 0.5f;
+        [SerializeField, Tooltip("스폰 위치를 지면 위로 얼마나 올릴지 (아이템 떠있게)")] private float spawnHeightOffset = 1f;
         [SerializeField, Tooltip("위쪽 여유 공간 검사 높이")] private float verticalClearance = 1.0f;
         [SerializeField, Tooltip("유효한 위치를 찾지 못했을 때 중앙 강제 스폰 사용 여부")] private bool useCenterFallback = false;
 
@@ -186,14 +186,9 @@ namespace Ilumisoft.SkillDrive.Game
                     Vector3 finalPos = hit.point + Vector3.up * spawnHeightOffset;
 
                     // 3) 장애물과 겹치는지 확인
-                    bool obstacleOverlap = Physics.CheckSphere(finalPos, obstacleCheckRadius, obstacleLayer);
+                    bool obstacleOverlap = Physics.CheckSphere(finalPos, 0.5f, obstacleLayer);
 
                     if (obstacleOverlap)
-                        continue;
-
-                    // 4) 스폰 반경 안에 다른 아이템 있는지 검사
-                    bool groundOverlap = Physics.CheckSphere(finalPos, spawnCheckRadius, groundLayer);
-                    if (groundOverlap)
                         continue;
 
                     position = finalPos;
