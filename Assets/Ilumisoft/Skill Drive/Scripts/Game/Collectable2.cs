@@ -55,19 +55,12 @@ namespace Ilumisoft.SkillDrive.Game
             if (!other.CompareTag("Player"))
                 return;
 
-            // 파티클 생성
-#if PHOTON_UNITY_NETWORKING
+            // 파티클 생성 (컬러 분리: Collectable2는 지정된 프리팹 사용)
             if (particlesPrefab != null)
             {
-                if (PhotonNetwork.InRoom)
-                    PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
-                else
-                    Instantiate(particlesPrefab, transform.position, transform.rotation);
-            }
-#else
-            if (particlesPrefab != null)
+                // 파티클은 네트워크 동기화가 필요 없으므로 로컬 생성만 수행
                 Instantiate(particlesPrefab, transform.position, transform.rotation);
-#endif
+            }
 
             // 점수 +5
             var vehicleCollectables = other.GetComponent<VehicleCollectables>();
