@@ -190,6 +190,7 @@ namespace Ilumisoft.SkillDrive
             {
                 respawnUI.ShowRespawnSequence(() =>
                 {
+                    // 카운트다운 완료 후 RPC로 리스폰 (마스터만 실행 또는 모든 클라이언트 동시 실행)
                     if (PhotonNetwork.IsConnected && photonView != null)
                     {
                         photonView.RPC("RPC_Respawn", RpcTarget.All);
@@ -198,13 +199,13 @@ namespace Ilumisoft.SkillDrive
                     {
                         PerformRespawn();
                     }
-                    isRespawning = false;
                 });
             }
             else
             {
-                // 다른 차량을 조종하는 플레이어는 카운트다운 안 보이고 바로 완료
-                isRespawning = false;
+                // 다른 차량을 조종하는 플레이어는 카운트다운 안 보임
+                // 하지만 마스터나 owner가 RPC_Respawn을 보낼 때까지 대기
+                // (리스폰 플래그는 RPC_Respawn 완료 후 해제)
             }
         }
 
@@ -231,6 +232,8 @@ namespace Ilumisoft.SkillDrive
         private void RPC_Respawn()
         {
             PerformRespawn();
+            // RPC 실행 완료 후 리스폰 플래그 해제
+            isRespawning = false;
         }
 
         private void PerformRespawn()
