@@ -641,6 +641,10 @@ MonoBehaviour:
   - 2..
   - 1..
   - Go!
+  audioSource: {fileID: 8572972288270932973}
+  tickClip: {fileID: 8300000, guid: 48766492cd70b6c43b0a8fe38b11d87f, type: 3}
+  goClip: {fileID: 8300000, guid: 48766492cd70b6c43b0a8fe38b11d87f, type: 3}
+  sfxVolume: 1
 --- !u!225 &781521532052065338
 CanvasGroup:
   m_ObjectHideFlags: 0

@@ -32,6 +32,7 @@ namespace Ilumisoft.SkillDrive
 
         private Rigidbody rb;
         private Vehicle vehicle;
+        private Ilumisoft.SkillDrive.Network.VehicleSeatManager seatManager;
         private bool isRespawning = false;
         private MeshRenderer[] meshRenderers;
         private ParticleSystem[] particleSystems;
@@ -41,10 +42,20 @@ namespace Ilumisoft.SkillDrive
         private Vector3 initialPosition;
         private Quaternion initialRotation;
 
+        [Header("Audio")]
+        [SerializeField] private AudioSource respawnAudioSource;
+        [SerializeField] private AudioClip respawnSfx;
+        [SerializeField, Range(0f, 1f)] private float respawnSfxVolume = 1.0f;
+
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
             vehicle = GetComponent<Vehicle>();
+            seatManager = GetComponent<Ilumisoft.SkillDrive.Network.VehicleSeatManager>();
+            if (respawnAudioSource == null)
+            {
+                respawnAudioSource = GetComponent<AudioSource>();
+            }
 
             // 초기 위치/회전 기록 (스폰포인트 누락 시 사용)
             initialPosition = transform.position;
@@ -226,6 +237,9 @@ namespace Ilumisoft.SkillDrive
                 GameObject explosion = Instantiate(explosionParticlePrefab, transform.position, Quaternion.identity);
                 Destroy(explosion, 3f);
             }
+
+            // 폭발 사운드 재생 (로컬 차량만)
+            PlayExplosionSfxIfLocal();
         }
 
         [PunRPC]
@@ -429,6 +443,28 @@ namespace Ilumisoft.SkillDrive
 
             // 차량 모델 다시 보이기
             ShowVehicleModel();
+        }
+
+        /// <summary>
+        /// 로컬이 조종하는 차량일 때만 폭발 SFX 재생 (F 누를 때)
+        /// </summary>
+        private void PlayExplosionSfxIfLocal()
+        {
+            if (respawnAudioSource == null || respawnSfx == null) return;
+
+#if PHOTON_UNITY_NETWORKING
+            // SeatManager에 로컬 Actor가 배정된 경우만 재생
+            if (seatManager != null && PhotonNetwork.LocalPlayer != null)
+            {
+                int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
+                if (seatManager.IsPlayerAssigned(localActor))
+                {
+                    respawnAudioSource.PlayOneShot(respawnSfx, respawnSfxVolume);
+                }
+            }
+#else
+            respawnAudioSource.PlayOneShot(respawnSfx, respawnSfxVolume);
+#endif
         }
 
         /// <summary>

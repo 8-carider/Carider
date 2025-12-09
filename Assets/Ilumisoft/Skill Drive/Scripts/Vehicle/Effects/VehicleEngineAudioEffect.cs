@@ -11,6 +11,7 @@ namespace Ilumisoft.SkillDrive.Effects
     public class VehicleEngineAudioEffect : VehicleComponent
     {
         GameManager gameManager;
+        Network.VehicleSeatManager seatManager;
 
         [SerializeField]
         float minPitch = 0.25f;
@@ -27,6 +28,8 @@ namespace Ilumisoft.SkillDrive.Effects
         {
             gameManager = FindAnyObjectByType<GameManager>();
             audioSource = GetComponent<AudioSource>();
+            // SeatManager는 상위(차량 루트)에 있을 수 있음
+            seatManager = GetComponentInParent<Network.VehicleSeatManager>();
         }
 
         private void Start()
@@ -63,8 +66,44 @@ namespace Ilumisoft.SkillDrive.Effects
         {
             if (Vehicle != null && audioSource != null)
             {
-                audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, Vehicle.NormalizedForwardSpeed * multiplier);
+                if (IsLocallyControlled())
+                {
+                    audioSource.mute = false;
+                    audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, Vehicle.NormalizedForwardSpeed * multiplier);
+                }
+                else
+                {
+                    audioSource.mute = true;
+                }
             }
+        }
+
+        private bool IsLocallyControlled()
+        {
+#if PHOTON_UNITY_NETWORKING
+            // Photon에 연결되어 있지 않으면 싱글플레이어로 간주
+            if (!Photon.Pun.PhotonNetwork.IsConnected)
+            {
+                return true;
+            }
+
+            // Seat-based control: check assigned actors (우선)
+            if (seatManager != null && Photon.Pun.PhotonNetwork.LocalPlayer != null)
+            {
+                var (t, s) = seatManager.GetAssignedActors();
+                int local = Photon.Pun.PhotonNetwork.LocalPlayer.ActorNumber;
+                if (t == local || s == local) return true;
+            }
+
+            // PhotonView 소유권 체크 (fallback)
+            var pv = GetComponentInParent<Photon.Pun.PhotonView>();
+            if (pv != null && pv.IsMine) return true;
+
+            return false;
+#else
+            // 싱글플레이어
+            return true;
+#endif
         }
     }
 }
