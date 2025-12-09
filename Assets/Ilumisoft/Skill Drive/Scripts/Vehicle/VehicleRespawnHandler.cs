@@ -80,6 +80,9 @@ namespace Ilumisoft.SkillDrive
 
             if (UnityEngine.Input.GetKeyDown(respawnKey))
             {
+                // 로컬에서 즉시 플래그 설정 (RPC 응답 대기하지 않음)
+                isRespawning = true;
+                
                 // RPC로 리스폰 요청 - 모든 클라이언트에서 동기화
                 if (PhotonNetwork.IsConnected && photonView != null)
                 {
@@ -118,9 +121,11 @@ namespace Ilumisoft.SkillDrive
             // 이미 리스폰 중이면 무시 (중복 방지)
             if (isRespawning)
             {
-                Debug.Log("[VehicleRespawnHandler] Already respawning! Ignoring duplicate request.");
                 return;
             }
+
+            // 플래그 설정
+            isRespawning = true;
 
             // UI가 없으면 바로 리스폰
             if (respawnUI == null)
@@ -135,9 +140,6 @@ namespace Ilumisoft.SkillDrive
                 }
                 return;
             }
-
-            // 리스폰 시퀀스 시작 - 플래그 설정
-            isRespawning = true;
 
             // 폭발 파티클과 차량 숨김은 모든 클라이언트에 동기화
             if (PhotonNetwork.IsConnected && photonView != null)
