@@ -9,18 +9,17 @@ namespace Ilumisoft.SkillDrive.Game
     public class Collectable2 : MonoBehaviour
     {
         [SerializeField]
-        GameObject particlesPrefab = null;
+        private GameObject particlesPrefab = null;
 
         public UnityAction OnCollect = null;
 
         private void Start()
         {
-            // Ground 레이어 위로 자동 위치 조정
+            // Ground 레이어 위 자동 위치 조정
             int groundLayer = LayerMask.NameToLayer("Ground");
             if (groundLayer >= 0)
             {
-                RaycastHit hit;
-                if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out hit, 100f, 1 << groundLayer))
+                if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out RaycastHit hit, 100f, 1 << groundLayer))
                 {
                     Vector3 pos = transform.position;
                     pos.y = hit.point.y;
@@ -56,12 +55,12 @@ namespace Ilumisoft.SkillDrive.Game
             if (!other.CompareTag("Player"))
                 return;
 
-            // 파티클
+            // 파티클 생성
 #if PHOTON_UNITY_NETWORKING
             if (particlesPrefab != null)
             {
                 if (PhotonNetwork.InRoom)
-                    PhotonNetwork.Instantiate("Collect Particles 2", transform.position, transform.rotation);
+                    PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
                 else
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
             }
@@ -79,7 +78,10 @@ namespace Ilumisoft.SkillDrive.Game
 
             OnCollect?.Invoke();
 
-            // Photon 파괴 처리
+            // 🔥 여기! 30초 뒤 재생성 요청
+            GetComponent<Collectable2Respawner>()?.TriggerRespawn();
+
+            // === 파괴 처리 ===
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
