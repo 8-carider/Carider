@@ -31,20 +31,74 @@ public class Collectable2Respawner : MonoBehaviour
     /// </summary>
     public void TriggerRespawn()
     {
-        StartCoroutine(RespawnCoroutine());
+        // Run respawn on an external helper so it survives this object being destroyed
+        Debug.Log($"[Collectable2Respawner] TriggerRespawn called. Position={originalPosition}, IsMaster={PhotonNetwork.IsMasterClient}, Prefab={originalPrefab}");
+        Collectable2RespawnRunner.ScheduleRespawn(originalPosition, originalRotation, respawnDelay, originalPrefab);
+    }
+}
+
+/// <summary>
+/// Helper runner that survives the original collectable destruction and respawns a new one after delay.
+/// </summary>
+internal class Collectable2RespawnRunner : MonoBehaviour
+{
+    private Vector3 pos;
+    private Quaternion rot;
+    private float delay;
+    private GameObject prefab;
+
+    public static void ScheduleRespawn(Vector3 position, Quaternion rotation, float respawnDelay, GameObject fallbackPrefab)
+    {
+        var go = new GameObject("Collectable2RespawnRunner");
+        // ⚠️ DO NOT use DontDestroyOnLoad - let it be destroyed when scene unloads
+        var runner = go.AddComponent<Collectable2RespawnRunner>();
+        runner.pos = position;
+        runner.rot = rotation;
+        runner.delay = respawnDelay;
+        runner.prefab = fallbackPrefab;
+        runner.StartCoroutine(runner.Run());
     }
 
-    private IEnumerator RespawnCoroutine()
+    private IEnumerator Run()
     {
-        yield return new WaitForSeconds(respawnDelay);
+        Debug.Log($"[Collectable2RespawnRunner] Waiting {delay} seconds before respawn at position {pos}");
+        yield return new WaitForSeconds(delay);
+
+        Debug.Log($"[Collectable2RespawnRunner] Respawn delay complete. IsMaster={PhotonNetwork.IsMasterClient}");
 
 #if PHOTON_UNITY_NETWORKING
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
         {
-            PhotonNetwork.Instantiate("Collectable2", originalPosition, originalRotation);
+            Debug.Log($"[Collectable2RespawnRunner] Master instantiating Collectable2 at {pos}");
+            try
+            {
+                PhotonNetwork.Instantiate("Collectable2", pos, rot);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Collectable2RespawnRunner] PhotonNetwork.Instantiate failed: {ex.Message}. Falling back to local instantiate");
+                if (prefab != null)
+                {
+                    Instantiate(prefab, pos, rot);
+                }
+            }
+        }
+        else
+        {
+            Debug.Log($"[Collectable2RespawnRunner] Non-master client or not in room, skipping instantiate");
         }
 #else
-        Instantiate(originalPrefab, originalPosition, originalRotation);
+        if (prefab != null)
+        {
+            Debug.Log($"[Collectable2RespawnRunner] Offline mode: instantiating prefab at {pos}");
+            Instantiate(prefab, pos, rot);
+        }
+        else
+        {
+            Debug.LogError("[Collectable2RespawnRunner] Offline mode but prefab is null!");
+        }
 #endif
+
+        Destroy(gameObject);
     }
 }
