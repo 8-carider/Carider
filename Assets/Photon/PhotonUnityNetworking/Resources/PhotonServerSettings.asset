@@ -68,6 +68,7 @@ MonoBehaviour:
   - RPC_ShowExplosionAndHide
   - RPC_LoadLevel
   - RPC_ShowCountdown
+  - RPC_OpenDoors
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

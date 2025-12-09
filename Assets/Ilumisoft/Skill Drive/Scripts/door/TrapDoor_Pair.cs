@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
 public class TrapDoorPair : MonoBehaviour
 {
@@ -49,16 +50,28 @@ public class TrapDoorPair : MonoBehaviour
 
     public void Open()
     {
+        // 호환용: 즉시 시작
+        OpenScheduled(PhotonNetwork.Time);
+    }
+
+    public void OpenScheduled(double startTime)
+    {
         if (!isRunning)
         {
-            isRunning = true;
-            StartCoroutine(DoorSequence());
+            StartCoroutine(DoorSequence(startTime));
         }
     }
 
-    IEnumerator DoorSequence()
+    IEnumerator DoorSequence(double startTime)
     {
-        
+        isRunning = true;
+
+        // 지정된 네트워크 시간까지 대기 (동시 시작 보장)
+        while (PhotonNetwork.Time < startTime)
+        {
+            yield return null;
+        }
+
         float timer = 0f;
         while (timer < warningTime)
         {

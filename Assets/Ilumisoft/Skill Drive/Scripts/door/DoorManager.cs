@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
-public class GroundManager : MonoBehaviour
+public class GroundManager : MonoBehaviourPun
 {
     [Header("문 연결")]
     public TrapDoorPair doorTL; 
@@ -17,15 +18,19 @@ public class GroundManager : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(PatternLoop());
+        // 마스터만 패턴을 계산하고 RPC로 전파한다
+        if (PhotonNetwork.IsMasterClient)
+        {
+            StartCoroutine(PatternLoop());
+        }
     }
 
-    void OpenDoors(bool tl, bool tr, bool bl, bool br)
+    void OpenDoors(bool tl, bool tr, bool bl, bool br, double startTime)
     {
-        if (tl) doorTL.Open();
-        if (tr) doorTR.Open();
-        if (bl) doorBL.Open();
-        if (br) doorBR.Open();
+        if (tl) doorTL.OpenScheduled(startTime);
+        if (tr) doorTR.OpenScheduled(startTime);
+        if (bl) doorBL.OpenScheduled(startTime);
+        if (br) doorBR.OpenScheduled(startTime);
     }
 
     IEnumerator PatternLoop()
@@ -36,48 +41,52 @@ public class GroundManager : MonoBehaviour
 
             if (isRandomMode)
             {
-                
                 bool rndTL = Random.value > 0.5f;
                 bool rndTR = Random.value > 0.5f;
                 bool rndBL = Random.value > 0.5f;
                 bool rndBR = Random.value > 0.5f;
 
-               
                 if (!rndTL && !rndTR && !rndBL && !rndBR)
                 {
-                rndTL = true;
-                rndTR = true;
-                rndBL = true;
-                rndBR = true;
+                    rndTL = true;
+                    rndTR = true;
+                    rndBL = true;
+                    rndBR = true;
                 }
 
-                OpenDoors(rndTL, rndTR, rndBL, rndBR);
-            
-            yield return new WaitForSeconds(interval);
+                double startTime = PhotonNetwork.Time + 0.2f; // 약간의 여유를 두고 동시 시작
+                photonView.RPC("RPC_OpenDoors", RpcTarget.All, rndTL, rndTR, rndBL, rndBR, startTime);
+
+                yield return new WaitForSeconds(interval);
             }
             else
             {
-                
                 // [패턴 1] 아래 2개
-                OpenDoors(false, false, true, true);
+                photonView.RPC("RPC_OpenDoors", RpcTarget.All, false, false, true, true, PhotonNetwork.Time + 0.2f);
                 yield return new WaitForSeconds(interval);
 
                 // [패턴 2] 위 2개
-                OpenDoors(true, true, false, false);
+                photonView.RPC("RPC_OpenDoors", RpcTarget.All, true, true, false, false, PhotonNetwork.Time + 0.2f);
                 yield return new WaitForSeconds(interval);
 
                 // [패턴 3] 대각선
-                OpenDoors(true, false, false, true);
+                photonView.RPC("RPC_OpenDoors", RpcTarget.All, true, false, false, true, PhotonNetwork.Time + 0.2f);
                 yield return new WaitForSeconds(interval);  
 
                 // [패턴 4] 대각선
-                OpenDoors(false, true, true, false);
+                photonView.RPC("RPC_OpenDoors", RpcTarget.All, false, true, true, false, PhotonNetwork.Time + 0.2f);
                 yield return new WaitForSeconds(interval);
 
                 // [패턴 5] 전체
-                OpenDoors(true, true, true, true);
-                
+                photonView.RPC("RPC_OpenDoors", RpcTarget.All, true, true, true, true, PhotonNetwork.Time + 0.2f);
+                yield return new WaitForSeconds(interval);
             }
         }
+    }
+
+    [PunRPC]
+    void RPC_OpenDoors(bool tl, bool tr, bool bl, bool br, double startTime)
+    {
+        OpenDoors(tl, tr, bl, br, startTime);
     }
 }
