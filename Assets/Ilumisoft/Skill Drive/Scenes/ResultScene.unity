@@ -950,7 +950,7 @@ MonoBehaviour:
   - {fileID: 124760393}
   - {fileID: 1730112781}
   - {fileID: 990756235}
-  heightMultiplier: 0.5
+  heightMultiplier: 1
 --- !u!1 &321722213
 GameObject:
   m_ObjectHideFlags: 0

@@ -135,7 +135,6 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         private void OnTimeOut()
         {
-
             JudgeAndShowResult();
         }
 
@@ -190,17 +189,40 @@ namespace Ilumisoft.SkillDrive.Game
                 showDrawUI.SetActive(true);
             }
 
-            // 결과 패널이 뜰 때 차량 이동 제한
-            var vehicle = player != null ? player.GetComponent<Vehicle>() : null;
-            if (vehicle != null)
+            // 로컬 플레이어 결과에 따른 SFX 출력 (승/패만)
+            if (audioSource != null)
             {
-                vehicle.CanMove = false;
-                vehicle.Rigidbody.linearDamping = 2.0f;
+                if (result == "win" && successSFX != null)
+                {
+                    audioSource.PlayOneShot(successSFX);
+                }
+                else if (result == "lose" && failSFX != null)
+                {
+                    audioSource.PlayOneShot(failSFX);
+                }
             }
+
+            StopAllVehicles();
 
             // 5. 4초 후 자동 씬 전환
             Debug.Log("씬 전환 코루틴 시작, 딜레이: " + resultPanelDuration);
             StartCoroutine(GoToNextSceneAfterDelay(resultPanelDuration));
+        }
+
+        /// <summary>
+        /// 모든 차량 정지 (타임아웃/결과 표시 시 호출)
+        /// </summary>
+        private void StopAllVehicles()
+        {
+            var vehicles = FindObjectsOfType<Vehicle>();
+            foreach (var v in vehicles)
+            {
+                v.CanMove = false;
+                if (v.Rigidbody != null)
+                {
+                    v.Rigidbody.linearDamping = 2.0f;
+                }
+            }
         }
 
         /// <summary>

@@ -205,6 +205,8 @@ namespace Ilumisoft.SkillDrive.Game
             //방을 나가자마자 같은 방에 재입장되어 씬이 강제로 동기화되는 것 방지
             PhotonNetwork.AutomaticallySyncScene = false;
 #endif
+            // 다음 게임을 위해 플레이어 수집 통계 초기화
+            PlayerCollectableStats.Instance.ResetAllStats();
             SceneManager.LoadScene("Menu");
         }
 
