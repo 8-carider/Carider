@@ -32,7 +32,6 @@ public class Collectable2Respawner : MonoBehaviour
     public void TriggerRespawn()
     {
         // Run respawn on an external helper so it survives this object being destroyed
-        Debug.Log($"[Collectable2Respawner] TriggerRespawn called. Position={originalPosition}, IsMaster={PhotonNetwork.IsMasterClient}, Prefab={originalPrefab}");
         Collectable2RespawnRunner.ScheduleRespawn(originalPosition, originalRotation, respawnDelay, originalPrefab);
     }
 }
@@ -61,15 +60,11 @@ internal class Collectable2RespawnRunner : MonoBehaviour
 
     private IEnumerator Run()
     {
-        Debug.Log($"[Collectable2RespawnRunner] Waiting {delay} seconds before respawn at position {pos}");
         yield return new WaitForSeconds(delay);
-
-        Debug.Log($"[Collectable2RespawnRunner] Respawn delay complete. IsMaster={PhotonNetwork.IsMasterClient}");
 
 #if PHOTON_UNITY_NETWORKING
         if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
         {
-            Debug.Log($"[Collectable2RespawnRunner] Master instantiating Collectable2 at {pos}");
             try
             {
                 PhotonNetwork.Instantiate("Collectable2", pos, rot);
@@ -85,12 +80,10 @@ internal class Collectable2RespawnRunner : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[Collectable2RespawnRunner] Non-master client or not in room, skipping instantiate");
         }
 #else
         if (prefab != null)
         {
-            Debug.Log($"[Collectable2RespawnRunner] Offline mode: instantiating prefab at {pos}");
             Instantiate(prefab, pos, rot);
         }
         else

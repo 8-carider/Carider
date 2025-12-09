@@ -42,7 +42,6 @@ namespace Ilumisoft.SkillDrive.Network
             // 맵 전용 2대 스폰 시스템이 있으면, 이 스포너는 비활성화 동작
             if (FindObjectOfType<MapVehicleSpawner>() != null)
             {
-                Debug.Log("[PlayerSpawner] MapVehicleSpawner detected. Skipping per-player spawn.");
                 // 완전히 비활성화 (씬에서 제거)
                 Destroy(this);
                 return;
@@ -53,7 +52,6 @@ namespace Ilumisoft.SkillDrive.Network
             var existing = FindObjectsOfType<Ilumisoft.SkillDrive.Vehicle>();
             if (existing != null && existing.Length > 0)
             {
-                Debug.Log("[PlayerSpawner] Vehicles already present. Skipping per-player spawn.");
                 return;
             }
 

@@ -33,7 +33,6 @@ namespace Ilumisoft.SkillDrive.Network
         {
             if (isConnecting)
             {
-                Debug.Log("[MenuNetworkManager] Already connecting...");
                 return;
             }
 
@@ -44,26 +43,19 @@ namespace Ilumisoft.SkillDrive.Network
                 PhotonNetwork.GameVersion = gameVersion;
                 PhotonNetwork.AutomaticallySyncScene = true;
                 PhotonNetwork.ConnectUsingSettings();
-                Debug.Log("[MenuNetworkManager] Connecting to Photon...");
                 return;
             }
-
-            Debug.Log("[MenuNetworkManager] Already connected, showing lobby");
             ShowLobby();
         }
 
         public override void OnConnectedToMaster()
         {
-            Debug.Log("[MenuNetworkManager] Connected to Master Server");
-
             // 열려있는 방 중에 게임이 시작되지 않은 방 찾기 (IsOpen=true)
             PhotonNetwork.JoinRandomRoom();
         }
 
         public override void OnJoinRandomFailed(short returnCode, string message)
         {
-            Debug.Log($"[MenuNetworkManager] No room available, creating new room...");
-
             // 방이 없으면 새로 생성
             string roomName = "Room_" + Random.Range(1000, 9999);
             RoomOptions roomOptions = new RoomOptions
@@ -78,7 +70,6 @@ namespace Ilumisoft.SkillDrive.Network
 
         public override void OnJoinedRoom()
         {
-            Debug.Log($"[MenuNetworkManager] Joined room: {PhotonNetwork.CurrentRoom.Name}");
             isConnecting = false;
 
             // LobbyPanel 표시

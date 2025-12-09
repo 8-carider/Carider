@@ -90,7 +90,6 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 throttleInput = Mathf.Clamp(y, -1f, 1f);
                 throttlePlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
-                Debug.Log($"[VehicleSeatManager] Throttle input from actor {actor}: {throttleInput:F2}");
             }
             
             // Steering 담당 플레이어의 X축 입력
@@ -98,7 +97,6 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 steeringInput = Mathf.Clamp(x, -1f, 1f);
                 steeringPlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
-                Debug.Log($"[VehicleSeatManager] Steering input from actor {actor}: {steeringInput:F2}");
             }
         }
 
@@ -114,8 +112,6 @@ namespace Ilumisoft.SkillDrive.Network
         {
             throttleSeatActorNumber = throttleActor;
             steeringSeatActorNumber = steeringActor;
-            
-            Debug.Log($"[VehicleSeatManager] Seats assigned on {gameObject.name} -> Throttle:{throttleActor} Steering:{steeringActor}");
 
             // 로컬 카메라 활성/비활성
             var cam = GetComponent<VehicleCameraManager>();
@@ -123,18 +119,6 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
                 bool active = IsPlayerAssigned(localActor);
-                
-                if (active)
-                {
-                    string seatRole = "";
-                    if (throttleSeatActorNumber == localActor && steeringSeatActorNumber == localActor)
-                        seatRole = "조향+가속";
-                    else if (throttleSeatActorNumber == localActor)
-                        seatRole = "가속";
-                    else if (steeringSeatActorNumber == localActor)
-                        seatRole = "조향";
-                    Debug.Log($"[플레이어 배정] {gameObject.name} ({seatRole})");
-                }
                 
                 cam.SetCameraActive(active, localActor);
                 if (cam.transform.TryGetComponent<Unity.Cinemachine.CinemachineCamera>(out var vcam))
