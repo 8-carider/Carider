@@ -153,6 +153,11 @@ namespace Ilumisoft.SkillDrive.Network
                 return;
             }
 
+            // 게임 시작 전 방을 잠가서 중간 입장 방지
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+            Debug.Log("[LobbyPanelManager] Room locked (no more players can join)");
+
             // Lobby 패널 숨기고 맵 선택 UI 표시
             Debug.Log("[LobbyPanelManager] Hiding lobby panel");
             HideLobbyPanel();

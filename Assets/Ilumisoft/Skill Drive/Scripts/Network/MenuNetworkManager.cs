@@ -56,15 +56,7 @@ namespace Ilumisoft.SkillDrive.Network
         {
             Debug.Log("[MenuNetworkManager] Connected to Master Server");
 
-            // 자동으로 방 생성 또는 참가 시도
-            RoomOptions roomOptions = new RoomOptions
-            {
-                MaxPlayers = maxPlayersPerRoom,
-                IsVisible = true,
-                IsOpen = true
-            };
-
-            // 랜덤 방 참가 시도, 없으면 새로 생성
+            // 열려있는 방 중에 게임이 시작되지 않은 방 찾기 (IsOpen=true)
             PhotonNetwork.JoinRandomRoom();
         }
 
