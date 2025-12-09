@@ -319,7 +319,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 52.827774
+      value: 42.827774
       objectReference: {fileID: 0}
     - target: {fileID: 3148238885775753245, guid: 25a452f70e5abfa41a042d556397f778, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4386,6 +4386,166 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 623813128}
   m_CullTransparentMesh: 1
+--- !u!1001 &698292532
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 373460459887380675, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_Name
+      value: Game Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380680, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -87.94
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 19.71
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4611442867809138983, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_text
+      value: "WASD: car control\nF: respawn\nESC: back to title\n\nCollect more objects
+        to win! \n\nPress H key to close\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915352591022748815, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: spawnAreaSize.x
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: spawnAreaSize.y
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: obstacleCheckRadius
+      value: 1.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 5943162169314495500, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7362040949216363880, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: sceneLoader
+      value: 
+      objectReference: {fileID: 32270445}
+    - target: {fileID: 7432688315893285729, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: sceneViewId
+      value: 6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 698292534}
+  m_SourcePrefab: {fileID: 100100000, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+--- !u!1 &698292533 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+  m_PrefabInstance: {fileID: 698292532}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &698292534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 698292533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d53a9a51063bcc4d867a72c11e422c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.SpeedUpCollectableSpawner
+  spawnCount: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  spawnCheckRadius: 2
+  obstacleCheckRadius: 1.7
+  maxTries: 30
+  spawnHeightOffset: 2
+  verticalClearance: 1
+  useCenterFallback: 0
+  spawnOnStart: 1
+  spawnOnJoinRoom: 1
+  spawnOnMasterSwitch: 1
+  logSpawnAttempts: 0
+  collectablePrefabs:
+  - {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
+  photonPrefabNames:
+  - PowerIconSpeedv3
+  spawnAreaSize: {x: 120, y: 120}
 --- !u!1 &768895885
 GameObject:
   m_ObjectHideFlags: 0
@@ -6161,142 +6321,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 694eaf4eb7cfdcb449e05d557350dd93, type: 3}
---- !u!1001 &1098895337
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 373460459887380675, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_Name
-      value: Game Manager
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380680, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: obstacleLayer.m_Bits
-      value: 128
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -87.94
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.37
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 19.71
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 373460459887380686, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_fontColor.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_fontColor.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4260117374344641458, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_fontColor.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4611442867809138983, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_text
-      value: "WASD: car control\nF: respawn\nESC: back to title\n\nCollect more objects
-        to win! \n\nPress H key to close\n"
-      objectReference: {fileID: 0}
-    - target: {fileID: 4915352591022748815, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: spawnAreaSize.x
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 5712007190792139278, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: spawnAreaSize.y
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 7362040949216363880, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      propertyPath: sceneLoader
-      value: 
-      objectReference: {fileID: 32270445}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 1098895339}
-  m_SourcePrefab: {fileID: 100100000, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
---- !u!1 &1098895338 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
-  m_PrefabInstance: {fileID: 1098895337}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1098895339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1098895338}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d53a9a51063bcc4d867a72c11e422c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.ItemSpawner
-  spawnCount: 2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  spawnCheckRadius: 2
-  obstacleCheckRadius: 1.7
-  maxTries: 30
-  spawnHeightOffset: 2
-  verticalClearance: 1
-  useCenterFallback: 0
-  spawnOnStart: 1
-  spawnOnJoinRoom: 1
-  spawnOnMasterSwitch: 1
-  logSpawnAttempts: 0
-  collectablePrefabs:
-  - {fileID: 3495280923729869191, guid: af02fc412dfee184e8ebb5cbef964623, type: 3}
-  photonPrefabNames:
-  - PowerIconSpeedv3
-  spawnAreaSize: {x: 150, y: 150}
 --- !u!43 &1160706095
 Mesh:
   m_ObjectHideFlags: 0
@@ -11331,7 +11355,6 @@ SceneRoots:
   - {fileID: 1621627935}
   - {fileID: 1516157970}
   - {fileID: 1245271109}
-  - {fileID: 1098895337}
   - {fileID: 32270444}
   - {fileID: 1900730771}
   - {fileID: 1328633030}
@@ -11345,3 +11368,4 @@ SceneRoots:
   - {fileID: 1032245028}
   - {fileID: 192557101}
   - {fileID: 1838117167}
+  - {fileID: 698292532}

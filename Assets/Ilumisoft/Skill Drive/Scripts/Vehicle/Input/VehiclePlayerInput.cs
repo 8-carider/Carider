@@ -160,8 +160,7 @@ namespace Ilumisoft.SkillDrive.Input
                         // VehicleSeatManager의 PhotonView를 통해 RPC 전송
                         if (seatManager.photonView != null)
                         {
-                            seatManager.photonView.RPC("RPC_SendInput", RpcTarget.AllBuffered, localInput.x, localInput.y, myActor);
-                            Debug.Log($"[VehiclePlayerInput] Sending input ({localInput.x:F2}, {localInput.y:F2}) from actor {myActor}");
+                            seatManager.photonView.RPC("RPC_ReceivePlayerInput", RpcTarget.AllBuffered, localInput.x, localInput.y, myActor);
                         }
                     }
                 }

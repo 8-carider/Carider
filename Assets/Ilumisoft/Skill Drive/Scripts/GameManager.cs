@@ -10,6 +10,7 @@ namespace Ilumisoft.SkillDrive.Game
         [Header("Result UI Panels")]
         [SerializeField] private GameObject showWinUI;
         [SerializeField] private GameObject showLoseUI;
+        [SerializeField] private GameObject showDrawUI;
         [SerializeField] private float resultPanelDuration = 4f;
 
         [Header("Scene Management")]
@@ -60,6 +61,23 @@ namespace Ilumisoft.SkillDrive.Game
 
             collectableManager = GetComponent<CollectableManager>();
             audioSource = GetComponent<AudioSource>();
+
+            // Fallback: auto-find result panels if not assigned in inspector
+            if (showWinUI == null)
+            {
+                var win = GameObject.Find("WinPanel") ?? GameObject.Find("WinUI");
+                if (win != null) showWinUI = win;
+            }
+            if (showLoseUI == null)
+            {
+                var lose = GameObject.Find("LosePanel") ?? GameObject.Find("LoseUI");
+                if (lose != null) showLoseUI = lose;
+            }
+            if (showDrawUI == null)
+            {
+                var draw = GameObject.Find("DrawPanel") ?? GameObject.Find("DrawUI");
+                if (draw != null) showDrawUI = draw;
+            }
 
             // 콜렉터블을 모두 먹어도 결과 패널을 띄우지 않음
             collectableManager.OnAllCollected += OnAllCollected;
@@ -157,6 +175,8 @@ namespace Ilumisoft.SkillDrive.Game
             // 4. 결과 패널 표시
             if (showWinUI != null) showWinUI.SetActive(false);
             if (showLoseUI != null) showLoseUI.SetActive(false);
+            if (showDrawUI != null) showDrawUI.SetActive(false);
+            
             if (result == "win" && showWinUI != null) {
                 Debug.Log("Win 패널 활성화");
                 showWinUI.SetActive(true);
@@ -165,7 +185,10 @@ namespace Ilumisoft.SkillDrive.Game
                 Debug.Log("Lose 패널 활성화");
                 showLoseUI.SetActive(true);
             }
-            // draw일 때는 둘 다 안 띄움(원하면 별도 패널 추가 가능)
+            else if (result == "draw" && showDrawUI != null) {
+                Debug.Log("Draw 패널 활성화");
+                showDrawUI.SetActive(true);
+            }
 
             // 결과 패널이 뜰 때 차량 이동 제한
             var vehicle = player != null ? player.GetComponent<Vehicle>() : null;
@@ -225,28 +248,24 @@ namespace Ilumisoft.SkillDrive.Game
             }
             string nextScene = isLastMap ? "ResultScene" : "Level Selection";
 
-#if PHOTON_UNITY_NETWORKING
-            if (Photon.Pun.PhotonNetwork.IsMasterClient)
-            {
-                if (sceneLoader != null)
-                {
-                    sceneLoader.LoadScene(nextScene);
-                }
-                else
-                {
-                    Photon.Pun.PhotonNetwork.LoadLevel(nextScene);
-                }
-            }
-#else
+            // 모든 클라이언트가 SceneLoader를 통해 페이드 연출과 함께 씬 전환
+            // SceneLoader는 내부적으로 Photon 체크를 하므로 마스터만 실제 LoadLevel 호출
             if (sceneLoader != null)
             {
                 sceneLoader.LoadScene(nextScene);
             }
             else
             {
+#if PHOTON_UNITY_NETWORKING
+                // SceneLoader가 없으면 마스터만 직접 씬 전환
+                if (Photon.Pun.PhotonNetwork.IsMasterClient)
+                {
+                    Photon.Pun.PhotonNetwork.LoadLevel(nextScene);
+                }
+#else
                 UnityEngine.SceneManagement.SceneManager.LoadScene(nextScene);
-            }
 #endif
+            }
         }
         
 

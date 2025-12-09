@@ -13,7 +13,6 @@ namespace Ilumisoft.SkillDrive.Network
     [RequireComponent(typeof(PhotonView))]
     public class VehicleNetworkController : MonoBehaviourPun, IPunObservable
     {
-        private VehicleSeatManager seatManager;
         private Rigidbody rb;
         
         // 네트워크 동기화용 변수
@@ -25,18 +24,11 @@ namespace Ilumisoft.SkillDrive.Network
         // 부드러운 동기화를 위한 추가 변수
         private float lerpSpeed = 20f; // 보간 속도 (20이 최적)
         private float positionThreshold = 5f; // 텔레포트 임계값 (2→5로 증가)
-        
-        // 버벅임 개선을 위한 추가 변수
-        private Vector3 lastReceivedPosition;
-        private Vector3 lastReceivedVelocity;
         private float receivedTime;
         
         private void Awake()
         {
-            seatManager = GetComponent<VehicleSeatManager>();
             rb = GetComponent<Rigidbody>();
-            
-            lastReceivedPosition = rb != null ? rb.position : Vector3.zero;
             
             if (rb != null)
             {
@@ -108,8 +100,6 @@ namespace Ilumisoft.SkillDrive.Network
                 
                 // 수신 시간 기록
                 receivedTime = Time.time;
-                lastReceivedPosition = networkPosition;
-                lastReceivedVelocity = networkVelocity;
             }
         }
     }

@@ -115,7 +115,7 @@ namespace Ilumisoft.SkillDrive.Game
             int selectedMapCount = mapCountDropdown.value + 1; // dropdown index 0 = 1 map
 
             // 각 맵마다 기본 제한시간 3분 설정
-            float timeLimit = 180f;
+            float timeLimit = 10f;
 
             Debug.Log($"[MapSelectionUI] Master selected {selectedMapCount} maps with {timeLimit}s time limit per map");
 

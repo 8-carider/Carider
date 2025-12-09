@@ -37,7 +37,12 @@ namespace Ilumisoft.SkillDrive
 #if PHOTON_UNITY_NETWORKING
             if (Photon.Pun.PhotonNetwork.IsConnected && Photon.Pun.PhotonNetwork.InRoom)
             {
-                Photon.Pun.PhotonNetwork.LoadLevel(name);
+                // 멀티플레이: 마스터만 실제 씬 전환 (클라이언트는 페이드 연출만 재생)
+                if (Photon.Pun.PhotonNetwork.IsMasterClient)
+                {
+                    Photon.Pun.PhotonNetwork.LoadLevel(name);
+                }
+                // 클라이언트는 마스터의 LoadLevel에 의해 자동으로 씬이 전환됨
             }
             else
             {

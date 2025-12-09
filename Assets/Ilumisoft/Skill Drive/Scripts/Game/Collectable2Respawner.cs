@@ -78,9 +78,7 @@ internal class Collectable2RespawnRunner : MonoBehaviour
                 }
             }
         }
-        else
-        {
-        }
+
 #else
         if (prefab != null)
         {
