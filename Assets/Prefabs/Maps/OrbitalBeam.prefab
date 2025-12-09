@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8288450156924283022
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6616283907621559253}
+  - component: {fileID: 1026844858761844843}
+  m_Layer: 0
+  m_Name: OrbitalBeam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6616283907621559253
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8288450156924283022}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: -90.00001, y: 0, z: 0}
+--- !u!114 &1026844858761844843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8288450156924283022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be519f55af4c45343a1f1208559ecd37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  listOfEffects:
+  - {fileID: 150941130920720651, guid: f4fe3015681665c41bb345e2ce749634, type: 3}
+  - {fileID: 5381570716127183593, guid: 0ebf7568bfcc5da4a928a592f199591a, type: 3}
+  - {fileID: 5377935830596832234, guid: f8b5e5551531bd541aa9af6a8181ad97, type: 3}
+  - {fileID: 6643931268488843683, guid: f512d511b14b0b440ad8367bb9a30ca7, type: 3}
+  - {fileID: 9039528559970624918, guid: f14de583596f39a4c83c5375cdd323c3, type: 3}
+  - {fileID: 7585125621595154307, guid: 821386e47d9794a42bcb2e3e23bdffba, type: 3}
+  - {fileID: 7352723259943148806, guid: 28442ce3cde607643b93733b195a3b89, type: 3}
+  loopTimeLength: 4.5

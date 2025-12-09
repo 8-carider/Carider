@@ -221,7 +221,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
@@ -829,11 +829,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: startOffset
-      value: 3.5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
@@ -1181,7 +1181,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
@@ -13440,11 +13440,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: startOffset
-      value: 3.5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
@@ -13700,7 +13700,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: loopTimeLength
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x

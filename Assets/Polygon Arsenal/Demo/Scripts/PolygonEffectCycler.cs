@@ -92,9 +92,9 @@ namespace PolygonArsenal
                     ActivateFireCenterCollider(effectRoot, false);
                     yield return new WaitForSeconds(startDelay);
 
-                    // 레이저 발사 시작 - Collider 활성화 (2~3.5초 구간만)
+                    // 레이저 발사 시작 - Collider 활성화 (2~2.7초 구간만)
                     ActivateFireCenterCollider(effectRoot, true);
-                    yield return new WaitForSeconds(1.5f); // 1.5초간만 위험
+                    yield return new WaitForSeconds(0.7f); // 0.7초간만 위험
 
                     // 레이저 발사 끝 - Collider 비활성화 (파티클은 계속 재생됨)
                     ActivateFireCenterCollider(effectRoot, false);
