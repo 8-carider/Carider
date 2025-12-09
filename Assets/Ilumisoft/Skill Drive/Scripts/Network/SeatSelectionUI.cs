@@ -21,14 +21,14 @@ namespace Ilumisoft.SkillDrive.Network
         [SerializeField] private Button vehicle2ThrottleButton;
         [SerializeField] private Button vehicle2SteeringButton;
         [SerializeField] private TextMeshProUGUI statusText;
-        [SerializeField] private Button startGameButton; // 마스터 전용 시작 버튼
+        [SerializeField] private Button startGameButton; // Master-only start button
 
         [Header("Settings")]
         [SerializeField] private bool showInLevelSelection = true;
 
     private int selectedVehicle = -1; // 0 or 1 (for temporary highlight)
     private bool selectedIsThrottle = true; // true = throttle, false = steering (for temporary highlight)
-        private bool isPanelLockedForSession = false; // 한 번 확정하면 레벨 클리어까지 재오픈 불가
+        private bool isPanelLockedForSession = false; // Once confirmed, cannot reopen until level clear
 
         private float refreshTimer = 0f;
         private readonly Color unoccupiedColor = new Color(0.3f,0.3f,0.3f);
@@ -50,9 +50,9 @@ namespace Ilumisoft.SkillDrive.Network
             }
 
             SetupButtons();
-            UpdateStatusText("Select your seat");
+            UpdateStatusText("Select your seat (Throttle or Steering)");
 
-            // Start 버튼 자동 바인딩(필드 미지정 시 이름으로 찾기)
+            // Auto-bind Start button (find by name if field not assigned)
             if (startGameButton == null)
             {
                 if (selectionPanel != null)
@@ -78,7 +78,7 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 startGameButton.onClick.AddListener(OnStartGameClicked);
                 startGameButton.gameObject.SetActive(PhotonNetwork.IsMasterClient);
-                startGameButton.interactable = false; // 좌석 다 찰 때까지 비활성
+                startGameButton.interactable = false; // Inactive until all seats filled
             }
         }
 
@@ -87,25 +87,25 @@ namespace Ilumisoft.SkillDrive.Network
             if (vehicle1ThrottleButton != null)
             {
                 vehicle1ThrottleButton.onClick.AddListener(() => OnSeatButtonClicked(0, true));
-                UpdateButtonText(vehicle1ThrottleButton, "Vehicle 1 : Forward Backward");
+                UpdateButtonText(vehicle1ThrottleButton, "V1 Throttle W/S");
             }
 
             if (vehicle1SteeringButton != null)
             {
                 vehicle1SteeringButton.onClick.AddListener(() => OnSeatButtonClicked(0, false));
-                UpdateButtonText(vehicle1SteeringButton, "Vehicle 1 : Left Right");
+                UpdateButtonText(vehicle1SteeringButton, "V1 Steer A/D");
             }
 
             if (vehicle2ThrottleButton != null)
             {
                 vehicle2ThrottleButton.onClick.AddListener(() => OnSeatButtonClicked(1, true));
-                UpdateButtonText(vehicle2ThrottleButton, "Vehicle 2 : Forward Backward");
+                UpdateButtonText(vehicle2ThrottleButton, "V2 Throttle W/S");
             }
 
             if (vehicle2SteeringButton != null)
             {
                 vehicle2SteeringButton.onClick.AddListener(() => OnSeatButtonClicked(1, false));
-                UpdateButtonText(vehicle2SteeringButton, "Vehicle 2 : Left Right");
+                UpdateButtonText(vehicle2SteeringButton, "V2 Steer A/D");
             }
 
             // Confirm 버튼은 제거됨
@@ -122,7 +122,7 @@ namespace Ilumisoft.SkillDrive.Network
             if (!PhotonNetwork.IsConnected || !PhotonNetwork.InRoom) return;
             int myActor = PhotonNetwork.LocalPlayer.ActorNumber;
 
-            // 현재 좌석 배정 상태 조회
+            // Check current seat assignment status
             int v1Throttle = -1, v1Steering = -1, v2Throttle = -1, v2Steering = -1;
             var managers = FindObjectsOfType<VehicleSeatManager>();
             foreach (var m in managers)
@@ -162,7 +162,7 @@ namespace Ilumisoft.SkillDrive.Network
             }
             if (!iOwnThisSeat && iOwnOtherVehicle)
             {
-                UpdateStatusText("Select seats in the same vehicle");
+                UpdateStatusText("ERROR: Cannot control both vehicles");
                 return;
             }
 
@@ -170,17 +170,17 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 // 내가 점유한 좌석이면 해제 요청
                 spawnerPV.RPC("RPC_ReleaseSeat", RpcTarget.MasterClient, myActor, vehicleIndex, isThrottle);
-                UpdateStatusText("Release request sent...");
+                UpdateStatusText("Releasing seat...");
             }
             else
             {
                 // 점유 요청
                 spawnerPV.RPC("RPC_RequestSeat", RpcTarget.MasterClient, myActor, vehicleIndex, isThrottle);
-                UpdateStatusText("Request sent...");
+                UpdateStatusText("Requesting seat...");
             }
         }
 
-        // 마스터가 게임 시작
+        // Master starts the game
         private void OnStartGameClicked()
         {
             Debug.Log("[SeatSelectionUI] Start button clicked!");
@@ -200,14 +200,14 @@ namespace Ilumisoft.SkillDrive.Network
                     var (t, s) = m.GetAssignedActors();
                     Debug.Log($"[SeatSelectionUI] {m.name}: Throttle={t}, Steering={s}");
                 }
-                UpdateStatusText("Not all seats filled");
+                UpdateStatusText("ERROR: Not all seats filled");
                 return;
             }
 
-            // 모든 클라이언트에서 카메라 연출 → 카운트다운 순서로 동작하도록 RPC 호출
+            // Call RPC to play camera sequence then countdown on all clients
             photonView.RPC("RPC_PlayCameraSequenceAndStartCountdown", RpcTarget.All);
 
-            // Start 버튼 즉시 숨김
+            // Hide Start button immediately
             if (startGameButton != null)
             {
                 startGameButton.gameObject.SetActive(false);
@@ -217,7 +217,7 @@ namespace Ilumisoft.SkillDrive.Network
         [PunRPC]
         private void RPC_PlayCameraSequenceAndStartCountdown()
         {
-            // 모든 차량의 카메라 연출 실행
+            // Play camera sequence on all vehicles
             var cameraSequences = FindObjectsByType<RaceCameraDistanceSequence>(FindObjectsSortMode.None);
             if (cameraSequences != null && cameraSequences.Length > 0)
             {
@@ -225,8 +225,8 @@ namespace Ilumisoft.SkillDrive.Network
                 {
                     seq.PlayCameraDistanceSequence();
                 }
-                UpdateStatusText("Camera sequence starting...");
-                // 연출이 끝난 후 카운트다운 시작 (2.5초 후)
+                UpdateStatusText("Camera sequence...");
+                // Start countdown after sequence ends (2.5s later)
                 Invoke(nameof(StartRaceCountdown), 2.5f);
             }
             else
@@ -234,14 +234,14 @@ namespace Ilumisoft.SkillDrive.Network
                 // 연출이 없으면 바로 카운트다운 시작
                 StartRaceCountdown();
             }
-            // 패널 숨김
+            // Hide selection panel
             if (selectionPanel != null)
                 selectionPanel.SetActive(false);
         }
 
         private void StartRaceCountdown()
         {
-            // 카운트다운 UI 실행
+            // Start race countdown UI
             var countdownUI = FindAnyObjectByType<RaceCountdownUI>();
             if (countdownUI != null)
             {
@@ -251,14 +251,14 @@ namespace Ilumisoft.SkillDrive.Network
             }
             else
             {
-                // 카운트다운 UI가 없으면 바로 다음 단계로
+                // No countdown UI, proceed immediately
                 OnCountdownFinished();
             }
         }
 
         private void OnCountdownFinished()
         {
-            // 기존 카운트다운 로직 실행 (타이머 시작 등)
+            // Start time limit countdown (begin race)
             float timeLimit = 120f;
             if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("TimeLimit"))
             {
@@ -269,7 +269,7 @@ namespace Ilumisoft.SkillDrive.Network
             }
             photonView.RPC("RPC_BeginCountdown", RpcTarget.AllBuffered, timeLimit);
 
-            // 차량 조작 활성화
+            // Enable vehicle controls
             var vehicles = FindObjectsByType<Ilumisoft.SkillDrive.Vehicle>(FindObjectsSortMode.None);
             foreach (var v in vehicles)
             {
@@ -283,9 +283,9 @@ namespace Ilumisoft.SkillDrive.Network
             var countdown = FindAnyObjectByType<Countdown>();
             if (countdown != null)
             {
-                // 기존 GameManager의 Countdown UI 재사용
+                // Use existing GameManager Countdown UI
                 countdown.SetTimeLimit(timeLimit);
-                // 중복 등록 방지 후 등록
+                // Prevent duplicate registration
                 countdown.OnTimeOut -= HandleCountdownTimeout;
                 countdown.OnTimeOut += HandleCountdownTimeout;
                 countdown.StartCountdown();
@@ -298,7 +298,7 @@ namespace Ilumisoft.SkillDrive.Network
 
         private void HandleCountdownTimeout()
         {
-            // 마스터만 다음 맵으로 진행
+            // Master moves to next map
             if (PhotonNetwork.IsMasterClient)
             {
                 if (GameSessionManager.Instance != null)
@@ -380,7 +380,7 @@ namespace Ilumisoft.SkillDrive.Network
 
         private void RefreshSeatOccupancyVisuals()
         {
-            // 현재 모든 VehicleSeatManager로부터 좌석 정보 수집
+            // Collect seat info from all VehicleSeatManagers
             var managers = FindObjectsOfType<VehicleSeatManager>();
             int v1Throttle = -1, v1Steering = -1, v2Throttle = -1, v2Steering = -1;
             foreach (var m in managers)
@@ -402,7 +402,7 @@ namespace Ilumisoft.SkillDrive.Network
             ApplySeatColor(vehicle2ThrottleButton, v2Throttle, true);
             ApplySeatColor(vehicle2SteeringButton, v2Steering, false);
 
-            // 시작 버튼 활성 조건
+            // Start button enabled condition
             if (startGameButton != null && PhotonNetwork.IsMasterClient)
             {
                 bool allSeatsReady = AllFourUniqueSeatsFilled();
@@ -410,11 +410,11 @@ namespace Ilumisoft.SkillDrive.Network
                 
                 if (allSeatsReady)
                 {
-                    UpdateStatusText("All seats ready\nMaster can start");
+                    UpdateStatusText("Ready to Start\nClick START button");
                 }
                 else
                 {
-                    // 몇 명이 배정되었는지 확인
+                    // Check how many players are assigned
                     System.Collections.Generic.HashSet<int> currentActors = new System.Collections.Generic.HashSet<int>();
                     foreach (var m in managers)
                     {
@@ -446,7 +446,7 @@ namespace Ilumisoft.SkillDrive.Network
             }
             else
             {
-                // 플레이어 리스트 순서 기반 인덱스 찾기
+                // Find player index from PlayerList order
                 var ordered = PhotonNetwork.PlayerList;
                 int idx = 0;
                 for (int i = 0; i < ordered.Length; i++)
@@ -459,7 +459,7 @@ namespace Ilumisoft.SkillDrive.Network
                     }
                 }
                 
-                // 로컬 플레이어인지 여부
+                // Check if local player
                 if (PhotonNetwork.LocalPlayer != null && PhotonNetwork.LocalPlayer.ActorNumber == actorNumber)
                 {
                     colors.normalColor = localHighlightColor;
@@ -472,7 +472,7 @@ namespace Ilumisoft.SkillDrive.Network
             
             btn.colors = colors;
             
-            // 버튼 텍스트에 플레이어 라벨 추가
+            // Add player label to button text
             UpdateButtonPlayerLabel(btn, playerLabel);
         }
         
@@ -482,23 +482,23 @@ namespace Ilumisoft.SkillDrive.Network
             var tmpText = btn.GetComponentInChildren<TextMeshProUGUI>();
             if (tmpText != null)
             {
-                // 항상 기본 형식으로 재구성 (중복 방지)
+                // Reconstruct with base format (prevent duplication)
                 string vehicleText = "";
                 string roleText = "";
                 
-                // 버튼 식별
-                if (btn == vehicle1ThrottleButton) { vehicleText = "Vehicle 1"; roleText = "F B"; }
-                else if (btn == vehicle1SteeringButton) { vehicleText = "Vehicle 1"; roleText = "L R"; }
-                else if (btn == vehicle2ThrottleButton) { vehicleText = "Vehicle 2"; roleText = "F B"; }
-                else if (btn == vehicle2SteeringButton) { vehicleText = "Vehicle 2"; roleText = "L R"; }
+                // Identify button
+                if (btn == vehicle1ThrottleButton) { vehicleText = "V1"; roleText = "Throttle W/S"; }
+                else if (btn == vehicle1SteeringButton) { vehicleText = "V1"; roleText = "Steer A/D"; }
+                else if (btn == vehicle2ThrottleButton) { vehicleText = "V2"; roleText = "Throttle W/S"; }
+                else if (btn == vehicle2SteeringButton) { vehicleText = "V2"; roleText = "Steer A/D"; }
                 
                 if (string.IsNullOrEmpty(playerLabel))
                 {
-                    tmpText.text = $"{vehicleText}\n{roleText}";
+                    tmpText.text = $"{vehicleText} {roleText}";
                 }
                 else
                 {
-                    tmpText.text = $"{vehicleText}\n{roleText} [{playerLabel}]";
+                    tmpText.text = $"{vehicleText} {roleText} [{playerLabel}]";
                 }
             }
         }
@@ -523,26 +523,26 @@ namespace Ilumisoft.SkillDrive.Network
                 }
             }
             
-            // 모든 좌석이 배정되어 있어야 함 (빈 좌석 없음)
+            // All seats must be assigned (no empty seats)
             if (v1Throttle == -1 || v1Steering == -1 || v2Throttle == -1 || v2Steering == -1)
             {
                 return false;
             }
             
-            // 각 차량별로 누가 배정되었는지 확인
+            // Check for player overlap across vehicles
             System.Collections.Generic.HashSet<int> vehicle1Actors = new System.Collections.Generic.HashSet<int> { v1Throttle, v1Steering };
             System.Collections.Generic.HashSet<int> vehicle2Actors = new System.Collections.Generic.HashSet<int> { v2Throttle, v2Steering };
             
-            // 차량 1과 차량 2의 플레이어가 겹치면 안 됨 (한 사람이 두 차량 동시 제어 불가)
+            // Players cannot control both vehicles simultaneously
             foreach (int actor in vehicle1Actors)
             {
                 if (vehicle2Actors.Contains(actor))
                 {
-                    return false; // 같은 사람이 두 차량에 배정됨
+                    return false; // Same player assigned to both vehicles
                 }
             }
             
-            // 2, 3, 4명 어떤 조합이든 허용 (이미 위에서 교차 제어 금지 검증됨)
+            // Allow any combination with 2, 3, or 4 unique players
             return true;
         }
 
@@ -554,7 +554,7 @@ namespace Ilumisoft.SkillDrive.Network
 
         public void OnSeatRequestResult(bool success, string message)
         {
-            // 패널은 숨기지 않고 계속 토글 가능
+            // Panel continues to be toggleable, not hidden
             UpdateStatusText(message);
         }
 
@@ -571,7 +571,7 @@ namespace Ilumisoft.SkillDrive.Network
         }
 
         /// <summary>
-        /// 외부에서 UI 강제 업데이트 (리스폰 후 등)
+        /// Force UI update from external caller (e.g., after respawn)
         /// </summary>
         public void ForceRefreshUI()
         {
@@ -584,7 +584,7 @@ namespace Ilumisoft.SkillDrive.Network
         public override void OnLeftRoom()
         {
             selectedVehicle = -1;
-            isPanelLockedForSession = false; // 방을 나가면 잠금 해제
+            isPanelLockedForSession = false; // Unlock when leaving room
         }
     }
 }

@@ -78,8 +78,30 @@ namespace Ilumisoft.SkillDrive.Game
 
             OnCollect?.Invoke();
 
-            // 🔥 여기! 30초 뒤 재생성 요청
-            GetComponent<Collectable2Respawner>()?.TriggerRespawn();
+            // 🔥 리스폰: 마스터만 스케줄, 나머지는 마스터에 요청
+            var respawner = GetComponent<Collectable2Respawner>();
+#if PHOTON_UNITY_NETWORKING
+            if (PhotonNetwork.InRoom)
+            {
+                PhotonView pv = PhotonView.Get(this);
+
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    respawner?.TriggerRespawn();
+                }
+                else
+                {
+                    // 마스터에게 리스폰 요청
+                    pv?.RPC("RPC_RequestRespawnMaster", RpcTarget.MasterClient);
+                }
+            }
+            else
+            {
+                respawner?.TriggerRespawn();
+            }
+#else
+            respawner?.TriggerRespawn();
+#endif
 
             // === 파괴 처리 ===
 #if PHOTON_UNITY_NETWORKING
@@ -119,6 +141,15 @@ namespace Ilumisoft.SkillDrive.Game
             if (PhotonNetwork.IsMasterClient)
             {
                 PhotonNetwork.Destroy(gameObject);
+            }
+        }
+
+        [PunRPC]
+        private void RPC_RequestRespawnMaster()
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                GetComponent<Collectable2Respawner>()?.TriggerRespawn();
             }
         }
 #endif

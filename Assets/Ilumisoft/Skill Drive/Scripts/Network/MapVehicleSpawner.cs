@@ -94,7 +94,7 @@ namespace Ilumisoft.SkillDrive.Network
                 {
                     if ((isThrottle && r.throttle) || (!isThrottle && r.steering))
                     {
-                        SendSeatRequestResult(actorNumber, false, "이미 다른 플레이어가 선택한 좌석입니다.");
+                        SendSeatRequestResult(actorNumber, false, "Seat already taken by another player.");
                         return;
                     }
                 }
@@ -103,7 +103,7 @@ namespace Ilumisoft.SkillDrive.Network
             // 동일 플레이어의 다른 차량 배정 여부 검사
             if (playerSeats.TryGetValue(actorNumber, out var rec) && rec.vehicle != vehicleIndex)
             {
-                SendSeatRequestResult(actorNumber, false, "이미 다른 차량을 선택했습니다. 같은 차량의 좌석만 가능합니다.");
+                SendSeatRequestResult(actorNumber, false, "You already chose the other vehicle. Use seats in one vehicle only.");
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace Ilumisoft.SkillDrive.Network
             rec.vehicle = vehicleIndex;
             playerSeats[actorNumber] = rec;
 
-            SendSeatRequestResult(actorNumber, true, "좌석 배정 성공");
+            SendSeatRequestResult(actorNumber, true, "Seat assigned.");
             BroadcastSeats();
         }
 
@@ -244,7 +244,7 @@ namespace Ilumisoft.SkillDrive.Network
 
                 BroadcastSeats();
                 // 결과 콜백 (성공 메시지)
-                SendSeatRequestResult(actorNumber, true, "좌석 해제 완료");
+                SendSeatRequestResult(actorNumber, true, "Seat released.");
             }
         }
     }
