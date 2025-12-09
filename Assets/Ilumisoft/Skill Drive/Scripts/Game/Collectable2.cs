@@ -61,7 +61,7 @@ namespace Ilumisoft.SkillDrive.Game
             if (particlesPrefab != null)
             {
                 if (PhotonNetwork.InRoom)
-                    PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
+                    PhotonNetwork.Instantiate("Collect Particles 2", transform.position, transform.rotation);
                 else
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
             }
