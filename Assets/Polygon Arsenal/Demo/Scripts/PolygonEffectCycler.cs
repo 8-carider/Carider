@@ -19,7 +19,13 @@ namespace PolygonArsenal
         [Tooltip("레이저 시작 지연 시간 (Row/Col 타이밍 엇갈리게)")]
         float startOffset = 0f;
 
+        [Header("FireCenter 발사 효과음")]
+        [SerializeField]
+        [Tooltip("FireCenter 발사 시 재생될 효과음")]
+        AudioClip fireCenterSound = null;
+
         double timeOfLastInstantiate;
+        AudioSource audioSource;
 
         GameObject instantiatedEffect;
         Coroutine activeColliderRoutine; // 현재 실행 중인 코루틴 추적
@@ -33,6 +39,16 @@ namespace PolygonArsenal
         {
             // 멀티플레이 시 Photon 시간 사용
             usePhotonTime = PhotonNetwork.IsConnected;
+
+            // AudioSource 컴포넌트 가져오기 또는 생성
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null && fireCenterSound != null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+                audioSource.playOnAwake = false;
+                audioSource.spatialBlend = 0.5f; // 반반 블렌드 (적당한 거리감)
+                audioSource.volume = 1.0f;
+            }
 
             // 초기 지연 설정 (startOffset만큼 시간을 뒤로 당김)
             timeOfLastInstantiate = GetCurrentTime() - loopTimeLength + startOffset;
@@ -94,6 +110,13 @@ namespace PolygonArsenal
 
                     // 레이저 발사 시작 - Collider 활성화 (2~2.7초 구간만)
                     ActivateFireCenterCollider(effectRoot, true);
+
+                    // FireCenter 발사 효과음 재생
+                    if (audioSource != null && fireCenterSound != null)
+                    {
+                        audioSource.PlayOneShot(fireCenterSound);
+                    }
+
                     yield return new WaitForSeconds(0.7f); // 0.7초간만 위험
 
                     // 레이저 발사 끝 - Collider 비활성화 (파티클은 계속 재생됨)

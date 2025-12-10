@@ -223,6 +223,10 @@ PrefabInstance:
       propertyPath: loopTimeLength
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: fireCenterSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 6a1bd54db023944a0a9532cb6eb6b33b, type: 3}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -835,6 +839,10 @@ PrefabInstance:
       propertyPath: loopTimeLength
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: fireCenterSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 6a1bd54db023944a0a9532cb6eb6b33b, type: 3}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -1183,6 +1191,10 @@ PrefabInstance:
       propertyPath: loopTimeLength
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: fireCenterSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 6a1bd54db023944a0a9532cb6eb6b33b, type: 3}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -13446,6 +13458,10 @@ PrefabInstance:
       propertyPath: loopTimeLength
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: fireCenterSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 6a1bd54db023944a0a9532cb6eb6b33b, type: 3}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -13702,6 +13718,10 @@ PrefabInstance:
       propertyPath: loopTimeLength
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1026844858761844843, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
+      propertyPath: fireCenterSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 6a1bd54db023944a0a9532cb6eb6b33b, type: 3}
     - target: {fileID: 6616283907621559253, guid: fc8d8b8578f774161b102250f52dacd4, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -15339,6 +15359,10 @@ PrefabInstance:
       propertyPath: sceneLoader
       value: 
       objectReference: {fileID: 1176777298}
+    - target: {fileID: 7432688315893285729, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: sceneViewId
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 2084082222633729963, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
