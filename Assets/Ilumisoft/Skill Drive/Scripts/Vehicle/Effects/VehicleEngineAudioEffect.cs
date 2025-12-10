@@ -12,6 +12,7 @@ namespace Ilumisoft.SkillDrive.Effects
     {
         GameManager gameManager;
         Network.VehicleSeatManager seatManager;
+        bool isDialogueActive = false; // Dialogue 활성 상태
 
         [SerializeField]
         float minPitch = 0.25f;
@@ -66,16 +67,49 @@ namespace Ilumisoft.SkillDrive.Effects
         {
             if (Vehicle != null && audioSource != null)
             {
-                if (IsLocallyControlled())
+                // Time.timeScale이 0이면 Dialogue 중 (일시정지)
+                CheckDialogueState();
+
+                // Dialogue 중이거나 자리 선택 중에는 엔진 소리 끄기
+                if (isDialogueActive || !IsLocallyControlled() || !HasPlayerAssigned())
+                {
+                    audioSource.mute = true;
+                }
+                else
                 {
                     audioSource.mute = false;
                     audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, Vehicle.NormalizedForwardSpeed * multiplier);
                 }
-                else
-                {
-                    audioSource.mute = true;
-                }
             }
+        }
+
+        private void CheckDialogueState()
+        {
+            // Time.timeScale이 0이면 Dialogue 활성 (게임 일시정지)
+            isDialogueActive = Time.timeScale == 0f;
+        }
+
+        private bool HasPlayerAssigned()
+        {
+#if PHOTON_UNITY_NETWORKING
+            // Photon에 연결되어 있지 않으면 항상 true (싱글플레이)
+            if (!Photon.Pun.PhotonNetwork.IsConnected)
+            {
+                return true;
+            }
+
+            // 좌석에 플레이어가 배정되었는지 확인
+            if (seatManager != null)
+            {
+                var (t, s) = seatManager.GetAssignedActors();
+                // 스로틀이나 조향 중 하나라도 배정되어 있으면 true
+                return t != -1 || s != -1;
+            }
+
+            return true;
+#else
+            return true;
+#endif
         }
 
         private bool IsLocallyControlled()

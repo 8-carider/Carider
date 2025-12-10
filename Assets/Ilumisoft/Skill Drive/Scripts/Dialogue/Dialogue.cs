@@ -30,6 +30,8 @@ namespace Ilumisoft.SkillDrive.DialogueSystem
 
         bool isComplete = false;
 
+        private AudioSource[] allAudioSources;
+
         void OnEnable()
         {
             ContinueAction.Enable();
@@ -63,6 +65,16 @@ namespace Ilumisoft.SkillDrive.DialogueSystem
             if (FreezeTime)
             {
                 Time.timeScale = 0.0f;
+            }
+
+            // Dialogue 중 모든 AudioSource 일시정지
+            allAudioSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+            foreach (var audioSource in allAudioSources)
+            {
+                if (audioSource != null && audioSource.isPlaying)
+                {
+                    audioSource.Pause();
+                }
             }
 
             yield return new WaitForSecondsRealtime(.5f);
@@ -135,6 +147,18 @@ namespace Ilumisoft.SkillDrive.DialogueSystem
                 if (FreezeTime)
                 {
                     Time.timeScale = 1.0f;
+                }
+
+                // Dialogue 종료 시 일시정지된 AudioSource 재생
+                if (allAudioSources != null)
+                {
+                    foreach (var audioSource in allAudioSources)
+                    {
+                        if (audioSource != null)
+                        {
+                            audioSource.UnPause();
+                        }
+                    }
                 }
 
                 OnComplete?.Invoke();
