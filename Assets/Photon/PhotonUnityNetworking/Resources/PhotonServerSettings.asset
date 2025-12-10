@@ -71,6 +71,7 @@ MonoBehaviour:
   - RPC_OpenDoors
   - RPC_RequestRespawnMaster
   - RPC_OnCollectable2PickedUp
+  - RPC_ReceivePlayerInput
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

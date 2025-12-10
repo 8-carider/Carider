@@ -81,8 +81,7 @@ namespace Ilumisoft.SkillDrive.Network
                     if (m != null && m.photonView != null)
                     {
                         // VehicleSeatManager는 차량 GameObject에 붙어 있으므로 photonView가 차량의 PhotonView를 가리킴
-                        m.photonView.RPC("RPC_SetSteering", RpcTarget.All, horizontal, myActor);
-                        m.photonView.RPC("RPC_SetThrottle", RpcTarget.All, vertical, myActor);
+                        m.photonView.RPC("RPC_ReceivePlayerInput", RpcTarget.All, horizontal, vertical, myActor);
                     }
                 }
 

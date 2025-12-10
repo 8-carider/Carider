@@ -14,12 +14,19 @@ namespace Ilumisoft.SkillDrive.Game
         public FlagSpawner flagSpawner;
         public AutoCameraAdjust cameraAdjuster;
 
+        [Header("Audio")]
+        [SerializeField] private AudioSource fireworksAudioSource;
+        [SerializeField] private AudioClip fireworksSfx;
+        [SerializeField] private float fireworksVolume = 1.0f;
+
         // 불꽃놀이
         public GameObject[] fireworksPrefabs;
 
         //  랭킹을 로컬에 복사해 두어서,
         //  중간에 누가 방을 나가도 결과는 그대로 유지
         private List<PlayerRankData> cachedRanking;
+
+        private bool fireworksSoundPlayed = false; // 폭죽 사운드 재생 여부
 
         private bool canReturnToMenu = false;
 
@@ -161,6 +168,7 @@ namespace Ilumisoft.SkillDrive.Game
         private IEnumerator SpawnFireworksLoop()
         {
             Camera cam = Camera.main;
+            fireworksSoundPlayed = false;
 
             while (true)
             {
@@ -177,6 +185,13 @@ namespace Ilumisoft.SkillDrive.Game
 
                     GameObject prefab = fireworksPrefabs[Random.Range(0, fireworksPrefabs.Length)];
                     Instantiate(prefab, spawnPos, Quaternion.identity);
+
+                    // 폭죽 사운드 재생 (처음 한 번만)
+                    if (!fireworksSoundPlayed && fireworksAudioSource != null && fireworksSfx != null)
+                    {
+                        fireworksAudioSource.PlayOneShot(fireworksSfx, fireworksVolume);
+                        fireworksSoundPlayed = true;
+                    }
                 }
 
                 yield return new WaitForSeconds(0.1f); // 반복 속도
@@ -205,6 +220,8 @@ namespace Ilumisoft.SkillDrive.Game
             //방을 나가자마자 같은 방에 재입장되어 씬이 강제로 동기화되는 것 방지
             PhotonNetwork.AutomaticallySyncScene = false;
 #endif
+            // 다음 게임을 위해 플레이어 수집 통계 초기화
+            PlayerCollectableStats.Instance.ResetAllStats();
             SceneManager.LoadScene("Menu");
         }
 

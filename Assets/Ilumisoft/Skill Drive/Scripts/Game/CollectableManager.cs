@@ -83,7 +83,6 @@ namespace Ilumisoft.SkillDrive.Game
             {
                 RegisterCollectable2(collectable);
             }
-            Debug.Log($"[CollectableManager] Registered {collectable2SpawnPoints.Count} Collectable2 items");
 
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.IsMasterClient)
@@ -110,7 +109,6 @@ namespace Ilumisoft.SkillDrive.Game
                 rotation = collectable.transform.rotation,
                 prefab = Resources.Load<GameObject>("Collectable2")
             };
-            Debug.Log($"[CollectableManager] Registered Collectable2: {key} at {collectable.transform.position}");
         }
 
         /// <summary>
@@ -119,7 +117,6 @@ namespace Ilumisoft.SkillDrive.Game
         public void OnCollectable2PickedUp(Collectable2 collectable)
         {
             string key = collectable.gameObject.GetInstanceID().ToString();
-            Debug.Log($"[CollectableManager] Collectable2 picked up: {key}");
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -149,11 +146,7 @@ namespace Ilumisoft.SkillDrive.Game
             }
 
             var spawnPoint = collectable2SpawnPoints[key];
-            Debug.Log($"[CollectableManager] Waiting {respawnDelay}s before respawning Collectable2 at {spawnPoint.position}");
-            
             yield return new WaitForSeconds(respawnDelay);
-
-            Debug.Log($"[CollectableManager] Respawning Collectable2 at {spawnPoint.position}");
 
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
@@ -161,7 +154,6 @@ namespace Ilumisoft.SkillDrive.Game
                 try
                 {
                     PhotonNetwork.Instantiate("Collectable2", spawnPoint.position, spawnPoint.rotation);
-                    Debug.Log($"[CollectableManager] Successfully instantiated Collectable2");
                 }
                 catch (System.Exception ex)
                 {

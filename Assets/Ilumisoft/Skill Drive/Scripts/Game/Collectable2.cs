@@ -55,19 +55,12 @@ namespace Ilumisoft.SkillDrive.Game
             if (!other.CompareTag("Player"))
                 return;
 
-            // 파티클 생성
-#if PHOTON_UNITY_NETWORKING
+            // 파티클 생성 (컬러 분리: Collectable2는 지정된 프리팹 사용)
             if (particlesPrefab != null)
             {
-                if (PhotonNetwork.InRoom)
-                    PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
-                else
-                    Instantiate(particlesPrefab, transform.position, transform.rotation);
-            }
-#else
-            if (particlesPrefab != null)
+                // 파티클은 네트워크 동기화가 필요 없으므로 로컬 생성만 수행
                 Instantiate(particlesPrefab, transform.position, transform.rotation);
-#endif
+            }
 
             // 점수 +5
             var vehicleCollectables = other.GetComponent<VehicleCollectables>();
@@ -79,7 +72,6 @@ namespace Ilumisoft.SkillDrive.Game
             OnCollect?.Invoke();
 
             // 🔥 리스폰: CollectableManager 중앙 관리로 통합
-            Debug.Log($"[Collectable2] OnTriggerEnter: InRoom={PhotonNetwork.InRoom}, IsMaster={PhotonNetwork.IsMasterClient}");
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
@@ -87,16 +79,13 @@ namespace Ilumisoft.SkillDrive.Game
             }
             else
             {
-                Debug.Log("[Collectable2] Offline mode: calling CollectableManager");
                 CollectableManager.Instance?.OnCollectable2PickedUp(this);
             }
 #else
-            Debug.Log("[Collectable2] No Photon: calling CollectableManager");
             CollectableManager.Instance?.OnCollectable2PickedUp(this);
 #endif
 
             // === 파괴 처리 ===
-            Debug.Log("[Collectable2] Starting destroy sequence");
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
@@ -104,30 +93,25 @@ namespace Ilumisoft.SkillDrive.Game
 
                 if (pv != null && !pv.IsMine)
                 {
-                    Debug.Log("[Collectable2] Not owner, requesting ownership");
                     pv.RequestOwnership();
                     return;
                 }
 
                 if (!PhotonNetwork.IsMasterClient)
                 {
-                    Debug.Log("[Collectable2] Non-master requesting destroy via RPC");
                     if (pv != null)
                         pv.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
                 }
                 else
                 {
-                    Debug.Log("[Collectable2] Master destroying gameobject");
                     PhotonNetwork.Destroy(gameObject);
                 }
             }
             else
             {
-                Debug.Log("[Collectable2] Offline mode: destroying gameobject");
                 Destroy(gameObject);
             }
 #else
-            Debug.Log("[Collectable2] No Photon: destroying gameobject");
             Destroy(gameObject);
 #endif
         }

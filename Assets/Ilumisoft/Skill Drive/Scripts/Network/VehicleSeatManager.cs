@@ -15,8 +15,6 @@ namespace Ilumisoft.SkillDrive.Network
         [SerializeField] private int throttleSeatActorNumber = -1;
         [SerializeField] private int steeringSeatActorNumber = -1;
         
-        public enum SeatType { Throttle = 0, Steering = 1, Both = 2 }
-
         private float throttleInput = 0f;  // Y축 (앞/뒤)
         private float steeringInput = 0f;  // X축 (좌/우)
         
@@ -90,7 +88,6 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 throttleInput = Mathf.Clamp(y, -1f, 1f);
                 throttlePlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
-                Debug.Log($"[VehicleSeatManager] Throttle input from actor {actor}: {throttleInput:F2}");
             }
             
             // Steering 담당 플레이어의 X축 입력
@@ -98,14 +95,12 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 steeringInput = Mathf.Clamp(x, -1f, 1f);
                 steeringPlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
-                Debug.Log($"[VehicleSeatManager] Steering input from actor {actor}: {steeringInput:F2}");
             }
         }
 
         [PunRPC]
-        private void RPC_SendInput(float x, float y, int actor)
+        private void RPC_ReceivePlayerInput(float x, float y, int actor)
         {
-            // VehiclePlayerInput에서 호출 - 입력을 처리
             ReceivePlayerInput(x, y, actor);
         }
 
@@ -114,8 +109,6 @@ namespace Ilumisoft.SkillDrive.Network
         {
             throttleSeatActorNumber = throttleActor;
             steeringSeatActorNumber = steeringActor;
-            
-            Debug.Log($"[VehicleSeatManager] Seats assigned on {gameObject.name} -> Throttle:{throttleActor} Steering:{steeringActor}");
 
             // 로컬 카메라 활성/비활성
             var cam = GetComponent<VehicleCameraManager>();
@@ -123,18 +116,6 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 int localActor = PhotonNetwork.LocalPlayer.ActorNumber;
                 bool active = IsPlayerAssigned(localActor);
-                
-                if (active)
-                {
-                    string seatRole = "";
-                    if (throttleSeatActorNumber == localActor && steeringSeatActorNumber == localActor)
-                        seatRole = "조향+가속";
-                    else if (throttleSeatActorNumber == localActor)
-                        seatRole = "가속";
-                    else if (steeringSeatActorNumber == localActor)
-                        seatRole = "조향";
-                    Debug.Log($"[플레이어 배정] {gameObject.name} ({seatRole})");
-                }
                 
                 cam.SetCameraActive(active, localActor);
                 if (cam.transform.TryGetComponent<Unity.Cinemachine.CinemachineCamera>(out var vcam))
@@ -159,55 +140,6 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 gameObject.name = runtimeName;
             }
-        }
-
-        /// <summary>
-        /// Client calls this on the desired vehicle's PhotonView to request a seat.
-        /// Master processes the request, unassigns the requester from other vehicles, and broadcasts new seats.
-        /// </summary>
-        [PunRPC]
-        public void RPC_RequestSeat(int seatType, int requestingActor)
-        {
-            if (!PhotonNetwork.IsMasterClient)
-            {
-                // Only master updates assignments; non-master ignores
-                return;
-            }
-
-            // Remove requester from any other vehicle seats
-            var allManagers = FindObjectsOfType<VehicleSeatManager>();
-            foreach (var mgr in allManagers)
-            {
-                if (mgr == null) continue;
-                var (t, s) = mgr.GetAssignedActors();
-                bool changed = false;
-                if (t == requestingActor) { t = -1; changed = true; }
-                if (s == requestingActor) { s = -1; changed = true; }
-                if (changed)
-                {
-                    mgr.photonView.RPC("RPC_SetSeats", RpcTarget.AllBuffered, t, s);
-                }
-            }
-
-            // Apply request on THIS vehicle
-            int newThrottle = throttleSeatActorNumber;
-            int newSteering = steeringSeatActorNumber;
-
-            switch ((SeatType)seatType)
-            {
-                case SeatType.Throttle:
-                    newThrottle = requestingActor;
-                    break;
-                case SeatType.Steering:
-                    newSteering = requestingActor;
-                    break;
-                case SeatType.Both:
-                    newThrottle = requestingActor;
-                    newSteering = requestingActor;
-                    break;
-            }
-
-            photonView.RPC("RPC_SetSeats", RpcTarget.AllBuffered, newThrottle, newSteering);
         }
 
     }

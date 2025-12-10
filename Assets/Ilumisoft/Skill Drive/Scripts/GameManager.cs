@@ -10,6 +10,7 @@ namespace Ilumisoft.SkillDrive.Game
         [Header("Result UI Panels")]
         [SerializeField] private GameObject showWinUI;
         [SerializeField] private GameObject showLoseUI;
+        [SerializeField] private GameObject showDrawUI;
         [SerializeField] private float resultPanelDuration = 4f;
 
         [Header("Scene Management")]
@@ -60,6 +61,23 @@ namespace Ilumisoft.SkillDrive.Game
 
             collectableManager = GetComponent<CollectableManager>();
             audioSource = GetComponent<AudioSource>();
+
+            // Fallback: auto-find result panels if not assigned in inspector
+            if (showWinUI == null)
+            {
+                var win = GameObject.Find("WinPanel") ?? GameObject.Find("WinUI");
+                if (win != null) showWinUI = win;
+            }
+            if (showLoseUI == null)
+            {
+                var lose = GameObject.Find("LosePanel") ?? GameObject.Find("LoseUI");
+                if (lose != null) showLoseUI = lose;
+            }
+            if (showDrawUI == null)
+            {
+                var draw = GameObject.Find("DrawPanel") ?? GameObject.Find("DrawUI");
+                if (draw != null) showDrawUI = draw;
+            }
 
             // 콜렉터블을 모두 먹어도 결과 패널을 띄우지 않음
             collectableManager.OnAllCollected += OnAllCollected;
@@ -117,7 +135,6 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         private void OnTimeOut()
         {
-
             JudgeAndShowResult();
         }
 
@@ -157,6 +174,8 @@ namespace Ilumisoft.SkillDrive.Game
             // 4. 결과 패널 표시
             if (showWinUI != null) showWinUI.SetActive(false);
             if (showLoseUI != null) showLoseUI.SetActive(false);
+            if (showDrawUI != null) showDrawUI.SetActive(false);
+            
             if (result == "win" && showWinUI != null) {
                 Debug.Log("Win 패널 활성화");
                 showWinUI.SetActive(true);
@@ -165,19 +184,45 @@ namespace Ilumisoft.SkillDrive.Game
                 Debug.Log("Lose 패널 활성화");
                 showLoseUI.SetActive(true);
             }
-            // draw일 때는 둘 다 안 띄움(원하면 별도 패널 추가 가능)
-
-            // 결과 패널이 뜰 때 차량 이동 제한
-            var vehicle = player != null ? player.GetComponent<Vehicle>() : null;
-            if (vehicle != null)
-            {
-                vehicle.CanMove = false;
-                vehicle.Rigidbody.linearDamping = 2.0f;
+            else if (result == "draw" && showDrawUI != null) {
+                Debug.Log("Draw 패널 활성화");
+                showDrawUI.SetActive(true);
             }
+
+            // 로컬 플레이어 결과에 따른 SFX 출력 (승/패만)
+            if (audioSource != null)
+            {
+                if (result == "win" && successSFX != null)
+                {
+                    audioSource.PlayOneShot(successSFX);
+                }
+                else if (result == "lose" && failSFX != null)
+                {
+                    audioSource.PlayOneShot(failSFX);
+                }
+            }
+
+            StopAllVehicles();
 
             // 5. 4초 후 자동 씬 전환
             Debug.Log("씬 전환 코루틴 시작, 딜레이: " + resultPanelDuration);
             StartCoroutine(GoToNextSceneAfterDelay(resultPanelDuration));
+        }
+
+        /// <summary>
+        /// 모든 차량 정지 (타임아웃/결과 표시 시 호출)
+        /// </summary>
+        private void StopAllVehicles()
+        {
+            var vehicles = FindObjectsOfType<Vehicle>();
+            foreach (var v in vehicles)
+            {
+                v.CanMove = false;
+                if (v.Rigidbody != null)
+                {
+                    v.Rigidbody.linearDamping = 2.0f;
+                }
+            }
         }
 
         /// <summary>
@@ -225,28 +270,24 @@ namespace Ilumisoft.SkillDrive.Game
             }
             string nextScene = isLastMap ? "ResultScene" : "Level Selection";
 
-#if PHOTON_UNITY_NETWORKING
-            if (Photon.Pun.PhotonNetwork.IsMasterClient)
-            {
-                if (sceneLoader != null)
-                {
-                    sceneLoader.LoadScene(nextScene);
-                }
-                else
-                {
-                    Photon.Pun.PhotonNetwork.LoadLevel(nextScene);
-                }
-            }
-#else
+            // 모든 클라이언트가 SceneLoader를 통해 페이드 연출과 함께 씬 전환
+            // SceneLoader는 내부적으로 Photon 체크를 하므로 마스터만 실제 LoadLevel 호출
             if (sceneLoader != null)
             {
                 sceneLoader.LoadScene(nextScene);
             }
             else
             {
+#if PHOTON_UNITY_NETWORKING
+                // SceneLoader가 없으면 마스터만 직접 씬 전환
+                if (Photon.Pun.PhotonNetwork.IsMasterClient)
+                {
+                    Photon.Pun.PhotonNetwork.LoadLevel(nextScene);
+                }
+#else
                 UnityEngine.SceneManagement.SceneManager.LoadScene(nextScene);
-            }
 #endif
+            }
         }
         
 

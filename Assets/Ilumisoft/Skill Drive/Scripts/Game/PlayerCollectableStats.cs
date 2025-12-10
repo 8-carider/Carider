@@ -52,7 +52,6 @@ namespace Ilumisoft.SkillDrive.Game
             }
 
             playerCollectedCounts[actorNumber] += amount;
-            Debug.Log($"[PlayerStats] Player {actorNumber} collected +{amount}, total: {playerCollectedCounts[actorNumber]}");
         }
 
         /// <summary>
@@ -85,7 +84,6 @@ namespace Ilumisoft.SkillDrive.Game
         public void ResetAllStats()
         {
             playerCollectedCounts.Clear();
-            Debug.Log("[PlayerStats] All player stats reset");
         }
     }
 }

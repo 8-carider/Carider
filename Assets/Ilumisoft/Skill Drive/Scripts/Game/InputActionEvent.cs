@@ -34,7 +34,7 @@ namespace Ilumisoft.SkillDrive.Game
 
         IEnumerator InvokeNextFrame(UnityAction action)
         {
-            yield return new WaitForSeconds(1);
+            yield return null;
 
             action?.Invoke();
         }

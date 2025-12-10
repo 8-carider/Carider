@@ -14,20 +14,16 @@ namespace Ilumisoft.SkillDrive.Network
             // Photon 서버에 연결
             PhotonNetwork.GameVersion = gameVersion;
             PhotonNetwork.ConnectUsingSettings();
-            
-            Debug.Log("Photon 서버에 연결 중...");
         }
 
         public override void OnConnectedToMaster()
         {
-            Debug.Log("Photon 서버에 연결됨!");
             // 로비에 참가
             PhotonNetwork.JoinLobby();
         }
 
         public override void OnJoinedLobby()
         {
-            Debug.Log("로비에 참가함!");
         }
 
         public override void OnDisconnected(DisconnectCause cause)
@@ -38,8 +34,6 @@ namespace Ilumisoft.SkillDrive.Network
         // 랜덤 룸에 참가 (없으면 생성)
         public void JoinOrCreateRoom()
         {
-            Debug.Log("[NetworkManager] JoinOrCreateRoom 호출됨");
-            
             if (!PhotonNetwork.IsConnected)
             {
                 Debug.LogError("[NetworkManager] Photon에 연결되지 않았습니다!");
@@ -52,13 +46,11 @@ namespace Ilumisoft.SkillDrive.Network
                 return;
             }
 
-            Debug.Log("[NetworkManager] 랜덤 룸 참가 시도...");
             PhotonNetwork.JoinRandomRoom();
         }
 
         public override void OnJoinRandomFailed(short returnCode, string message)
         {
-            Debug.Log("랜덤 룸 참가 실패, 새 룸 생성 중...");
             
             RoomOptions roomOptions = new RoomOptions
             {
@@ -72,8 +64,6 @@ namespace Ilumisoft.SkillDrive.Network
 
         public override void OnJoinedRoom()
         {
-            Debug.Log($"룸에 참가함! 플레이어 수: {PhotonNetwork.CurrentRoom.PlayerCount}");
-
             // 모든 클라이언트를 Level Selection 씬으로 동기화 이동
             // PhotonNetwork.AutomaticallySyncScene 가 TRUE인지 확인 필요 (Project Settings or 코드에서 설정)
             if (!PhotonNetwork.AutomaticallySyncScene)
@@ -87,25 +77,21 @@ namespace Ilumisoft.SkillDrive.Network
                 GameObject inputObj = new GameObject("PlayerSeatInput");
                 inputObj.AddComponent<PlayerSeatInput>();
                 DontDestroyOnLoad(inputObj);
-                Debug.Log("[NetworkManager] PlayerSeatInput created for local player");
             }
 
             // 마스터 클라이언트만 씬 로드 호출 (자동 동기화됨)
             if (PhotonNetwork.IsMasterClient)
             {
-                Debug.Log("마스터 클라이언트 - Level Selection 씬 로드");
                 PhotonNetwork.LoadLevel("Level Selection");
             }
         }
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
-            Debug.Log($"새 플레이어 참가: {newPlayer.NickName}");
         }
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
-            Debug.Log($"플레이어 퇴장: {otherPlayer.NickName}");
         }
     }
 }

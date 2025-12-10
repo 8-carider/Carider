@@ -141,6 +141,17 @@ namespace Ilumisoft.SkillDrive.Game
             {
                 timerText.color = Color.red;
             }
+
+            // 시간 종료 시 모든 차량 정지 (클라이언트 포함)
+            var vehicles = FindObjectsOfType<Ilumisoft.SkillDrive.Vehicle>();
+            foreach (var v in vehicles)
+            {
+                v.CanMove = false;
+                if (v.Rigidbody != null)
+                {
+                    v.Rigidbody.linearDamping = 2.0f;
+                }
+            }
         }
 
         /// <summary>

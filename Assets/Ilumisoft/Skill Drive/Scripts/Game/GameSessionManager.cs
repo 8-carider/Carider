@@ -83,6 +83,35 @@ namespace Ilumisoft.SkillDrive.Game
             }
         }
 
+        public override void OnCreatedRoom()
+        {
+            // 방을 새로 만들 때 모든 통계 초기화
+            Debug.Log("[GameSessionManager] OnCreatedRoom - 통계 초기화");
+            PlayerCollectableStats.Instance.ResetAllStats();
+            ResetAllVehicleCollectables();
+        }
+
+        public override void OnJoinedRoom()
+        {
+            // 방에 입장할 때 차량 점수 및 플레이어 통계 초기화
+            Debug.Log("[GameSessionManager] OnJoinedRoom - 차량/플레이어 점수 초기화");
+            PlayerCollectableStats.Instance.ResetAllStats();
+            ResetAllVehicleCollectables();
+        }
+
+        /// <summary>
+        /// 씬의 모든 VehicleCollectables 초기화
+        /// </summary>
+        private void ResetAllVehicleCollectables()
+        {
+            var allVehicles = FindObjectsOfType<VehicleCollectables>();
+            foreach (var vehicle in allVehicles)
+            {
+                vehicle.ResetCollectableCount();
+            }
+            Debug.Log($"[GameSessionManager] {allVehicles.Length}개 차량 점수 초기화 완료");
+        }
+
         /// <summary>
         /// 마스터가 게임 세션 시작 (총 맵 개수 설정)
         /// </summary>
