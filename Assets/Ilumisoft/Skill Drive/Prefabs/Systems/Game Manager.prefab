@@ -1758,7 +1758,7 @@ MonoBehaviour:
   obstacleCheckRadius: 1
   maxSpawnAttempts: 5
   collectableCount: 5
-  respawnDelay: 2
+  respawnDelay: 20
 --- !u!82 &8572972288270932973
 AudioSource:
   m_ObjectHideFlags: 0
