@@ -21,6 +21,11 @@ namespace Ilumisoft.SkillDrive.Network
         // 각 플레이어의 개별 입력 저장
         private Vector2 throttlePlayerInput = Vector2.zero;  // Throttle 담당 플레이어의 입력
         private Vector2 steeringPlayerInput = Vector2.zero;  // Steering 담당 플레이어의 입력
+        
+        // 입력 스무딩 (더 부드러운 입력)
+        private Vector2 smoothedThrottleInput = Vector2.zero;
+        private Vector2 smoothedSteeringInput = Vector2.zero;
+        private float inputSmoothSpeed = 15f; // 스무딩 속도
 
         /// <summary>
         /// 플레이어가 이 차량에 배정되었는지 확인
@@ -88,13 +93,15 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 throttleInput = Mathf.Clamp(y, -1f, 1f);
                 throttlePlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
+                smoothedThrottleInput = throttlePlayerInput; // 즉시 적용
             }
             
-            // Steering 담당 플레이어의 X축 입력
+            // Steering 담당 플레이어의 X쵩1 입력
             if (actor == steeringSeatActorNumber)
             {
                 steeringInput = Mathf.Clamp(x, -1f, 1f);
                 steeringPlayerInput = new Vector2(x, y);  // 전체 입력 저장 (WASD UI용)
+                smoothedSteeringInput = steeringPlayerInput; // 즉시 적용
             }
         }
 

@@ -150,17 +150,21 @@ namespace Ilumisoft.SkillDrive.Input
             {
                 Vector2 localInput = moveAction.ReadValue<Vector2>();
 
-                // 입력이 있을 때만 RPC 전송 (대역폭 절약)
-                if (localInput.sqrMagnitude > 0.01f || currentInput.sqrMagnitude > 0.01f)
+                // 입력이 있을 때 더 자주 RPC 전송 (반응성 향상)
+                if (localInput.sqrMagnitude > 0.001f || currentInput.sqrMagnitude > 0.001f)
                 {
-                    if (Vector2.Distance(localInput, currentInput) > 0.01f)
+                    if (Vector2.Distance(localInput, currentInput) > 0.005f)
                     {
                         currentInput = localInput;
 
                         // VehicleSeatManager의 PhotonView를 통해 RPC 전송
                         if (seatManager.photonView != null)
                         {
-                            seatManager.photonView.RPC("RPC_ReceivePlayerInput", RpcTarget.AllBuffered, localInput.x, localInput.y, myActor);
+                            // 로꺾 즉시 반영 (클라이언트 사이드 예측)
+                            seatManager.ReceivePlayerInput(localInput.x, localInput.y, myActor);
+                            
+                            // All(비신뢰성)로 빠르게 전송 - 입력은 지연보다 속도 중요
+                            seatManager.photonView.RPC("RPC_ReceivePlayerInput", RpcTarget.Others, localInput.x, localInput.y, myActor);
                         }
                     }
                 }

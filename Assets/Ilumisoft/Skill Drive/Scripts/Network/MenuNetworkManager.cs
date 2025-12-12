@@ -29,6 +29,15 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 startButton.onClick.AddListener(OnStartButtonClicked);
             }
+            
+            // 네트워크 전송 빈도 설정 (반응성 향상)
+            PhotonNetwork.SendRate = 30; // 초당 30회 전송
+            PhotonNetwork.SerializationRate = 20; // 초당 20회 직렬화
+            
+            // FixedUpdate 빈도 증가 (물리 업데이트 빈도) - 레이싱 게임 최적화
+            Time.fixedDeltaTime = 1f / 100f; // 50Hz → 100Hz (매우 부드러운 물리)
+            
+            Debug.Log($"[MenuNetworkManager] ⚡ High-Performance Mode: SendRate={PhotonNetwork.SendRate}, SerializationRate={PhotonNetwork.SerializationRate}, FixedDeltaTime={Time.fixedDeltaTime}ms ({1f/Time.fixedDeltaTime}Hz)");
         }
 
         private void OnStartButtonClicked()

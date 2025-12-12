@@ -70,11 +70,14 @@
                 Rigidbody.useGravity = false;
                 // 클라이언트: Extrapolate로 미래 위치 예측 → 더 부드러운 움직임
                 Rigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
+                // 더 빠른 물리 업데이트
+                Rigidbody.maxAngularVelocity = 50f; // 기본 7 → 50
             }
             else if (PhotonNetwork.IsMasterClient && Rigidbody != null)
             {
                 // 마스터: Interpolate로 안정적의 계산
                 Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+                Rigidbody.maxAngularVelocity = 50f;
             }
         }
     }
