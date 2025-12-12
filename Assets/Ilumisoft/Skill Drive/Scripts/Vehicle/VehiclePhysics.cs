@@ -8,6 +8,9 @@ namespace Ilumisoft.SkillDrive
     [System.Serializable]
     public class VehiclePhysics
     {
+        [Tooltip("The transform that determines the center of the vehicle's mass.")]
+        public Transform CenterOfMass;
+
         [Tooltip("The gravity applied when the vehicle is grounded")]
         [SerializeField]
         float gravity = 20;

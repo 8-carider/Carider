@@ -99,6 +99,7 @@
 
         CollectInput();
         PerformGroundCheck();
+        ApplyCenterOfMass();
         ApplyGravity();
         ApplyLateralFriction();
         ApplySteering();
@@ -154,6 +155,17 @@
     protected virtual void PerformGroundCheck()
     {
         groundDetection.CheckGround();
+    }
+
+    /// <summary>
+    /// Applies the custom center of mass to the rigidbody
+    /// </summary>
+    protected virtual void ApplyCenterOfMass()
+    {
+        if (physics.CenterOfMass != null)
+        {
+            Rigidbody.centerOfMass = Rigidbody.transform.InverseTransformPoint(physics.CenterOfMass.position);
+        }
     }
 
     /// <summary>
@@ -213,11 +225,10 @@
     {
         if (IsGrounded && CanMove)
         {
-            var force = FinalStats.Acceleration * Input.y;
-            if (Mathf.Abs(force) > 0.01f)
-            {
-                Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
-            }
+            // Arcade Racing Kit style acceleration with drag system
+            float drag = FinalStats.Acceleration / FinalStats.MaxSpeed;
+            var force = FinalStats.Acceleration * Input.y - drag * Mathf.Clamp(ForwardSpeed, 0f, FinalStats.MaxSpeed);
+            Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
         }
     }
 
