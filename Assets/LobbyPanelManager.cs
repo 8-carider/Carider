@@ -91,25 +91,11 @@ namespace Ilumisoft.SkillDrive.Network
             for (int i = 0; i < players.Length; i++)
             {
                 var player = players[i];
-                string role = "";
-                if (player.IsMasterClient)
-                {
-                    role = " (Master)";
-                }
-                else if (i == 1)
-                {
-                    role = " (P2)";
-                }
-                else if (i == 2)
-                {
-                    role = " (P3)";
-                }
-                else if (i == 3)
-                {
-                    role = " (P4)";
-                }
+                // 항상 배열 인덱스로 P1, P2, P3, P4 표시
+                string playerNum = $"P{i + 1}";
+                string role = player.IsMasterClient ? "Master" : "Guest";
                 string youTag = (player == PhotonNetwork.LocalPlayer) ? " <- you" : "";
-                text += $"- {player.NickName}{role}{youTag}\n";
+                text += $"- {playerNum}: {role}{youTag}\n";
             }
 
             playerListText.text = text;

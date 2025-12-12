@@ -446,7 +446,7 @@ namespace Ilumisoft.SkillDrive.Network
             }
             else
             {
-                // Find player index from PlayerList order
+                // PlayerList 인덱스 사용하여 항상 P1, P2, P3, P4로 표시 (ActorNumber는 재사용 안됨)
                 var ordered = PhotonNetwork.PlayerList;
                 int idx = 0;
                 for (int i = 0; i < ordered.Length; i++)
@@ -454,7 +454,7 @@ namespace Ilumisoft.SkillDrive.Network
                     if (ordered[i].ActorNumber == actorNumber)
                     {
                         idx = i;
-                        playerLabel = $"P{i + 1}";
+                        playerLabel = $"P{i + 1}"; // 배열 순서로 P1~P4
                         break;
                     }
                 }
