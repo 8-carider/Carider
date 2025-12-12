@@ -70,14 +70,11 @@
                 Rigidbody.useGravity = false;
                 // 클라이언트: Extrapolate로 미래 위치 예측 → 더 부드러운 움직임
                 Rigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
-                // 더 빠른 물리 업데이트
-                Rigidbody.maxAngularVelocity = 50f; // 기본 7 → 50
             }
             else if (PhotonNetwork.IsMasterClient && Rigidbody != null)
             {
                 // 마스터: Interpolate로 안정적의 계산
                 Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-                Rigidbody.maxAngularVelocity = 50f;
             }
         }
     }
@@ -102,7 +99,6 @@
 
         CollectInput();
         PerformGroundCheck();
-        ApplyCenterOfMass();
         ApplyGravity();
         ApplyLateralFriction();
         ApplySteering();
@@ -158,17 +154,6 @@
     protected virtual void PerformGroundCheck()
     {
         groundDetection.CheckGround();
-    }
-
-    /// <summary>
-    /// Applies the custom center of mass to the rigidbody
-    /// </summary>
-    protected virtual void ApplyCenterOfMass()
-    {
-        if (physics.CenterOfMass != null)
-        {
-            Rigidbody.centerOfMass = Rigidbody.transform.InverseTransformPoint(physics.CenterOfMass.position);
-        }
     }
 
     /// <summary>
@@ -228,10 +213,11 @@
     {
         if (IsGrounded && CanMove)
         {
-            // Arcade Racing Kit style acceleration with drag system
-            float drag = FinalStats.Acceleration / FinalStats.MaxSpeed;
-            var force = FinalStats.Acceleration * Input.y - drag * Mathf.Clamp(ForwardSpeed, 0f, FinalStats.MaxSpeed);
-            Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
+            var force = FinalStats.Acceleration * Input.y;
+            if (Mathf.Abs(force) > 0.01f)
+            {
+                Rigidbody.AddForce(transform.forward * force, ForceMode.Acceleration);
+            }
         }
     }
 

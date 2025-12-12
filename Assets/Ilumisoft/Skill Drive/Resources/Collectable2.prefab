@@ -96,7 +96,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16875d4d92c09354cbf5f401a02eb038, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Collectable2
-  scoreAmount: 5
   particlesPrefab: {fileID: 2879622467641632436, guid: c44dd4419c3c31a4785e5ab016df3114, type: 3}
 --- !u!1 &5489907549315065674
 GameObject:

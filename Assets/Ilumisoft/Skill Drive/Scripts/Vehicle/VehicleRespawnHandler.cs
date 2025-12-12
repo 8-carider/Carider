@@ -57,7 +57,7 @@ namespace Ilumisoft.SkillDrive
                 respawnAudioSource = GetComponent<AudioSource>();
             }
 
-            // 초기 위치/회전 기록 (스폰포인트 누락 시 사용)
+            // ★ 가장 빠른 시점에 초기 위치 저장 (차량이 움직이기 전)
             initialPosition = transform.position;
             initialRotation = transform.rotation;
 
@@ -94,9 +94,10 @@ namespace Ilumisoft.SkillDrive
                 // 로컬에서 즉시 플래그 설정 (RPC 응답 대기하지 않음)
                 isRespawning = true;
                 
-                // RPC로 리스폰 요청 - 모든 클라이언트에서 동기화
+                // ★ 이 차량만 리스폰 (다른 차량은 영향 없음)
                 if (PhotonNetwork.IsConnected && photonView != null)
                 {
+                    // 이 차량의 PhotonView를 통해 모든 클라이언트에 동기화
                     photonView.RPC("RPC_RequestRespawn", RpcTarget.All);
                 }
                 else
@@ -152,7 +153,7 @@ namespace Ilumisoft.SkillDrive
                 return;
             }
 
-            // 폭발 파티클과 차량 숨김은 모든 클라이언트에 동기화
+            // ★ 이 차량만 폭발/숨김 (photonView를 통해 이 차량에만 RPC 전달)
             if (PhotonNetwork.IsConnected && photonView != null)
             {
                 photonView.RPC("RPC_ShowExplosionAndHide", RpcTarget.All);
@@ -162,7 +163,7 @@ namespace Ilumisoft.SkillDrive
                 ShowExplosionAndHide();
             }
 
-            // 카운트다운 UI는 모든 클라이언트에서 보여줌 (RPC 동기화)
+            // ★ 이 차량만 카운트다운 (photonView를 통해 이 차량에만 RPC 전달)
             if (PhotonNetwork.IsConnected && photonView != null)
             {
                 photonView.RPC("RPC_ShowCountdown", RpcTarget.All);
@@ -201,7 +202,7 @@ namespace Ilumisoft.SkillDrive
             {
                 respawnUI.ShowRespawnSequence(() =>
                 {
-                    // 카운트다운 완료 후 RPC로 리스폰 (마스터만 실행 또는 모든 클라이언트 동시 실행)
+                    // ★ 카운트다운 완료 후 이 차량만 리스폰 (photonView를 통해)
                     if (PhotonNetwork.IsConnected && photonView != null)
                     {
                         photonView.RPC("RPC_Respawn", RpcTarget.All);
@@ -252,22 +253,35 @@ namespace Ilumisoft.SkillDrive
 
         private void PerformRespawn()
         {
+            // ★ initialPosition을 항상 사용 (spawnPoint Transform은 차량과 함께 움직이므로 신뢰 불가)
+            Vector3 targetPosition = initialPosition;
+            Quaternion targetRotation = initialRotation;
+            
+            Debug.Log($"[VehicleRespawnHandler] Respawning {gameObject.name} to initial position: {targetPosition}");
+            
             // 텔레포트 전에 차량이 완전히 비활성화되어 있는지 확인
             // (충돌체가 꺼져있어야 콜렉터블과 충돌 안 함)
             DisableVehicle();
             
-            if (spawnPoint == null)
+            // ★ Rigidbody.position 사용 (transform.position보다 물리 엔진에 즉시 반영)
+            if (rb != null)
             {
-                // 스폰포인트가 누락된 경우 초기 위치로 리스폰
-                Debug.LogWarning("[VehicleRespawnHandler] No spawn point assigned! Falling back to initial transform.");
-                transform.position = initialPosition;
-                transform.rotation = initialRotation;
+                rb.position = targetPosition;
+                rb.rotation = targetRotation;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
             }
             else
             {
-                // Teleport to spawn point (비활성화 상태로 이동)
-                transform.position = spawnPoint.position;
-                transform.rotation = spawnPoint.rotation;
+                transform.position = targetPosition;
+                transform.rotation = targetRotation;
+            }
+            
+            // ★ 네트워크 동기화 강제 업데이트 (이 차량만)
+            if (PhotonNetwork.IsConnected && PhotonNetwork.IsMasterClient && photonView != null)
+            {
+                // photonView를 통해 이 차량에만 RPC 전달
+                photonView.RPC("RPC_ForcePositionSync", RpcTarget.AllBuffered, targetPosition, targetRotation);
             }
 
             // 텔레포트 후 차량 다시 활성화
@@ -307,6 +321,15 @@ namespace Ilumisoft.SkillDrive
         public void SetSpawnPoint(Transform point)
         {
             spawnPoint = point;
+            
+            // ★ 스폰포인트의 위치를 고정값으로 저장 (Transform 참조 대신)
+            // 이유: spawnPoint가 차량의 자식이면 차량과 함께 움직이기 때문
+            if (point != null)
+            {
+                initialPosition = point.position;
+                initialRotation = point.rotation;
+                Debug.Log($"[VehicleRespawnHandler] {gameObject.name}: Spawn point saved at {initialPosition}");
+            }
         }
 
         /// <summary>
@@ -511,6 +534,28 @@ namespace Ilumisoft.SkillDrive
                         renderer.enabled = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// 네트워크 위치 강제 동기화 RPC (마스터가 리스폰 후 호출)
+        /// </summary>
+        [PunRPC]
+        private void RPC_ForcePositionSync(Vector3 position, Quaternion rotation)
+        {
+            if (rb != null)
+            {
+                rb.position = position;
+                rb.rotation = rotation;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                transform.position = position;
+                transform.rotation = rotation;
+            }
+            
+            Debug.Log($"[VehicleRespawnHandler] Force synced position to {position} on client {PhotonNetwork.LocalPlayer.ActorNumber}");
         }
     }
 }

@@ -28,12 +28,9 @@ namespace Ilumisoft.SkillDrive.Network
         private float positionChangeThreshold = 0.01f; // 0.01 단위 변화만 전송
         
         // 부드러운 동기화를 위한 추가 변수
-        private float lerpSpeed = 30f; // 보간 속도 (더 빠른 반응을 위해 증가)
-        private float positionThreshold = 5f; // 텔레포트 임계값
+        private float lerpSpeed = 20f; // 보간 속도 (20이 최적)
+        private float positionThreshold = 5f; // 텔레포트 임계값 (2→5로 증가)
         private float receivedTime;
-        
-        // 클라이언트 사이드 예측
-        private bool useClientPrediction = true;
         
         private void Awake()
         {
@@ -45,8 +42,8 @@ namespace Ilumisoft.SkillDrive.Network
                 if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
                 {
                     rb.isKinematic = true; // 비 마스터는 transform만 업데이트
-                    // 더 부드러운 움직임을 위해 회전 제약 제거
-                    rb.constraints = RigidbodyConstraints.None;
+                    // 리지드바디 물리 업데이트를 최소화
+                    rb.constraints = RigidbodyConstraints.FreezeRotation;
                 }
             }
             
@@ -76,11 +73,11 @@ namespace Ilumisoft.SkillDrive.Network
                 }
                 else
                 {
-                    // 거리와 시간을 고려한 동적 보간 속도 (더 빠르게)
-                    float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 2f, distance / positionThreshold);
+                    // 거리와 시간을 고려한 동적 보간 속도
+                    float dynamicLerpSpeed = Mathf.Lerp(lerpSpeed, lerpSpeed * 1.5f, distance / positionThreshold);
                     
-                    // 외삽 시간 증가로 더 빠른 반응 (0.15초까지 예측)
-                    float extrapolationFactor = Mathf.Min(timeSinceUpdate, 0.15f);
+                    // 외삽 계수를 더 낮춰서 움찔거림 방지 (최대 0.1초까지만 예측)
+                    float extrapolationFactor = Mathf.Min(timeSinceUpdate, 0.1f);
                     Vector3 extrapolatedPosition = networkPosition + networkVelocity * extrapolationFactor;
                     
                     // 부드러운 보간
