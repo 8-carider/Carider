@@ -68,7 +68,12 @@
             if (!PhotonNetwork.IsMasterClient && Rigidbody != null)
             {
                 Rigidbody.useGravity = false;
-                // 부드러운 보간을 위해 Interpolate 사용
+                // 클라이언트: Extrapolate로 미래 위치 예측 → 더 부드러운 움직임
+                Rigidbody.interpolation = RigidbodyInterpolation.Extrapolate;
+            }
+            else if (PhotonNetwork.IsMasterClient && Rigidbody != null)
+            {
+                // 마스터: Interpolate로 안정적의 계산
                 Rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             }
         }

@@ -88,9 +88,9 @@ namespace Ilumisoft.SkillDrive.Game
 #if PHOTON_UNITY_NETWORKING
             if (Photon.Pun.PhotonNetwork.IsConnected)
             {
-                Photon.Pun.PhotonNetwork.SendRate = 30; // 기본 20 → 30
-                Photon.Pun.PhotonNetwork.SerializationRate = 20; // 기본 10 → 20
-                Debug.Log("[GameManager] Photon SendRate=30, SerializationRate=20 설정 완료");
+                Photon.Pun.PhotonNetwork.SendRate = 50; // 기본 20 → 50 (더 부드러운 멀티플레이 동기화)
+                Photon.Pun.PhotonNetwork.SerializationRate = 40; // 기본 10 → 40
+                Debug.Log("[GameManager] Photon SendRate=50, SerializationRate=40 설정 완료");
             }
 #endif
         }

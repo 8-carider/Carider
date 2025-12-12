@@ -21,6 +21,12 @@ namespace Ilumisoft.SkillDrive.Network
         private Vector3 networkVelocity;
         private Vector3 networkAngularVelocity;
         
+        // 마지막 전송한 데이터 (불필요한 네트워크 업데이트 방지)
+        private Vector3 lastSentPosition;
+        private Quaternion lastSentRotation;
+        private Vector3 lastSentVelocity;
+        private float positionChangeThreshold = 0.01f; // 0.01 단위 변화만 전송
+        
         // 부드러운 동기화를 위한 추가 변수
         private float lerpSpeed = 20f; // 보간 속도 (20이 최적)
         private float positionThreshold = 5f; // 텔레포트 임계값 (2→5로 증가)
@@ -39,6 +45,14 @@ namespace Ilumisoft.SkillDrive.Network
                     // 리지드바디 물리 업데이트를 최소화
                     rb.constraints = RigidbodyConstraints.FreezeRotation;
                 }
+            }
+            
+            // 초기값 저장 (불필요한 네트워크 업데이트 방지)
+            if (rb != null)
+            {
+                lastSentPosition = rb.position;
+                lastSentRotation = rb.rotation;
+                lastSentVelocity = rb.linearVelocity;
             }
         }
         
@@ -84,11 +98,20 @@ namespace Ilumisoft.SkillDrive.Network
         {
             if (stream.IsWriting)
             {
-                // 마스터가 위치/회전/속도 전송
+                // 마스터: 변화가 있을 때만 전송 (네트워크 효율화)
+                bool posChanged = Vector3.Distance(rb.position, lastSentPosition) > positionChangeThreshold;
+                bool rotChanged = Quaternion.Angle(rb.rotation, lastSentRotation) > 1f;
+                bool velChanged = Vector3.Distance(rb.linearVelocity, lastSentVelocity) > 0.1f;
+                
                 stream.SendNext(rb.position);
                 stream.SendNext(rb.rotation);
                 stream.SendNext(rb.linearVelocity);
                 stream.SendNext(rb.angularVelocity);
+                
+                // 마지막 전송값 업데이트
+                if (posChanged) lastSentPosition = rb.position;
+                if (rotChanged) lastSentRotation = rb.rotation;
+                if (velChanged) lastSentVelocity = rb.linearVelocity;
             }
             else
             {
