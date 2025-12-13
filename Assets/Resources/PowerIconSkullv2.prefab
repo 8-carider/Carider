@@ -9907,7 +9907,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.50000036, y: -0.49999976, z: 0.49999964, w: -0.5000003}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1425630924295943211}
@@ -14749,7 +14749,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5115471
-  m_Center: {x: 0.0000000041723305, y: 0.0000000041723047, z: 0.07000001}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2963256211433509473
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -14789,8 +14789,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c957094009785645965267c92a3d4b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Game.RoleSwapCollectable
-  particlesPrefab: {fileID: 1424016689071528415}
-  swapDuration: 5
+  particlesPrefab: {fileID: 0}
+  swapDuration: 20
   respawnDelay: 10
 --- !u!114 &901494556093132657
 MonoBehaviour:
