@@ -137,69 +137,89 @@ namespace Ilumisoft.SkillDrive.Game
                 return;
             }
 
-            // 마스터만 실행 (이미 Collectable2에서 마스터 체크를 했지만 안전장치)
-            if (PhotonNetwork.IsMasterClient)
-            {
-                respawningKeys.Add(key);
-                StartCoroutine(RespawnCollectable2Coroutine(key));
-            }
+            Debug.Log($"[CollectableManager] OnCollectable2PickedUp 호출: ID={key}, 마스터={PhotonNetwork.IsMasterClient}");
+            respawningKeys.Add(key);
+            StartCoroutine(RespawnCollectable2Coroutine(key));
         }
 
         private IEnumerator RespawnCollectable2Coroutine(string key)
         {
-            if (!collectable2SpawnPoints.ContainsKey(key))
+            try
             {
-                Debug.LogWarning($"[CollectableManager] Spawn point not found for: {key}");
-                respawningKeys.Remove(key); // 실패 시 플래그 제거
-                yield break;
-            }
+                if (!collectable2SpawnPoints.ContainsKey(key))
+                {
+                    Debug.LogWarning($"[CollectableManager] Spawn point not found for: {key}");
+                    yield break;
+                }
 
-            var spawnPoint = collectable2SpawnPoints[key];
-            yield return new WaitForSeconds(respawnDelay);
+                var spawnPoint = collectable2SpawnPoints[key];
+                Debug.Log($"[CollectableManager] {respawnDelay}초 후 재생성 예정: ID={key}, 위치={spawnPoint.position}");
+                yield return new WaitForSeconds(respawnDelay);
 
-            Debug.Log($"[CollectableManager] Collectable2 재생성: ID={key}, 위치={spawnPoint.position}");
+                Debug.Log($"[CollectableManager] Collectable2 재생성 시작: ID={key}, 마스터={PhotonNetwork.IsMasterClient}");
 
 #if PHOTON_UNITY_NETWORKING
-            if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
-            {
-                try
+                if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
                 {
-                    GameObject obj = PhotonNetwork.Instantiate("Collectable2", spawnPoint.position, spawnPoint.rotation);
-                    // 생성된 오브젝트에 SpawnPointID 설정
-                    var collectable = obj.GetComponent<Collectable2>();
-                    if (collectable != null)
+                    try
                     {
-                        photonView.RPC("RPC_SetSpawnPointID", RpcTarget.AllBuffered, obj.GetPhotonView().ViewID, int.Parse(key));
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"[CollectableManager] PhotonNetwork.Instantiate failed: {ex.Message}. Falling back to local instantiate");
-                    if (spawnPoint.prefab != null)
-                    {
-                        GameObject obj = Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
-                        var collectable = obj.GetComponent<Collectable2>();
-                        if (collectable != null)
+                        GameObject obj = PhotonNetwork.Instantiate("Collectable2", spawnPoint.position, spawnPoint.rotation);
+                        if (obj != null)
                         {
-                            collectable.SetSpawnPointID(int.Parse(key));
+                            // 생성된 오브젝트에 SpawnPointID 설정
+                            var collectable = obj.GetComponent<Collectable2>();
+                            if (collectable != null)
+                            {
+                                var pv = obj.GetPhotonView();
+                                if (pv != null)
+                                {
+                                    photonView.RPC("RPC_SetSpawnPointID", RpcTarget.AllBuffered, pv.ViewID, int.Parse(key));
+                                    Debug.Log($"[CollectableManager] Collectable2 재생성 완료: ID={key}, ViewID={pv.ViewID}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError($"[CollectableManager] PhotonNetwork.Instantiate returned null for ID={key}");
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"[CollectableManager] PhotonNetwork.Instantiate failed for ID={key}: {ex.Message}");
+                        // Fallback to local instantiate
+                        if (spawnPoint.prefab != null)
+                        {
+                            GameObject obj = Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
+                            var collectable = obj.GetComponent<Collectable2>();
+                            if (collectable != null)
+                            {
+                                collectable.SetSpawnPointID(int.Parse(key));
+                            }
                         }
                     }
                 }
-            }
-#else
-            if (spawnPoint.prefab != null)
-            {
-                GameObject obj = Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
-                var collectable = obj.GetComponent<Collectable2>();
-                if (collectable != null)
+                else
                 {
-                    collectable.SetSpawnPointID(int.Parse(key));
+                    Debug.LogWarning($"[CollectableManager] 마스터가 아니거나 방에 없어서 리스폰 중단: ID={key}");
                 }
-            }
+#else
+                if (spawnPoint.prefab != null)
+                {
+                    GameObject obj = Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
+                    var collectable = obj.GetComponent<Collectable2>();
+                    if (collectable != null)
+                    {
+                        collectable.SetSpawnPointID(int.Parse(key));
+                    }
+                }
 #endif
-            
-            // 리스폰 완료 후 플래그 제거
-            respawningKeys.Remove(key);
+            }
+            finally
+            {
+                // 리스폰 완료 또는 실패 시 항상 플래그 제거
+                respawningKeys.Remove(key);
+                Debug.Log($"[CollectableManager] 리스폰 작업 종료: ID={key}");
+            }
         }
 
         private void ClearExistingCollectables()
@@ -236,11 +256,29 @@ namespace Ilumisoft.SkillDrive.Game
         private void SpawnCollectables()
         {
             spawned = 0;
+            int totalAttempts = 0;
+            int maxTotalAttempts = maxSpawnAttempts * collectableCount; // 전체 시도 횟수 제한
 
-            while (spawned < collectableCount)
+            while (spawned < collectableCount && totalAttempts < maxTotalAttempts)
             {
-                if (!TrySpawnOne())
-                    break;
+                totalAttempts++;
+                if (TrySpawnOne())
+                {
+                    Debug.Log($"[CollectableManager] Collectable 생성 성공: {spawned}/{collectableCount}");
+                }
+                else if (totalAttempts % 100 == 0)
+                {
+                    Debug.LogWarning($"[CollectableManager] Collectable 생성 시도 중... {spawned}/{collectableCount} (시도: {totalAttempts})");
+                }
+            }
+
+            if (spawned < collectableCount)
+            {
+                Debug.LogError($"[CollectableManager] Collectable 생성 실패! 생성된 수: {spawned}/{collectableCount}");
+            }
+            else
+            {
+                Debug.Log($"[CollectableManager] Collectable 전체 생성 완료: {spawned}/{collectableCount}");
             }
 
             AttachCollectEventsToAll();
@@ -249,41 +287,68 @@ namespace Ilumisoft.SkillDrive.Game
 
         private bool TrySpawnOne()
         {
-            int attempts = 0;
+            Vector3 posXZ = new Vector3(
+                Random.Range(-spawnAreaSize.x / 2, spawnAreaSize.x / 2),
+                50f,
+                Random.Range(-spawnAreaSize.y / 2, spawnAreaSize.y / 2)
+            );
 
-            while (attempts < maxSpawnAttempts)
+            // Raycast로 땅 찾기(허공 생성 방지)
+            if (Physics.Raycast(posXZ, Vector3.down, out RaycastHit hit, 100f, groundLayer))
             {
-                attempts++;
+                Vector3 finalPos = hit.point;
 
-                Vector3 posXZ = new Vector3(
-                    Random.Range(-spawnAreaSize.x / 2, spawnAreaSize.x / 2),
-                    50f,
-                    Random.Range(-spawnAreaSize.y / 2, spawnAreaSize.y / 2)
-                );
+                // 장애물 여부
+                bool obstacleOverlap = Physics.CheckSphere(finalPos, obstacleCheckRadius, obstacleLayer);
+                if (obstacleOverlap)
+                    return false;
 
-                // Raycast로 땅 찾기(허공 생성 방지)
-                if (Physics.Raycast(posXZ, Vector3.down, out RaycastHit hit, 100f, groundLayer))
+                // 기존 Collectable과 너무 가까운지 체크
+                var existingCollectables = FindObjectsByType<Collectable>(FindObjectsSortMode.None);
+                foreach (var existing in existingCollectables)
                 {
-                    Vector3 finalPos = hit.point;
+                    if (Vector3.Distance(existing.transform.position, finalPos) < spawnCheckRadius * 2)
+                    {
+                        return false; // 너무 가까움
+                    }
+                }
 
-                    // 장애물 여부
-                    bool obstacleOverlap =
-                        Physics.CheckSphere(finalPos, obstacleCheckRadius, obstacleLayer);
-
-                    if (obstacleOverlap)
-                        continue;
-
+                try
+                {
 #if PHOTON_UNITY_NETWORKING
-                    PhotonNetwork.Instantiate("Collectable", finalPos + Vector3.up * 0.1f, Quaternion.identity);
+                    var obj = PhotonNetwork.Instantiate("Collectable", finalPos + Vector3.up * 0.1f, Quaternion.identity);
+                    if (obj != null)
+                    {
+                        spawned++;
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogError("[CollectableManager] PhotonNetwork.Instantiate returned null");
+                        return false;
+                    }
 #else
-                    Instantiate(collectablePrefab, finalPos + Vector3.up * 0.1f, Quaternion.identity);
+                    if (collectablePrefab != null)
+                    {
+                        Instantiate(collectablePrefab, finalPos + Vector3.up * 0.1f, Quaternion.identity);
+                        spawned++;
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogError("[CollectableManager] collectablePrefab is null!");
+                        return false;
+                    }
 #endif
-                    spawned++;
-                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[CollectableManager] Collectable 생성 실패: {ex.Message}");
+                    return false;
                 }
             }
 
-            return false; // spawn 실패
+            return false; // Raycast 실패
         }
 
 #if PHOTON_UNITY_NETWORKING

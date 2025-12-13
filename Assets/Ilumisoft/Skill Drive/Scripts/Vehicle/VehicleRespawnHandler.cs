@@ -34,6 +34,8 @@ namespace Ilumisoft.SkillDrive
         private Vehicle vehicle;
         private Ilumisoft.SkillDrive.Network.VehicleSeatManager seatManager;
         private bool isRespawning = false;
+        private double lastRespawnTime = -999.0; // 마지막 리스폰 시간 (중복 방지, 초기값을 음수로 설정)
+        private const double RESPAWN_COOLDOWN = 1.0; // 리스폰 쿨다운 (초)
         private MeshRenderer[] meshRenderers;
         private ParticleSystem[] particleSystems;
         private TrailRenderer[] trailRenderers;
@@ -84,21 +86,32 @@ namespace Ilumisoft.SkillDrive
         private void Update()
         {
             // 리스폰 중에는 입력 무시
-            if (isRespawning) return;
+            if (isRespawning)
+            {
+                Debug.Log($"[VehicleRespawnHandler] 리스폰 중이라 F 키 무시");
+                return;
+            }
 
             // Only process input from players assigned to this vehicle
-            if (!CanRespawn()) return;
+            if (!CanRespawn())
+            {
+                return;
+            }
 
             if (UnityEngine.Input.GetKeyDown(respawnKey))
             {
+                Debug.Log($"[VehicleRespawnHandler] F 키 눌림!");
+                
                 // 로컬에서 즉시 플래그 설정 (RPC 응답 대기하지 않음)
                 isRespawning = true;
+                double currentTime = PhotonNetwork.IsConnected ? PhotonNetwork.Time : Time.timeAsDouble;
+                lastRespawnTime = currentTime;
                 
                 // ★ 이 차량만 리스폰 (다른 차량은 영향 없음)
                 if (PhotonNetwork.IsConnected && photonView != null)
                 {
                     // 이 차량의 PhotonView를 통해 모든 클라이언트에 동기화
-                    photonView.RPC("RPC_RequestRespawn", RpcTarget.All);
+                    photonView.RPC("RPC_RequestRespawn", RpcTarget.All, currentTime);
                 }
                 else
                 {
@@ -130,14 +143,20 @@ namespace Ilumisoft.SkillDrive
 
         public void RequestRespawn()
         {
+            Debug.Log($"[VehicleRespawnHandler] RequestRespawn 호출됨");
+            
             // 이미 리스폰 중이면 무시 (중복 방지)
             if (isRespawning)
             {
+                Debug.Log($"[VehicleRespawnHandler] {gameObject.name} 이미 리스폰 중 (무시)");
                 return;
             }
 
             // 플래그 설정
             isRespawning = true;
+            double currentTime = PhotonNetwork.IsConnected ? PhotonNetwork.Time : Time.timeAsDouble;
+            lastRespawnTime = currentTime;
+            Debug.Log($"[VehicleRespawnHandler] {gameObject.name} 리스폰 시작 (시간: {currentTime})");
 
             // UI가 없으면 바로 리스폰
             if (respawnUI == null)
@@ -175,8 +194,19 @@ namespace Ilumisoft.SkillDrive
         }
 
         [PunRPC]
-        private void RPC_RequestRespawn()
+        private void RPC_RequestRespawn(double requestTime)
         {
+            Debug.Log($"[VehicleRespawnHandler] RPC_RequestRespawn 받음 (requestTime={requestTime}, lastRespawnTime={lastRespawnTime})");
+            
+            // 타임스탬프 기반 중복 체크 (네트워크 지연 대응)
+            double timeDiff = requestTime - lastRespawnTime;
+            if (timeDiff > -0.1 && timeDiff < RESPAWN_COOLDOWN && isRespawning)
+            {
+                Debug.Log($"[VehicleRespawnHandler] {gameObject.name} 중복 리스폰 요청 무시 (시간차: {timeDiff:F2}초)");
+                return;
+            }
+            
+            lastRespawnTime = requestTime;
             RequestRespawn();
         }
 
@@ -249,6 +279,7 @@ namespace Ilumisoft.SkillDrive
             PerformRespawn();
             // RPC 실행 완료 후 리스폰 플래그 해제
             isRespawning = false;
+            Debug.Log($"[VehicleRespawnHandler] {gameObject.name} 리스폰 완료");
         }
 
         private void PerformRespawn()

@@ -14,6 +14,9 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("이 Collectable2의 고유 ID (자동 생성됨, 수동 설정 가능)")]
         private int spawnPointID = 0;
 
+        // 중복 수집 방지 플래그
+        private bool isCollected = false;
+
         public int SpawnPointID => spawnPointID;
 
         public UnityAction OnCollect = null;
@@ -74,6 +77,12 @@ namespace Ilumisoft.SkillDrive.Game
         {
             if (!other.CompareTag("Player"))
                 return;
+
+            // 중복 수집 방지
+            if (isCollected)
+                return;
+
+            isCollected = true;
 
             // 파티클 생성 (컬러 분리: Collectable2는 지정된 프리팹 사용)
             if (particlesPrefab != null)

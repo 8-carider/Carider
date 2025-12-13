@@ -17,6 +17,9 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("생성 파티클이 재생될 시간(초)")]
         private float spawnParticleShowDuration = 2.0f;
 
+        // 중복 수집 방지 플래그
+        private bool isCollected = false;
+
         public UnityAction OnCollect = null;
 
         private void Start()
@@ -165,69 +168,82 @@ namespace Ilumisoft.SkillDrive.Game
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+            if (!other.CompareTag("Player"))
+                return;
+
+            // 중복 수집 방지
+            if (isCollected)
             {
+                Debug.Log($"[Collectable] {gameObject.name} 이미 수집됨 (무시)");
+                return;
+            }
+
+            isCollected = true;
+            Debug.Log($"[Collectable] {gameObject.name} 수집됨");
 
 #if PHOTON_UNITY_NETWORKING
-                if (particlesPrefab != null)
+            if (particlesPrefab != null)
+            {
+                if (PhotonNetwork.InRoom)
                 {
-                    if (PhotonNetwork.InRoom)
-                    {
-                        PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
-                    }
-                    else
-                    {
-                        Instantiate(particlesPrefab, transform.position, transform.rotation);
-                    }
+                    PhotonNetwork.Instantiate("Collect Particles", transform.position, transform.rotation);
                 }
-#else
-                if (particlesPrefab != null)
+                else
                 {
                     Instantiate(particlesPrefab, transform.position, transform.rotation);
                 }
+            }
+#else
+            if (particlesPrefab != null)
+            {
+                Instantiate(particlesPrefab, transform.position, transform.rotation);
+            }
 #endif
 
 
-                // 차량의 VehicleCollectables 컴포넌트 업데이트
-                var vehicleCollectables = other.GetComponent<VehicleCollectables>();
-                if (vehicleCollectables != null)
-                {
-                    vehicleCollectables.AddCollectable(1);
-                }
+            // 차량의 VehicleCollectables 컴포넌트 업데이트
+            var vehicleCollectables = other.GetComponent<VehicleCollectables>();
+            if (vehicleCollectables != null)
+            {
+                vehicleCollectables.AddCollectable(1);
+            }
 
-                OnCollect?.Invoke();
+            OnCollect?.Invoke();
+
+            // 콜라이더 즉시 비활성화 (중복 충돌 방지)
+            var col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
 
 #if PHOTON_UNITY_NETWORKING
-                if (PhotonNetwork.InRoom)
+            if (PhotonNetwork.InRoom)
+            {
+                PhotonView photonView = PhotonView.Get(this);
+                if (photonView != null && !photonView.IsMine)
                 {
-                    PhotonView photonView = PhotonView.Get(this);
-                    if (photonView != null && !photonView.IsMine)
+                    // 소유권이 없으면 먼저 요청만 하고, 파괴는 소유권이 넘어온 후에만 시도
+                    photonView.RequestOwnership();
+                    return;
+                }
+                // 소유자(또는 마스터)가 파괴를 시도
+                if (!PhotonNetwork.IsMasterClient)
+                {
+                    if (photonView != null)
                     {
-                        // 소유권이 없으면 먼저 요청만 하고, 파괴는 소유권이 넘어온 후에만 시도
-                        photonView.RequestOwnership();
-                        return;
-                    }
-                    // 소유자(또는 마스터)가 파괴를 시도
-                    if (!PhotonNetwork.IsMasterClient)
-                    {
-                        if (photonView != null)
-                        {
-                            photonView.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
-                        }
-                    }
-                    else
-                    {
-                        PhotonNetwork.Destroy(gameObject);
+                        photonView.RPC("RPC_RequestDestroy", RpcTarget.MasterClient);
                     }
                 }
                 else
                 {
-                    Destroy(gameObject);
+                    PhotonNetwork.Destroy(gameObject);
                 }
-#else
-                Destroy(gameObject);
-#endif
             }
+            else
+            {
+                Destroy(gameObject);
+            }
+#else
+            Destroy(gameObject);
+#endif
         }
 
 #if PHOTON_UNITY_NETWORKING
