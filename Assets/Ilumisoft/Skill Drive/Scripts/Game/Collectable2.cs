@@ -11,20 +11,24 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField]
         private GameObject particlesPrefab = null;
 
+        [SerializeField, Tooltip("이 Collectable2의 고유 ID (맵에서 각각 다르게 설정)")]
+        private int spawnPointID = 0;
+
+        public int SpawnPointID => spawnPointID;
+
         public UnityAction OnCollect = null;
+
+        public void SetSpawnPointID(int id)
+        {
+            spawnPointID = id;
+        }
 
         private void Start()
         {
-            // Ground 레이어 위 자동 위치 조정
-            int groundLayer = LayerMask.NameToLayer("Ground");
-            if (groundLayer >= 0)
+            // CollectableManager에 등록 (위치 저장)
+            if (CollectableManager.Instance != null)
             {
-                if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out RaycastHit hit, 100f, 1 << groundLayer))
-                {
-                    Vector3 pos = transform.position;
-                    pos.y = hit.point.y;
-                    transform.position = pos;
-                }
+                CollectableManager.Instance.RegisterCollectable2(this);
             }
 
             // RadarSystem 자동 등록

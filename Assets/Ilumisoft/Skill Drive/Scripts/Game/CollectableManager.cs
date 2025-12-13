@@ -36,7 +36,7 @@ namespace Ilumisoft.SkillDrive.Game
         [Header("Spawn Checks")]
         [SerializeField] private float spawnCheckRadius = 0.6f;
         [SerializeField] private float obstacleCheckRadius = 1.0f;
-        [SerializeField] private int maxSpawnAttempts = 100;
+        [SerializeField] private int maxSpawnAttempts = 1000;
 
         [Header("Count")]
         [SerializeField] private int collectableCount = 10;
@@ -55,6 +55,7 @@ namespace Ilumisoft.SkillDrive.Game
             public GameObject prefab;
         }
         private Dictionary<string, CollectableSpawnPoint> collectable2SpawnPoints = new Dictionary<string, CollectableSpawnPoint>();
+        private HashSet<string> respawningKeys = new HashSet<string>(); // 현재 리스폰 중인 키들
         private PhotonView photonView;
 
         private void Awake()
@@ -102,13 +103,20 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         public void RegisterCollectable2(Collectable2 collectable)
         {
-            string key = collectable.gameObject.GetInstanceID().ToString();
-            collectable2SpawnPoints[key] = new CollectableSpawnPoint
+            // SpawnPointID를 키로 사용 (InstanceID 대신)
+            string key = collectable.SpawnPointID.ToString();
+            
+            // 이미 등록되어 있으면 업데이트하지 않음 (처음 등록된 위치 유지)
+            if (!collectable2SpawnPoints.ContainsKey(key))
             {
-                position = collectable.transform.position,
-                rotation = collectable.transform.rotation,
-                prefab = Resources.Load<GameObject>("Collectable2")
-            };
+                collectable2SpawnPoints[key] = new CollectableSpawnPoint
+                {
+                    position = collectable.transform.position,
+                    rotation = collectable.transform.rotation,
+                    prefab = Resources.Load<GameObject>("Collectable2")
+                };
+                Debug.Log($"[CollectableManager] Collectable2 등록: ID={key}, 위치={collectable.transform.position}");
+            }
         }
 
         /// <summary>
@@ -116,10 +124,18 @@ namespace Ilumisoft.SkillDrive.Game
         /// </summary>
         public void OnCollectable2PickedUp(Collectable2 collectable)
         {
-            string key = collectable.gameObject.GetInstanceID().ToString();
+            string key = collectable.SpawnPointID.ToString();
+
+            // 이미 리스폰 중이면 무시
+            if (respawningKeys.Contains(key))
+            {
+                Debug.Log($"[CollectableManager] 이미 리스폰 중: ID={key}");
+                return;
+            }
 
             if (PhotonNetwork.IsMasterClient)
             {
+                respawningKeys.Add(key);
                 StartCoroutine(RespawnCollectable2Coroutine(key));
             }
             else
@@ -131,8 +147,16 @@ namespace Ilumisoft.SkillDrive.Game
         [PunRPC]
         private void RPC_OnCollectable2PickedUp(string key)
         {
+            // 이미 리스폰 중이면 무시
+            if (respawningKeys.Contains(key))
+            {
+                Debug.Log($"[CollectableManager] RPC: 이미 리스폰 중: ID={key}");
+                return;
+            }
+
             if (PhotonNetwork.IsMasterClient)
             {
+                respawningKeys.Add(key);
                 StartCoroutine(RespawnCollectable2Coroutine(key));
             }
         }
@@ -142,34 +166,56 @@ namespace Ilumisoft.SkillDrive.Game
             if (!collectable2SpawnPoints.ContainsKey(key))
             {
                 Debug.LogWarning($"[CollectableManager] Spawn point not found for: {key}");
+                respawningKeys.Remove(key); // 실패 시 플래그 제거
                 yield break;
             }
 
             var spawnPoint = collectable2SpawnPoints[key];
             yield return new WaitForSeconds(respawnDelay);
 
+            Debug.Log($"[CollectableManager] Collectable2 재생성: ID={key}, 위치={spawnPoint.position}");
+
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.IsMasterClient && PhotonNetwork.InRoom)
             {
                 try
                 {
-                    PhotonNetwork.Instantiate("Collectable2", spawnPoint.position, spawnPoint.rotation);
+                    GameObject obj = PhotonNetwork.Instantiate("Collectable2", spawnPoint.position, spawnPoint.rotation);
+                    // 생성된 오브젝트에 SpawnPointID 설정
+                    var collectable = obj.GetComponent<Collectable2>();
+                    if (collectable != null)
+                    {
+                        photonView.RPC("RPC_SetSpawnPointID", RpcTarget.AllBuffered, obj.GetPhotonView().ViewID, int.Parse(key));
+                    }
                 }
                 catch (System.Exception ex)
                 {
                     Debug.LogError($"[CollectableManager] PhotonNetwork.Instantiate failed: {ex.Message}. Falling back to local instantiate");
                     if (spawnPoint.prefab != null)
                     {
-                        Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
+                        GameObject obj = Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
+                        var collectable = obj.GetComponent<Collectable2>();
+                        if (collectable != null)
+                        {
+                            collectable.SetSpawnPointID(int.Parse(key));
+                        }
                     }
                 }
             }
 #else
             if (spawnPoint.prefab != null)
             {
-                Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
+                GameObject obj = Instantiate(spawnPoint.prefab, spawnPoint.position, spawnPoint.rotation);
+                var collectable = obj.GetComponent<Collectable2>();
+                if (collectable != null)
+                {
+                    collectable.SetSpawnPointID(int.Parse(key));
+                }
             }
 #endif
+            
+            // 리스폰 완료 후 플래그 제거
+            respawningKeys.Remove(key);
         }
 
         private void ClearExistingCollectables()
@@ -255,5 +301,21 @@ namespace Ilumisoft.SkillDrive.Game
 
             return false; // spawn 실패
         }
+
+#if PHOTON_UNITY_NETWORKING
+        [PunRPC]
+        private void RPC_SetSpawnPointID(int viewID, int spawnPointID)
+        {
+            PhotonView pv = PhotonView.Find(viewID);
+            if (pv != null)
+            {
+                var collectable = pv.GetComponent<Collectable2>();
+                if (collectable != null)
+                {
+                    collectable.SetSpawnPointID(spawnPointID);
+                }
+            }
+        }
+#endif
     }
 }

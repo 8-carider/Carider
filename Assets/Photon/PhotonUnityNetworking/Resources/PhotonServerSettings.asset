@@ -76,6 +76,7 @@ MonoBehaviour:
   - RPC_ForcePositionSync
   - RPC_ForceMaxSpeed
   - RPC_SwapRoles
+  - RPC_SetSpawnPointID
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
