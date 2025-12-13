@@ -27,6 +27,14 @@ namespace Ilumisoft.SkillDrive.Network
         private Vector2 smoothedSteeringInput = Vector2.zero;
         private float inputSmoothSpeed = 15f; // 스무딩 속도
 
+        // 역할 교체 관련
+        private float roleSwapTimer = 0f;
+        private int originalThrottleActor = -1;
+        private int originalSteeringActor = -1;
+        private bool isRoleSwapped = false;
+
+        public bool IsRoleSwapped => isRoleSwapped;
+
         /// <summary>
         /// 플레이어가 이 차량에 배정되었는지 확인
         /// </summary>
@@ -147,6 +155,89 @@ namespace Ilumisoft.SkillDrive.Network
             {
                 gameObject.name = runtimeName;
             }
+        }
+
+        private void Update()
+        {
+            // 역할 교체 타이머 처리
+            if (roleSwapTimer > 0f)
+            {
+                roleSwapTimer -= Time.deltaTime;
+                if (roleSwapTimer <= 0f)
+                {
+                    // 원래 역할로 복구
+                    RestoreOriginalRoles();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 특정 시간 동안 역할 교체 (가속 <-> 조향)
+        /// </summary>
+        public void SwapRoles(float duration)
+        {
+            if (PhotonNetwork.InRoom && photonView.IsMine)
+            {
+                photonView.RPC("RPC_SwapRoles", RpcTarget.All, duration);
+            }
+            else
+            {
+                ApplyRoleSwap(duration);
+            }
+        }
+
+        [PunRPC]
+        private void RPC_SwapRoles(float duration)
+        {
+            ApplyRoleSwap(duration);
+        }
+
+        private void ApplyRoleSwap(float duration)
+        {
+            // 같은 플레이어가 둘 다 담당하면 교체 불가
+            if (throttleSeatActorNumber == steeringSeatActorNumber)
+                return;
+
+            // 원래 역할 저장 (처음 교체 시에만)
+            if (!isRoleSwapped)
+            {
+                originalThrottleActor = throttleSeatActorNumber;
+                originalSteeringActor = steeringSeatActorNumber;
+            }
+
+            // 역할 교체
+            int temp = throttleSeatActorNumber;
+            throttleSeatActorNumber = steeringSeatActorNumber;
+            steeringSeatActorNumber = temp;
+
+            // 타이머 설정
+            roleSwapTimer = duration;
+            isRoleSwapped = true;
+
+            // 입력 초기화
+            throttleInput = 0f;
+            steeringInput = 0f;
+
+            Debug.Log($"[VehicleSeatManager] 역할 교체! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
+        }
+
+        private void RestoreOriginalRoles()
+        {
+            if (!isRoleSwapped)
+                return;
+
+            // 원래 역할로 복구
+            throttleSeatActorNumber = originalThrottleActor;
+            steeringSeatActorNumber = originalSteeringActor;
+
+            isRoleSwapped = false;
+            roleSwapTimer = 0f;
+
+            // 입력 초기화
+            throttleInput = 0f;
+            steeringInput = 0f;
+
+            Debug.Log($"[VehicleSeatManager] 역할 복구! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
         }
 
     }

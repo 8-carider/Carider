@@ -75,6 +75,7 @@ MonoBehaviour:
   - RPC_PreviewVehicle
   - RPC_ForcePositionSync
   - RPC_ForceMaxSpeed
+  - RPC_SwapRoles
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
