@@ -126,12 +126,6 @@ namespace Ilumisoft.SkillDrive.Input
 
             int myActor = PhotonNetwork.LocalPlayer?.ActorNumber ?? -1;
             bool isAssigned = seatManager.IsPlayerAssigned(myActor);
-            
-            // 디버그 로그 (첫 프레임만)
-            if (Time.frameCount % 60 == 0)
-            {
-                Debug.Log($"[VehiclePlayerInput] {gameObject.name}: MyActor={myActor}, Assigned={isAssigned}");
-            }
 
             // Canvas 활성화/비활성화 - 자신의 차량일 때만 보여주기
             if (wasdCanvas != null)

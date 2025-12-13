@@ -115,7 +115,11 @@ namespace Ilumisoft.SkillDrive.Game
                     rotation = collectable.transform.rotation,
                     prefab = Resources.Load<GameObject>("Collectable2")
                 };
-                Debug.Log($"[CollectableManager] Collectable2 등록: ID={key}, 위치={collectable.transform.position}");
+                Debug.Log($"[CollectableManager] Collectable2 등록 성공: ID={key}, 이름={collectable.gameObject.name}, 위치={collectable.transform.position}");
+            }
+            else
+            {
+                Debug.LogWarning($"[CollectableManager] SpawnPointID 중복! ID={key}, 기존 등록된 위치={collectable2SpawnPoints[key].position}, 새 오브젝트={collectable.gameObject.name} (무시됨)");
             }
         }
 

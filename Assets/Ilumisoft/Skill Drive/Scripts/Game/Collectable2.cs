@@ -11,7 +11,7 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField]
         private GameObject particlesPrefab = null;
 
-        [SerializeField, Tooltip("이 Collectable2의 고유 ID (맵에서 각각 다르게 설정)")]
+        [SerializeField, Tooltip("이 Collectable2의 고유 ID (자동 생성됨, 수동 설정 가능)")]
         private int spawnPointID = 0;
 
         public int SpawnPointID => spawnPointID;
@@ -23,12 +23,28 @@ namespace Ilumisoft.SkillDrive.Game
             spawnPointID = id;
         }
 
+        private void Awake()
+        {
+            // SpawnPointID가 0이면 InstanceID를 기반으로 자동 생성
+            if (spawnPointID == 0)
+            {
+                spawnPointID = Mathf.Abs(GetInstanceID());
+            }
+        }
+
         private void Start()
         {
+            // SpawnPointID 확인
+            Debug.Log($"[Collectable2] {gameObject.name} 시작: SpawnPointID={spawnPointID}, 위치={transform.position}");
+            
             // CollectableManager에 등록 (위치 저장)
             if (CollectableManager.Instance != null)
             {
                 CollectableManager.Instance.RegisterCollectable2(this);
+            }
+            else
+            {
+                Debug.LogWarning($"[Collectable2] CollectableManager.Instance가 null입니다!");
             }
 
             // RadarSystem 자동 등록
@@ -75,6 +91,8 @@ namespace Ilumisoft.SkillDrive.Game
 
             OnCollect?.Invoke();
 
+            Debug.Log($"[Collectable2] {gameObject.name} 먹힘: SpawnPointID={spawnPointID}, 마스터={PhotonNetwork.IsMasterClient}");
+
             // 🔥 리스폰: CollectableManager 중앙 관리로 통합
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
@@ -93,17 +111,22 @@ namespace Ilumisoft.SkillDrive.Game
             CollectableManager.Instance?.OnCollectable2PickedUp(this);
 #endif
 
-            // === 파괴 처리 ===
+            // === 파괴 처리 (약간 지연하여 모든 클라이언트가 OnTriggerEnter 처리할 수 있도록) ===
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
-                PhotonView pv = PhotonView.Get(this);
-
-                if (pv != null && !pv.IsMine)
+                // 콜라이더 비활성화로 중복 충돌 방지
+                var col = GetComponent<Collider>();
+                if (col != null) col.enabled = false;
+                
+                // 렌더러도 비활성화 (시각적으로 즉시 사라짐)
+                var renderers = GetComponentsInChildren<Renderer>();
+                foreach (var renderer in renderers)
                 {
-                    pv.RequestOwnership();
-                    return;
+                    renderer.enabled = false;
                 }
+                
+                PhotonView pv = PhotonView.Get(this);
 
                 if (!PhotonNetwork.IsMasterClient)
                 {
@@ -112,15 +135,20 @@ namespace Ilumisoft.SkillDrive.Game
                 }
                 else
                 {
-                    PhotonNetwork.Destroy(gameObject);
+                    // 마스터는 약간 지연 후 파괴
+                    StartCoroutine(DestroyAfterDelay(0.1f));
                 }
             }
             else
             {
-                Destroy(gameObject);
+                var col = GetComponent<Collider>();
+                if (col != null) col.enabled = false;
+                Destroy(gameObject, 0.1f);
             }
 #else
-            Destroy(gameObject);
+            var col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+            Destroy(gameObject, 0.1f);
 #endif
         }
 
@@ -129,6 +157,16 @@ namespace Ilumisoft.SkillDrive.Game
         private void RPC_RequestDestroy()
         {
             if (PhotonNetwork.IsMasterClient)
+            {
+                StartCoroutine(DestroyAfterDelay(0.1f));
+            }
+        }
+
+        private System.Collections.IEnumerator DestroyAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            
+            if (PhotonNetwork.IsMasterClient && gameObject != null)
             {
                 PhotonNetwork.Destroy(gameObject);
             }

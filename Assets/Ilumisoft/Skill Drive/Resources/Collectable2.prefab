@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Collectable2
   particlesPrefab: {fileID: 2879622467641632436, guid: c44dd4419c3c31a4785e5ab016df3114, type: 3}
+  spawnPointID: 0
 --- !u!1 &5489907549315065674
 GameObject:
   m_ObjectHideFlags: 0
