@@ -437,6 +437,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d28604db03ff51e4a8604a4576bfb048, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vehicleSpeedParticlePrefab: {fileID: 1957075435711846, guid: d430ed7bfc308284b8cd185ac91b03e2, type: 3}
   stats:
     MaxSpeed: 40
     Acceleration: 25

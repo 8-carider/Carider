@@ -1,10 +1,10 @@
-﻿    using Ilumisoft.SkillDrive.Input;
-    using Photon.Pun;
-    using Ilumisoft.SkillDrive.Network;
-    using UnityEngine;
+﻿using Ilumisoft.SkillDrive.Input;
+using Photon.Pun;
+using Ilumisoft.SkillDrive.Network;
+using UnityEngine;
 
-    namespace Ilumisoft.SkillDrive
-    {
+namespace Ilumisoft.SkillDrive
+{
     public class Vehicle : MonoBehaviour
     {
         // 스피드업 효과 관련 필드
@@ -13,11 +13,19 @@
         private float originalAcceleration;
         private float originalMaxSpeed;
 
+        // 최대 속도 강제 고정 관련 필드
+        private float forceMaxSpeedTimer = 0f;
+        private ParticleSystem vehicleSpeedParticles = null;
+
+        [SerializeField, Tooltip("차량 주변에 생성될 스피드업 파티클 프리팹")]
+        private GameObject vehicleSpeedParticlePrefab = null;
+
         // 스피드업 활성화 여부 (제트엔진 파티클용)
-        public bool IsSpeedUpActive => speedUpTimer > 0f;
+        public bool IsSpeedUpActive => speedUpTimer > 0f || forceMaxSpeedTimer > 0f;
         public float SpeedUpMultiplier => speedUpMultiplier;
-    [SerializeField]
-    private VehicleStats stats = new VehicleStats();
+
+        [SerializeField]
+        private VehicleStats stats = new VehicleStats();
 
     [SerializeField]
     private VehiclePhysics physics = new VehiclePhysics();
@@ -97,6 +105,35 @@
             }
         }
 
+        // 최대 속도 강제 고정 타이머 처리
+        if (forceMaxSpeedTimer > 0f)
+        {
+            forceMaxSpeedTimer -= Time.fixedDeltaTime;
+            
+            // 타이머 종료 시 차량 파티클 제거
+            if (forceMaxSpeedTimer <= 0f)
+            {
+                RemoveVehicleSpeedParticles();
+            }
+            
+            // 현재 속도를 최대 속도로 강제 설정
+            if (IsGrounded && CanMove)
+            {
+                Vector3 velocity = Rigidbody.linearVelocity;
+                Vector3 forwardDirection = transform.forward;
+                
+                // 입력에 따라 방향 결정 (뒤키를 누르면 후진, 아니면 전진)
+                float direction = (Input.y < 0) ? -1f : 1f;
+                
+                // 목표 속도
+                float targetSpeed = FinalStats.MaxSpeed * direction;
+                
+                // 즉시 최대 속도로 설정 (좌우 속도는 유지)
+                velocity = forwardDirection * targetSpeed + transform.right * Vector3.Dot(velocity, transform.right);
+                Rigidbody.linearVelocity = velocity;
+            }
+        }
+
         CollectInput();
         PerformGroundCheck();
         ApplyGravity();
@@ -126,6 +163,84 @@
     }
 
     /// <summary>
+    /// 일정 시간 동안 차량을 원래 최대 속도로 강제 고정
+    /// </summary>
+    public void ForceMaxSpeed(float duration)
+    {
+        // Photon RPC로 모든 클라이언트에 동기화
+#if PHOTON_UNITY_NETWORKING
+        PhotonView photonView = PhotonView.Get(this);
+        if (photonView != null && PhotonNetwork.InRoom)
+        {
+            photonView.RPC("RPC_ForceMaxSpeed", RpcTarget.All, duration);
+        }
+        else
+        {
+            // 싱글플레이 또는 PhotonView 없을 때
+            ApplyForceMaxSpeed(duration);
+        }
+#else
+        ApplyForceMaxSpeed(duration);
+#endif
+    }
+
+#if PHOTON_UNITY_NETWORKING
+    [PunRPC]
+    private void RPC_ForceMaxSpeed(float duration)
+    {
+        ApplyForceMaxSpeed(duration);
+    }
+#endif
+
+    /// <summary>
+    /// 최대 속도 강제 고정 효과 실제 적용
+    /// </summary>
+    private void ApplyForceMaxSpeed(float duration)
+    {
+        forceMaxSpeedTimer = duration;
+        CreateVehicleSpeedParticles();
+    }
+
+    /// <summary>
+    /// 차량 주변에 스피드 파티클 생성
+    /// </summary>
+    private void CreateVehicleSpeedParticles()
+    {
+        if (vehicleSpeedParticlePrefab == null) return;
+        
+        // 이미 존재하면 재사용
+        if (vehicleSpeedParticles != null)
+        {
+            vehicleSpeedParticles.Play();
+            return;
+        }
+
+        // 차량의 자식으로 파티클 생성
+        GameObject particleObj = Instantiate(vehicleSpeedParticlePrefab, transform);
+        particleObj.transform.localPosition = Vector3.zero;
+        particleObj.transform.localRotation = Quaternion.identity;
+        
+        vehicleSpeedParticles = particleObj.GetComponent<ParticleSystem>();
+        if (vehicleSpeedParticles != null)
+        {
+            vehicleSpeedParticles.Play();
+        }
+    }
+
+    /// <summary>
+    /// 차량 스피드 파티클 제거
+    /// </summary>
+    private void RemoveVehicleSpeedParticles()
+    {
+        if (vehicleSpeedParticles != null)
+        {
+            vehicleSpeedParticles.Stop();
+            Destroy(vehicleSpeedParticles.gameObject, 2f); // 2초 후 삭제 (파티클이 자연스럽게 사라지도록)
+            vehicleSpeedParticles = null;
+        }
+    }
+
+    /// <summary>
     /// 스피드업 효과를 즉시 초기화 (리스폰 시 사용)
     /// </summary>
     public void ResetSpeedUp()
@@ -138,6 +253,10 @@
             speedUpMultiplier = 1f;
             speedUpTimer = 0f;
         }
+        
+        // 최대 속도 강제 효과도 초기화
+        forceMaxSpeedTimer = 0f;
+        RemoveVehicleSpeedParticles();
     }
 
     /// <summary>

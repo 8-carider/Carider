@@ -69,11 +69,20 @@ namespace Ilumisoft.SkillDrive.Game
                 }
 #endif
 
-                // 차량에 스피드업 효과 적용
-                var vehicle = other.GetComponent<Vehicle>();
-                if (vehicle != null)
+                // 아이템을 먹은 차량을 제외한 다른 모든 차량에 최대 속도 강제 고정 효과 적용
+                var myVehicle = other.GetComponent<Vehicle>();
+                if (myVehicle != null)
                 {
-                    vehicle.ApplySpeedUp(speedUpDuration, speedUpMultiplier);
+                    // 씬의 모든 차량 찾기
+                    var allVehicles = FindObjectsOfType<Vehicle>();
+                    foreach (var vehicle in allVehicles)
+                    {
+                        // 아이템을 먹은 차량을 제외한 나머지 차량들에게만 적용
+                        if (vehicle != myVehicle)
+                        {
+                            vehicle.ForceMaxSpeed(speedUpDuration);
+                        }
+                    }
                 }
 
                 OnCollect?.Invoke();
