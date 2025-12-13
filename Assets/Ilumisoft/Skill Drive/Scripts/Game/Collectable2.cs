@@ -79,7 +79,11 @@ namespace Ilumisoft.SkillDrive.Game
 #if PHOTON_UNITY_NETWORKING
             if (PhotonNetwork.InRoom)
             {
-                CollectableManager.Instance?.OnCollectable2PickedUp(this);
+                // 마스터만 리스폰 처리 (중복 방지)
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    CollectableManager.Instance?.OnCollectable2PickedUp(this);
+                }
             }
             else
             {

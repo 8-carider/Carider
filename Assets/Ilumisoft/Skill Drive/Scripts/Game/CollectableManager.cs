@@ -133,27 +133,7 @@ namespace Ilumisoft.SkillDrive.Game
                 return;
             }
 
-            if (PhotonNetwork.IsMasterClient)
-            {
-                respawningKeys.Add(key);
-                StartCoroutine(RespawnCollectable2Coroutine(key));
-            }
-            else
-            {
-                photonView.RPC("RPC_OnCollectable2PickedUp", RpcTarget.MasterClient, key);
-            }
-        }
-
-        [PunRPC]
-        private void RPC_OnCollectable2PickedUp(string key)
-        {
-            // 이미 리스폰 중이면 무시
-            if (respawningKeys.Contains(key))
-            {
-                Debug.Log($"[CollectableManager] RPC: 이미 리스폰 중: ID={key}");
-                return;
-            }
-
+            // 마스터만 실행 (이미 Collectable2에서 마스터 체크를 했지만 안전장치)
             if (PhotonNetwork.IsMasterClient)
             {
                 respawningKeys.Add(key);
