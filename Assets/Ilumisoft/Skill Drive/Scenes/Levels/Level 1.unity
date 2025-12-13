@@ -32225,6 +32225,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6373790046151622197, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: photonPrefabNames.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6373790046151622197, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: collectablePrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6373790046151622197, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: 'photonPrefabNames.Array.data[1]'
+      value: PowerIconSkullv2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6373790046151622197, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
+      propertyPath: 'collectablePrefabs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1424016689071528415, guid: b63ade3a2a73e9d479413bc38ca048d6, type: 3}
     - target: {fileID: 7095281162756934040, guid: 5758304666eb1fa49b56d9bccc2a2764, type: 3}
       propertyPath: m_Name
       value: Game Manager

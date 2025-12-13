@@ -57,7 +57,7 @@ namespace Ilumisoft.SkillDrive.Game
                 {
                     if (PhotonNetwork.InRoom)
                     {
-                        PhotonNetwork.Instantiate("RoleSwapParticles", transform.position, transform.rotation);
+                        PhotonNetwork.Instantiate("PowerIconSkullv2", transform.position, transform.rotation);
                     }
                     else
                     {

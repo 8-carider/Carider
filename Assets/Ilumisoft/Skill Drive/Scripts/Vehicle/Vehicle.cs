@@ -96,12 +96,20 @@ namespace Ilumisoft.SkillDrive
         if (speedUpTimer > 0f)
         {
             speedUpTimer -= Time.fixedDeltaTime;
+            
+            // 매 프레임마다 FinalStats 값 확인 (문제 진단용)
+            if (Time.frameCount % 50 == 0) // 50프레임마다 로그 출력
+            {
+                Debug.Log($"[Vehicle FixedUpdate] 현재 Accel={FinalStats.Acceleration}, MaxSpeed={FinalStats.MaxSpeed}, 타이머={speedUpTimer}");
+            }
+            
             if (speedUpTimer <= 0f)
             {
                 // 원래 값 복구
                 FinalStats.Acceleration = originalAcceleration;
                 FinalStats.MaxSpeed = originalMaxSpeed;
                 speedUpMultiplier = 1f;
+                Debug.Log($"[Vehicle] 스피드업 종료, 원래 값 복구: Accel={FinalStats.Acceleration}, MaxSpeed={FinalStats.MaxSpeed}");
             }
         }
 
@@ -146,11 +154,14 @@ namespace Ilumisoft.SkillDrive
     /// </summary>
     public void ApplySpeedUp(float duration, float multiplier)
     {
+        Debug.Log($"[Vehicle] ApplySpeedUp 호출됨: duration={duration}, multiplier={multiplier}, 현재 타이머={speedUpTimer}");
+        
         // 첫 번째 스피드업이면 원래 값 저장
         if (speedUpTimer <= 0f)
         {
             originalAcceleration = FinalStats.Acceleration;
             originalMaxSpeed = FinalStats.MaxSpeed;
+            Debug.Log($"[Vehicle] 원래 값 저장: Accel={originalAcceleration}, MaxSpeed={originalMaxSpeed}");
         }
         
         // 타이머 추가 (누적)
@@ -160,6 +171,8 @@ namespace Ilumisoft.SkillDrive
         speedUpMultiplier = multiplier;
         FinalStats.Acceleration = originalAcceleration * multiplier;
         FinalStats.MaxSpeed = originalMaxSpeed * multiplier;
+        
+        Debug.Log($"[Vehicle] 스피드업 적용 완료: 새 Accel={FinalStats.Acceleration}, 새 MaxSpeed={FinalStats.MaxSpeed}, 타이머={speedUpTimer}");
     }
 
     /// <summary>

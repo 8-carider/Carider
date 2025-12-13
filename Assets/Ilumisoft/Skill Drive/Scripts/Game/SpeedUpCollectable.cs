@@ -61,7 +61,7 @@ namespace Ilumisoft.SkillDrive.Game
                 {
                     if (PhotonNetwork.InRoom)
                     {
-                        PhotonNetwork.Instantiate("SpeedUpParticles", transform.position, transform.rotation);
+                        PhotonNetwork.Instantiate("PowerIconSpeedv3", transform.position, transform.rotation);
                     }
                     else
                     {
@@ -75,11 +75,23 @@ namespace Ilumisoft.SkillDrive.Game
                 }
 #endif
 
-                // 차량에 스피드업 효과 적용
-                var vehicle = other.GetComponent<Vehicle>();
-                if (vehicle != null)
+                // 아이템을 먹은 차량을 제외한 다른 모든 차량을 최대 속도로 강제 이동
+                var myVehicle = other.GetComponent<Vehicle>();
+                if (myVehicle != null)
                 {
-                    vehicle.ApplySpeedUp(speedUpDuration, speedUpMultiplier);
+                    var allVehicles = FindObjectsOfType<Vehicle>();
+                    foreach (var vehicle in allVehicles)
+                    {
+                        if (vehicle != myVehicle)
+                        {
+                            Debug.Log($"[SpeedUpCollectable] 상대 차량({vehicle.name})에게 최대 속도 강제 적용: duration={speedUpDuration}");
+                            vehicle.ForceMaxSpeed(speedUpDuration);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[SpeedUpCollectable] Vehicle 컴포넌트를 찾을 수 없음: {other.name}");
                 }
 
                 // 사운드 재생 (먹은 차량의 AudioSource에서)
@@ -98,11 +110,8 @@ namespace Ilumisoft.SkillDrive.Game
                 if (PhotonNetwork.InRoom)
                 {
                     PhotonView photonView = PhotonView.Get(this);
-                    if (photonView != null && !photonView.IsMine)
-                    {
-                        photonView.RequestOwnership();
-                        return;
-                    }
+                    
+                    // 마스터 클라이언트가 아니면 마스터에게 파괴 요청
                     if (!PhotonNetwork.IsMasterClient)
                     {
                         if (photonView != null)
@@ -112,7 +121,7 @@ namespace Ilumisoft.SkillDrive.Game
                     }
                     else
                     {
-                        // 마스터 클라이언트에서만 재생성 예약
+                        // 마스터 클라이언트에서만 재생성 예약 및 파괴
                         TryScheduleRespawn();
                         PhotonNetwork.Destroy(gameObject);
                     }
