@@ -36,7 +36,7 @@ namespace Ilumisoft.SkillDrive.Game
         [Header("Spawn Checks")]
         [SerializeField] private float spawnCheckRadius = 0.6f;
         [SerializeField] private float obstacleCheckRadius = 1.0f;
-        [SerializeField] private int maxSpawnAttempts = 100;
+        [SerializeField] private int maxSpawnAttempts = 1000;
 
         [Header("Count")]
         [SerializeField] private int collectableCount = 10;
