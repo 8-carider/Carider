@@ -32,6 +32,10 @@ namespace Ilumisoft.SkillDrive.Network
         private int originalThrottleActor = -1;
         private int originalSteeringActor = -1;
         private bool isRoleSwapped = false;
+        private ParticleSystem roleSwapParticles = null;
+
+        [SerializeField, Tooltip("역할 교체 시 차량 주변에 생성될 파티클 프리팹")]
+        private GameObject roleSwapParticlePrefab = null;
 
         public bool IsRoleSwapped => isRoleSwapped;
 
@@ -218,6 +222,9 @@ namespace Ilumisoft.SkillDrive.Network
             throttleInput = 0f;
             steeringInput = 0f;
 
+            // 파티클 생성
+            CreateRoleSwapParticles();
+
             Debug.Log($"[VehicleSeatManager] 역할 교체! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
         }
 
@@ -237,7 +244,49 @@ namespace Ilumisoft.SkillDrive.Network
             throttleInput = 0f;
             steeringInput = 0f;
 
+            // 파티클 제거
+            RemoveRoleSwapParticles();
+
             Debug.Log($"[VehicleSeatManager] 역할 복구! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
+        }
+
+        /// <summary>
+        /// 차량 주변에 역할 교체 파티클 생성
+        /// </summary>
+        private void CreateRoleSwapParticles()
+        {
+            if (roleSwapParticlePrefab == null) return;
+            
+            // 이미 존재하면 재사용
+            if (roleSwapParticles != null)
+            {
+                roleSwapParticles.Play();
+                return;
+            }
+
+            // 차량의 자식으로 파티클 생성
+            GameObject particleObj = Instantiate(roleSwapParticlePrefab, transform);
+            particleObj.transform.localPosition = Vector3.zero;
+            particleObj.transform.localRotation = Quaternion.identity;
+            
+            roleSwapParticles = particleObj.GetComponent<ParticleSystem>();
+            if (roleSwapParticles != null)
+            {
+                roleSwapParticles.Play();
+            }
+        }
+
+        /// <summary>
+        /// 역할 교체 파티클 제거
+        /// </summary>
+        private void RemoveRoleSwapParticles()
+        {
+            if (roleSwapParticles != null)
+            {
+                roleSwapParticles.Stop();
+                Destroy(roleSwapParticles.gameObject, 2f);
+                roleSwapParticles = null;
+            }
         }
 
     }

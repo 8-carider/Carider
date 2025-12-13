@@ -31989,6 +31989,10 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5512314989168647493, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
+      propertyPath: roleSwapParticlePrefab
+      value: 
+      objectReference: {fileID: 1424016689071528415, guid: b63ade3a2a73e9d479413bc38ca048d6, type: 3}
     - target: {fileID: 7562906232898423908, guid: c36826e3e866e584cb5b8b45c3003d8f, type: 3}
       propertyPath: stats.Grip
       value: 0.51
