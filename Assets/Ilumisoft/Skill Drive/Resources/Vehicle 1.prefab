@@ -442,7 +442,7 @@ MonoBehaviour:
     MaxSpeed: 40
     Acceleration: 25
     SteeringPower: 1.5
-    Grip: 0.8
+    Grip: 0.51
   physics:
     CenterOfMass: {fileID: 8285289005778007049}
     gravity: 20
@@ -467,10 +467,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39dee8d330a413f479d766f622b29fc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WKey: {fileID: 0}
-  AKey: {fileID: 0}
-  SKey: {fileID: 0}
-  DKey: {fileID: 0}
+  WKey: {fileID: 2932405333086664601}
+  AKey: {fileID: 7049335288111365594}
+  SKey: {fileID: 4161722403944421756}
+  DKey: {fileID: 6761973832581310805}
   pressedColor: {r: 0.4, g: 0.4, b: 0.4, a: 1}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!65 &7755348753579058470
@@ -543,6 +543,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Ilumisoft.SkillDrive.Network.VehicleSeatManager
   throttleSeatActorNumber: -1
   steeringSeatActorNumber: -1
+  roleSwapParticlePrefab: {fileID: 6898843469999874674, guid: cc984613408d50841a3ac8429425b514, type: 3}
+  roleSwapLoopSound: {fileID: 8300000, guid: 627f97da22d84554aa4ceb39ae3323e1, type: 3}
+  loopSoundVolume: 0.5
 --- !u!114 &9080675938443539647
 MonoBehaviour:
   m_ObjectHideFlags: 0

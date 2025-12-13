@@ -4939,6 +4939,8 @@ MonoBehaviour:
   speedUpDuration: 3
   speedUpMultiplier: 1.5
   respawnDelay: 8
+  collectSound: {fileID: 8300000, guid: cb62b89a3bd15374ebd95e483b3aca11, type: 3}
+  soundVolume: 1
 --- !u!1 &8895338483242430715
 GameObject:
   m_ObjectHideFlags: 0

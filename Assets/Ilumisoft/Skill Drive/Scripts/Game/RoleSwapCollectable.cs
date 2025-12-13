@@ -17,6 +17,12 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("해당 아이템을 먹은 후 재생성까지 대기 시간(초). 0 이하이면 재생성 안 함")]
         private float respawnDelay = 10.0f;
 
+        [SerializeField, Tooltip("아이템 수집 시 재생할 사운드")]
+        private AudioClip collectSound = null;
+
+        [SerializeField, Tooltip("사운드 볼륨")]
+        private float soundVolume = 1.0f;
+
         public UnityAction OnCollect = null;
 
         private void Start()
@@ -80,6 +86,16 @@ namespace Ilumisoft.SkillDrive.Game
                                 seatManager.SwapRoles(swapDuration);
                             }
                         }
+                    }
+                }
+
+                // 사운드 재생 (먹은 차량의 AudioSource에서)
+                if (collectSound != null)
+                {
+                    var audioSource = other.GetComponent<AudioSource>();
+                    if (audioSource != null)
+                    {
+                        audioSource.PlayOneShot(collectSound, soundVolume);
                     }
                 }
 

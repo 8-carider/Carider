@@ -33,9 +33,16 @@ namespace Ilumisoft.SkillDrive.Network
         private int originalSteeringActor = -1;
         private bool isRoleSwapped = false;
         private ParticleSystem roleSwapParticles = null;
+        private AudioSource roleSwapAudioSource = null;
 
         [SerializeField, Tooltip("역할 교체 시 차량 주변에 생성될 파티클 프리팹")]
         private GameObject roleSwapParticlePrefab = null;
+
+        [SerializeField, Tooltip("역할 교체 지속 시간 동안 재생될 루핑 사운드")]
+        private AudioClip roleSwapLoopSound = null;
+
+        [SerializeField, Tooltip("지속 사운드 볼륨")]
+        private float loopSoundVolume = 0.5f;
 
         public bool IsRoleSwapped => isRoleSwapped;
 
@@ -200,13 +207,17 @@ namespace Ilumisoft.SkillDrive.Network
         {
             // 같은 플레이어가 둘 다 담당하면 교체 불가
             if (throttleSeatActorNumber == steeringSeatActorNumber)
+            {
+                Debug.Log($"[VehicleSeatManager] {gameObject.name}: 역할 교체 불가 (혼자 조종)");
                 return;
+            }
 
             // 원래 역할 저장 (처음 교체 시에만)
             if (!isRoleSwapped)
             {
                 originalThrottleActor = throttleSeatActorNumber;
                 originalSteeringActor = steeringSeatActorNumber;
+                Debug.Log($"[VehicleSeatManager] {gameObject.name}: 원래 역할 저장 - Throttle: {originalThrottleActor}, Steering: {originalSteeringActor}");
             }
 
             // 역할 교체
@@ -225,7 +236,10 @@ namespace Ilumisoft.SkillDrive.Network
             // 파티클 생성
             CreateRoleSwapParticles();
 
-            Debug.Log($"[VehicleSeatManager] 역할 교체! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
+            // 지속 사운드 재생
+            PlayRoleSwapLoopSound();
+
+            Debug.Log($"[VehicleSeatManager] {gameObject.name}: 역할 교체 완료! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
         }
 
         private void RestoreOriginalRoles()
@@ -246,6 +260,9 @@ namespace Ilumisoft.SkillDrive.Network
 
             // 파티클 제거
             RemoveRoleSwapParticles();
+
+            // 지속 사운드 중지
+            StopRoleSwapLoopSound();
 
             Debug.Log($"[VehicleSeatManager] 역할 복구! Throttle: {throttleSeatActorNumber}, Steering: {steeringSeatActorNumber}");
         }
@@ -286,6 +303,45 @@ namespace Ilumisoft.SkillDrive.Network
                 roleSwapParticles.Stop();
                 Destroy(roleSwapParticles.gameObject, 2f);
                 roleSwapParticles = null;
+            }
+        }
+
+        /// <summary>
+        /// 역할 교체 지속 사운드 재생
+        /// </summary>
+        private void PlayRoleSwapLoopSound()
+        {
+            if (roleSwapLoopSound == null) return;
+
+            // AudioSource가 없으면 찾거나 생성
+            if (roleSwapAudioSource == null)
+            {
+                roleSwapAudioSource = GetComponent<AudioSource>();
+                if (roleSwapAudioSource == null)
+                {
+                    roleSwapAudioSource = gameObject.AddComponent<AudioSource>();
+                    roleSwapAudioSource.playOnAwake = false;
+                    roleSwapAudioSource.spatialBlend = 1.0f; // 3D 사운드
+                    roleSwapAudioSource.minDistance = 5f;
+                    roleSwapAudioSource.maxDistance = 50f;
+                }
+            }
+
+            // 루핑 사운드 재생
+            roleSwapAudioSource.clip = roleSwapLoopSound;
+            roleSwapAudioSource.volume = loopSoundVolume;
+            roleSwapAudioSource.loop = true;
+            roleSwapAudioSource.Play();
+        }
+
+        /// <summary>
+        /// 역할 교체 지속 사운드 중지
+        /// </summary>
+        private void StopRoleSwapLoopSound()
+        {
+            if (roleSwapAudioSource != null && roleSwapAudioSource.isPlaying)
+            {
+                roleSwapAudioSource.Stop();
             }
         }
 

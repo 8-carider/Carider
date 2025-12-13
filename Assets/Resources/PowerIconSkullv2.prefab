@@ -14792,6 +14792,8 @@ MonoBehaviour:
   particlesPrefab: {fileID: 0}
   swapDuration: 20
   respawnDelay: 10
+  collectSound: {fileID: 8300000, guid: cb62b89a3bd15374ebd95e483b3aca11, type: 3}
+  soundVolume: 1
 --- !u!114 &901494556093132657
 MonoBehaviour:
   m_ObjectHideFlags: 0

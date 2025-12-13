@@ -20,6 +20,12 @@ namespace Ilumisoft.SkillDrive.Game
         [SerializeField, Tooltip("해당 아이템을 먹은 후 재생성까지 대기 시간(초). 0 이하이면 재생성 안 함")]
         private float respawnDelay = 8.0f;
 
+        [SerializeField, Tooltip("아이템 수집 시 재생할 사운드")]
+        private AudioClip collectSound = null;
+
+        [SerializeField, Tooltip("사운드 볼륨")]
+        private float soundVolume = 1.0f;
+
         public UnityAction OnCollect = null;
 
         private void Start()
@@ -69,19 +75,20 @@ namespace Ilumisoft.SkillDrive.Game
                 }
 #endif
 
-                // 아이템을 먹은 차량을 제외한 다른 모든 차량에 최대 속도 강제 고정 효과 적용
-                var myVehicle = other.GetComponent<Vehicle>();
-                if (myVehicle != null)
+                // 차량에 스피드업 효과 적용
+                var vehicle = other.GetComponent<Vehicle>();
+                if (vehicle != null)
                 {
-                    // 씬의 모든 차량 찾기
-                    var allVehicles = FindObjectsOfType<Vehicle>();
-                    foreach (var vehicle in allVehicles)
+                    vehicle.ApplySpeedUp(speedUpDuration, speedUpMultiplier);
+                }
+
+                // 사운드 재생 (먹은 차량의 AudioSource에서)
+                if (collectSound != null)
+                {
+                    var audioSource = other.GetComponent<AudioSource>();
+                    if (audioSource != null)
                     {
-                        // 아이템을 먹은 차량을 제외한 나머지 차량들에게만 적용
-                        if (vehicle != myVehicle)
-                        {
-                            vehicle.ForceMaxSpeed(speedUpDuration);
-                        }
+                        audioSource.PlayOneShot(collectSound, soundVolume);
                     }
                 }
 
