@@ -62,11 +62,11 @@ namespace Ilumisoft.SkillDrive.Game
                 Instantiate(particlesPrefab, transform.position, transform.rotation);
             }
 
-            // 점수 +5
+            // 점수 +2
             var vehicleCollectables = other.GetComponent<VehicleCollectables>();
             if (vehicleCollectables != null)
             {
-                vehicleCollectables.AddCollectable(5);
+                vehicleCollectables.AddCollectable(2);
             }
 
             OnCollect?.Invoke();
